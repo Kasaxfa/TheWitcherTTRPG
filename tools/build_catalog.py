@@ -119,10 +119,11 @@ def validate_catalog(connection: sqlite3.Connection) -> None:
         raise sqlite3.DatabaseError(f"Alchemy symbols must refer to ingredients: {bad_symbol}")
 
 
-def export_site_data(connection: sqlite3.Connection) -> int:
+def build_site_data(connection: sqlite3.Connection) -> dict[str, Any]:
     query = """
-        SELECT r.recipe_id, r.title, r.recipe_type, c.label AS category,
-               t.label AS tier, r.craft_dc, r.crafting_time
+        SELECT r.recipe_id, r.title, r.recipe_type, r.category_id,
+               c.label AS category, t.tier_code, t.label AS tier,
+               r.craft_dc, r.crafting_time
         FROM recipes r
         JOIN recipe_categories c ON c.category_id = r.category_id
         LEFT JOIN skill_tiers t ON t.tier_code = r.tier_code
@@ -149,40 +150,168 @@ def export_site_data(connection: sqlite3.Connection) -> int:
                 (recipe["recipe_id"],),
             )
         ]
+        outputs = [
+            {"itemId": output["item_id"], "name": output["name"], "quantity": output["quantity"]}
+            for output in connection.execute(
+                """SELECT o.item_id, i.name, o.quantity
+                   FROM recipe_outputs o JOIN items i ON i.item_id=o.item_id
+                   WHERE o.recipe_id=? ORDER BY o.item_id""",
+                (recipe["recipe_id"],),
+            )
+        ]
         result.append(
             {
+                "id": recipe["recipe_id"],
                 "type": recipe["recipe_type"],
+                "categoryId": recipe["category_id"],
                 "category": recipe["category"],
+                "tierCode": recipe["tier_code"],
                 "tier": recipe["tier"],
                 "name": recipe["title"],
                 "dc": str(recipe["craft_dc"]) if recipe["craft_dc"] is not None else "",
                 "time": recipe["crafting_time"] or "",
                 "ingredients": ingredients,
+                "outputs": outputs,
+                "sourcePages": source_pages,
                 "page": source_pages[0] if len(source_pages) == 1 else ", ".join(
                     str(page) for page in source_pages
                 ),
             }
         )
 
-    payload = json.dumps(result, ensure_ascii=False, separators=(",", ":"))
     symbols = {
-        row["item_id"]: {"name": row["name"], "color": row["color"], "path": row["svg_path"]}
+        row["item_id"]: {"name": row["name"], "code": row["symbol_code"], "color": row["color"], "path": row["svg_path"]}
         for row in connection.execute("""
-            SELECT s.item_id, i.name, s.color, s.svg_path
+            SELECT s.item_id, i.name, s.symbol_code, s.color, s.svg_path
             FROM alchemy_group_symbols s JOIN items i ON i.item_id=s.item_id
             ORDER BY s.symbol_code
         """)
     }
-    SITE_DATA_PATH.write_text(
-        "// Generated from database/catalog.sqlite3 by tools/build_catalog.py.\n"
-        "window.RECIPES = "
-        + payload
-        + ";\nwindow.ALCHEMY_SYMBOLS = "
-        + json.dumps(symbols, ensure_ascii=False, separators=(",", ":"))
-        + ";\n",
-        encoding="utf-8",
+    items: list[dict[str, Any]] = []
+    item_query = """
+        SELECT i.item_id, i.name, i.item_type, ty.label AS type_label,
+               i.description, i.weight_kg, i.cost_crowns
+        FROM items i JOIN item_types ty ON ty.item_type=i.item_type
+        ORDER BY ty.item_type, i.name COLLATE NOCASE, i.item_id
+    """
+    for item in connection.execute(item_query):
+        details: dict[str, Any] = {}
+        table_by_type = {
+            "ingredient": ("ingredient_details", ("habitat", "rarity", "acquisition_method", "alchemy_group", "notes")),
+            "alchemical": ("alchemical_details", ("effect", "duration", "toxicity", "application", "notes")),
+        }
+        if item["item_type"] in table_by_type:
+            table, fields = table_by_type[item["item_type"]]
+            row = connection.execute(f"SELECT {', '.join(fields)} FROM {table} WHERE item_id=?", (item["item_id"],)).fetchone()
+            if row:
+                details = {field: row[field] for field in fields if row[field] is not None}
+        attributes = [
+            {"code": row["attribute_code"], "label": row["label"],
+             "value": row["text_value"] if row["text_value"] is not None else row["numeric_value"],
+             "unit": row["unit"], "ordinal": row["ordinal"], "sourcePage": row["source_page"]}
+            for row in connection.execute("""
+                SELECT a.attribute_code, d.label, d.unit, a.text_value,
+                       a.numeric_value, a.ordinal, a.source_page
+                FROM item_attributes a JOIN attribute_definitions d USING(attribute_code)
+                WHERE a.item_id=? ORDER BY d.label, a.ordinal
+            """, (item["item_id"],))
+        ]
+        effects = [
+            {"order": row["effect_order"], "text": row["effect_text"],
+             "duration": row["duration"], "toxicity": row["toxicity"],
+             "application": row["application"], "sourcePage": row["source_page"]}
+            for row in connection.execute("""
+                SELECT effect_order, effect_text, duration, toxicity, application, source_page
+                FROM item_effects WHERE item_id=? ORDER BY effect_order
+            """, (item["item_id"],))
+        ]
+        pages = [row["page_number"] for row in connection.execute(
+            "SELECT DISTINCT page_number FROM item_sources WHERE item_id=? ORDER BY page_number",
+            (item["item_id"],),
+        )]
+        items.append({
+            "id": item["item_id"], "name": item["name"], "type": item["item_type"],
+            "typeLabel": item["type_label"], "description": item["description"],
+            "weightKg": item["weight_kg"], "costCrowns": item["cost_crowns"],
+            "details": details, "attributes": attributes, "effects": effects,
+            "sourcePages": pages, "symbol": symbols.get(item["item_id"]),
+        })
+    aliases = {
+        row["retired_item_id"]: row["current_item_id"]
+        for row in connection.execute("SELECT retired_item_id,current_item_id FROM item_id_aliases ORDER BY retired_item_id")
+    }
+    return {"recipes": result, "items": items, "symbols": symbols, "itemIdAliases": aliases}
+
+
+def render_site_data(data: dict[str, Any]) -> str:
+    return "// Generated from database/catalog.sqlite3 by tools/build_catalog.py. Do not edit manually.\n" + "".join(
+        f"window.{name} = {json.dumps(value, ensure_ascii=False, separators=(',', ':'))};\n"
+        for name, value in (
+            ("RECIPES", data["recipes"]), ("ITEMS", data["items"]),
+            ("ALCHEMY_SYMBOLS", data["symbols"]), ("ITEM_ID_ALIASES", data["itemIdAliases"]),
+        )
     )
-    return len(result)
+
+
+def validate_site_data(connection: sqlite3.Connection, data: dict[str, Any]) -> None:
+    item_ids = {item["id"] for item in data["items"]}
+    recipe_ids = {recipe["id"] for recipe in data["recipes"]}
+    if len(item_ids) != len(data["items"]):
+        raise sqlite3.DatabaseError("Export contains duplicate item IDs")
+    if len(recipe_ids) != len(data["recipes"]):
+        raise sqlite3.DatabaseError("Export contains duplicate recipe IDs")
+    for recipe in data["recipes"]:
+        for link in recipe["ingredients"] + recipe["outputs"]:
+            if link["itemId"] not in item_ids:
+                raise sqlite3.DatabaseError(f"Recipe {recipe['id']} has an exported link to a missing item")
+    for old_id, current_id in data["itemIdAliases"].items():
+        if old_id in item_ids or current_id not in item_ids:
+            raise sqlite3.DatabaseError(f"Invalid exported item ID alias: {old_id} -> {current_id}")
+    counts = (len(data["items"]), len(data["recipes"]))
+    expected = (
+        connection.execute("SELECT COUNT(*) FROM items").fetchone()[0],
+        connection.execute("SELECT COUNT(*) FROM recipes").fetchone()[0],
+    )
+    if counts != expected:
+        raise sqlite3.DatabaseError(f"Export count mismatch: {counts}, expected {expected}")
+    exported_counts = {
+        "recipe_ingredients": sum(len(recipe["ingredients"]) for recipe in data["recipes"]),
+        "recipe_outputs": sum(len(recipe["outputs"]) for recipe in data["recipes"]),
+        "item_attributes": sum(len(item["attributes"]) for item in data["items"]),
+        "item_effects": sum(len(item["effects"]) for item in data["items"]),
+        "alchemy_group_symbols": len(data["symbols"]),
+        "item_id_aliases": len(data["itemIdAliases"]),
+    }
+    for table, exported_count in exported_counts.items():
+        database_count = connection.execute(f"SELECT COUNT(*) FROM {table}").fetchone()[0]
+        if exported_count != database_count:
+            raise sqlite3.DatabaseError(
+                f"Export count mismatch for {table}: {exported_count}, expected {database_count}"
+            )
+    detail_fields = {
+        "ingredient_details": ("habitat", "rarity", "acquisition_method", "alchemy_group", "notes"),
+        "alchemical_details": ("effect", "duration", "toxicity", "application", "notes"),
+    }
+    for table, fields in detail_fields.items():
+        database_count = sum(
+            connection.execute(f"SELECT COUNT({field}) FROM {table}").fetchone()[0]
+            for field in fields
+        )
+        exported_count = sum(
+            sum(field in item["details"] for field in fields)
+            for item in data["items"]
+        )
+        if exported_count != database_count:
+            raise sqlite3.DatabaseError(
+                f"Exported {table} details mismatch: {exported_count}, expected {database_count}"
+            )
+
+
+def export_site_data(connection: sqlite3.Connection) -> int:
+    data = build_site_data(connection)
+    validate_site_data(connection, data)
+    SITE_DATA_PATH.write_text(render_site_data(data), encoding="utf-8")
+    return len(data["recipes"])
 
 
 def report_database(connection: sqlite3.Connection, recipe_count: int) -> None:
@@ -220,8 +349,12 @@ def main() -> int:
         validate_catalog(connection)
         recipe_count = connection.execute("SELECT COUNT(*) FROM recipes").fetchone()[0]
         if args.check:
+            expected_data = build_site_data(connection)
+            validate_site_data(connection, expected_data)
+            if not SITE_DATA_PATH.exists() or SITE_DATA_PATH.read_text(encoding="utf-8") != render_site_data(expected_data):
+                raise sqlite3.DatabaseError("data.js does not match the current database export; run tools/build_catalog.py")
             report_database(connection, recipe_count)
-            print("SQLite integrity, sources and ingredient links checked.")
+            print("SQLite integrity, sources, links and generated site data checked.")
             return 0
         exported_count = export_site_data(connection)
         if exported_count != recipe_count:

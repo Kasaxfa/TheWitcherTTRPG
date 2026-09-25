@@ -10,12 +10,16 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "tools"))
-from build_catalog import DATABASE_PATH, migrate_database, validate_catalog  # noqa: E402
+from build_catalog import (  # noqa: E402
+    DATABASE_PATH, SITE_DATA_PATH, build_site_data, migrate_database,
+    render_site_data, validate_catalog, validate_site_data,
+)
 
 
 class CatalogTests(unittest.TestCase):
     def setUp(self):
         self.connection = sqlite3.connect(DATABASE_PATH)
+        self.connection.row_factory = sqlite3.Row
         self.connection.execute("PRAGMA foreign_keys = ON")
 
     def tearDown(self):
@@ -51,6 +55,22 @@ class CatalogTests(unittest.TestCase):
             self.assertTrue(self.connection.execute("""
                 SELECT 1 FROM recipe_outputs WHERE item_id=? LIMIT 1
             """, (current[0],)).fetchone())
+
+    def test_export_contains_full_catalog_and_all_id_links(self):
+        data = build_site_data(self.connection)
+        validate_site_data(self.connection, data)
+        self.assertEqual(len(data["items"]), 252)
+        self.assertEqual(len(data["recipes"]), 147)
+        self.assertEqual(len(data["symbols"]), 9)
+        self.assertEqual(len(data["itemIdAliases"]), 4)
+        self.assertTrue(all(recipe["id"] and recipe["categoryId"] for recipe in data["recipes"]))
+        self.assertTrue(all(
+            link["itemId"] in {item["id"] for item in data["items"]}
+            for recipe in data["recipes"]
+            for link in recipe["ingredients"] + recipe["outputs"]
+        ))
+        exported = SITE_DATA_PATH.read_text(encoding="utf-8")
+        self.assertEqual(exported, render_site_data(data))
 
     def test_renames_and_reordering_do_not_change_ids_or_details(self):
         with tempfile.TemporaryDirectory() as directory:

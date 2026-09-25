@@ -3,8 +3,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#101712">
-  <meta name="description" content="Справочник формул алхимии и ремесленных чертежей для НРИ Ведьмак.">
+  <meta name="theme-color" content="#f5f7f6">
+  <meta name="description" content="Рецепты, предметы и личный инвентарь для НРИ Ведьмак.">
   <title>Кодекс ремесленника — Ведьмак НРИ</title>
   <link rel="stylesheet" href="./styles.css">
   <script src="./data.js" defer></script>
@@ -20,13 +20,13 @@
   </header>
 
   <main id="top" class="layout">
-    <aside class="sidebar" aria-label="Категории каталога">
-      <div class="sidebar-label">Каталог</div>
-      <button class="nav-item active" data-section="all"><span class="nav-icon">⌕</span>Все рецепты<span class="nav-count" id="count-all">0</span></button>
-      <button class="nav-item" data-section="alchemy"><span class="nav-icon">◉</span>Алхимия<span class="nav-count" id="count-alchemy">0</span></button>
-      <button class="nav-item" data-section="weapon"><span class="nav-icon">⚔</span>Оружие<span class="nav-count" id="count-weapon">0</span></button>
-      <button class="nav-item" data-section="armor"><span class="nav-icon">⬡</span>Броня<span class="nav-count" id="count-armor">0</span></button>
-      <button class="nav-item" data-section="material"><span class="nav-icon">◇</span>Компоненты<span class="nav-count" id="count-material">0</span></button>
+    <aside class="sidebar" aria-label="Разделы сайта">
+      <div class="sidebar-label">Мастерская</div>
+      <nav class="section-nav" aria-label="Разделы">
+        <button class="nav-item active" data-page="recipes" aria-current="page"><span class="nav-icon">⌕</span>Рецепты<span class="nav-count" id="count-recipes">0</span></button>
+        <button class="nav-item" data-page="items"><span class="nav-icon">◇</span>Предметы<span class="nav-count" id="count-items">0</span></button>
+        <button class="nav-item" data-page="inventory"><span class="nav-icon">▤</span>Инвентарь<span class="nav-count" id="count-inventory">0</span></button>
+      </nav>
       <div class="sidebar-rule"></div>
       <div class="source-card">
         <span class="source-kicker">Источник</span>
@@ -35,52 +35,74 @@
       </div>
     </aside>
 
-    <section class="workspace" aria-labelledby="page-title">
-      <div class="workspace-head">
-        <div>
-          <div class="eyebrow"><span class="eyebrow-line"></span>Архив мастерской</div>
-          <h1 id="page-title">Рецепты и чертежи</h1>
-          <p class="intro">Ищите формулу по названию или нужному компоненту.</p>
+    <div class="workspace">
+      <section id="recipes-page" class="page-view" aria-labelledby="recipe-title">
+        <div class="workspace-head">
+          <div>
+            <div class="eyebrow"><span class="eyebrow-line"></span>Архив мастерской</div>
+            <h1 id="recipe-title">Рецепты и чертежи</h1>
+            <p class="intro">Найдите формулу, снаряжение или нужный компонент.</p>
+          </div>
+          <div class="result-badge"><strong id="result-count">0</strong><span>рецептов</span></div>
         </div>
-        <div class="result-badge"><strong id="result-count">0</strong><span>записей</span></div>
-      </div>
+        <div class="controls">
+          <label class="searchbox"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Название или компонент…" autocomplete="off" aria-label="Поиск по рецептам"><kbd>/</kbd></label>
+          <label class="select-wrap"><span class="sr-only">Уровень ремесла</span><select id="tier-filter"><option value="">Любой уровень</option><option value="Новичок">Новичок</option><option value="Подмастерье">Подмастерье</option><option value="Мастер">Мастер</option><option value="Великий мастер">Великий мастер</option></select></label>
+          <button class="clear-button" id="clear-filters" type="button">Сбросить</button>
+        </div>
+        <div class="quick-filters" id="quick-filters" aria-label="Быстрые категории"></div>
+        <div class="list-heading"><span id="list-label">Все рецепты</span><span class="list-hint">Нажмите на карточку, чтобы раскрыть детали</span></div>
+        <div id="recipe-list" class="recipe-list" aria-live="polite"></div>
+        <div id="recipe-empty" class="empty-state" hidden><div class="empty-glyph">⌕</div><h2>Ничего не найдено</h2><p>Измените запрос или сбросьте фильтры.</p></div>
+        <footer class="footer-note"><span class="footer-symbol">✦</span><span>Формулы показаны символами алхимических групп. Страница книги указана у каждого рецепта.</span></footer>
+      </section>
 
-      <div class="controls">
-        <label class="searchbox">
-          <span aria-hidden="true">⌕</span>
-          <input id="search" type="search" placeholder="Название или компонент…" autocomplete="off" aria-label="Поиск по рецептам">
-          <kbd>/</kbd>
-        </label>
-        <label class="select-wrap">
-          <span class="sr-only">Уровень ремесла</span>
-          <select id="tier-filter">
-            <option value="">Любой уровень</option>
-            <option value="Новичок">Новичок</option>
-            <option value="Подмастерье">Подмастерье</option>
-            <option value="Мастер">Мастер</option>
-            <option value="Великий мастер">Великий мастер</option>
-          </select>
-        </label>
-        <button class="clear-button" id="clear-filters" type="button">Сбросить</button>
-      </div>
+      <section id="items-page" class="page-view" aria-labelledby="items-title" hidden>
+        <div class="workspace-head">
+          <div><div class="eyebrow"><span class="eyebrow-line"></span>Каталог</div><h1 id="items-title">Предметы</h1><p class="intro">Ингредиенты, алхимия, материалы, оружие и броня.</p></div>
+          <div class="result-badge"><strong id="item-result-count">0</strong><span>предметов</span></div>
+        </div>
+        <div class="controls">
+          <label class="searchbox"><span aria-hidden="true">⌕</span><input id="item-search" type="search" placeholder="Найти предмет…" autocomplete="off" aria-label="Поиск по предметам"></label>
+          <label class="select-wrap"><span class="sr-only">Тип предмета</span><select id="item-type-filter"><option value="">Все типы</option><option value="ingredient">Ингредиенты</option><option value="alchemical">Алхимические средства</option><option value="material">Материалы</option><option value="weapon">Оружие</option><option value="armor">Броня</option></select></label>
+        </div>
+        <div id="item-list" class="item-list" aria-live="polite"></div>
+        <div id="item-empty" class="empty-state" hidden><div class="empty-glyph">⌕</div><h2>Предметы не найдены</h2><p>Попробуйте изменить запрос или тип.</p></div>
+      </section>
 
-      <div class="quick-filters" id="quick-filters" aria-label="Быстрые категории"></div>
-      <div class="list-heading">
-        <span id="list-label">Все рецепты</span>
-        <span class="list-hint">Нажмите на карточку, чтобы раскрыть детали</span>
-      </div>
-      <div id="recipe-list" class="recipe-list" aria-live="polite"></div>
-      <div id="empty-state" class="empty-state" hidden>
-        <div class="empty-glyph">⌕</div>
-        <h2>Ничего не найдено</h2>
-        <p>Измените запрос или сбросьте фильтры.</p>
-      </div>
-
-      <footer class="footer-note">
-        <span class="footer-symbol">✦</span>
-        <span>Включены формулы и чертежи из основной книги правил. Типы алхимических компонентов расшифрованы по таблицам на стр. 143–145; страница источника указана в каждой карточке.</span>
-      </footer>
-    </section>
+      <section id="inventory-page" class="page-view" aria-labelledby="inventory-title" hidden>
+        <div class="workspace-head">
+          <div><div class="eyebrow"><span class="eyebrow-line"></span>Лист персонажа</div><h1 id="inventory-title">Инвентарь</h1><p class="intro">Содержимое сумки и общий переносимый вес.</p></div>
+          <div class="inventory-actions"><button class="button secondary" id="import-inventory" type="button">Загрузить JSON</button><button class="button primary" id="export-inventory" type="button">Сохранить JSON</button><input id="inventory-file" type="file" accept="application/json,.json" hidden></div>
+        </div>
+        <div class="inventory-summary">
+          <label class="capacity-field">Грузоподъёмность <span><input id="capacity-input" type="number" min="0" step="0.1" inputmode="decimal"> кг</span></label>
+          <div class="weight-readout"><strong id="weight-total">0 кг</strong><span id="weight-caption">из 0 кг</span></div>
+          <div class="weight-track" role="progressbar" aria-label="Загрузка грузоподъёмности" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="weight-progress"></span></div>
+          <p id="weight-warning" class="inline-warning" hidden></p>
+        </div>
+        <form id="add-inventory-item" class="add-inventory-item">
+          <label class="field grow">Предмет из каталога<select id="inventory-item-select"><option value="">Выберите предмет…</option></select></label>
+          <label class="field">Количество<input id="inventory-quantity" type="number" min="0.1" step="0.1" value="1" required></label>
+          <label class="field">Вес за шт., кг<input id="inventory-unit-weight" type="number" min="0" step="0.1" placeholder="из каталога"></label>
+          <button class="button primary add-button" type="submit">Добавить</button>
+        </form>
+        <details class="custom-item-details">
+          <summary>Добавить свой предмет, которого нет в каталоге</summary>
+          <form id="add-custom-item" class="add-inventory-item custom-form">
+            <label class="field grow">Название<input id="custom-item-name" maxlength="120" required></label>
+            <label class="field">Количество<input id="custom-item-quantity" type="number" min="0.1" step="0.1" value="1" required></label>
+            <label class="field">Вес за шт., кг<input id="custom-item-weight" type="number" min="0" step="0.1" placeholder="неизвестен"></label>
+            <button class="button secondary add-button" type="submit">Добавить</button>
+          </form>
+        </details>
+        <div class="list-heading"><span>В сумке</span><button class="text-button" id="clear-inventory" type="button">Очистить инвентарь</button></div>
+        <div id="inventory-list" class="inventory-list"></div>
+        <div id="inventory-empty" class="empty-state"><div class="empty-glyph">▤</div><h2>Инвентарь пока пуст</h2><p>Выберите предмет в каталоге или добавьте собственный.</p></div>
+        <p id="inventory-message" class="status-message" role="status" aria-live="polite"></p>
+        <p class="privacy-note">Данные хранятся в этом браузере. JSON-файл можно перенести на другое устройство или использовать как резервную копию.</p>
+      </section>
+    </div>
   </main>
 </body>
 </html>
