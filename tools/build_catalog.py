@@ -1,13 +1,10 @@
 #!/usr/bin/env python3
-"""Initialize the catalog SQLite database and export its recipes for the static site."""
+"""Migrate and verify the committed SQLite catalog, then export static recipes."""
 
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
-import os
-import re
 import sqlite3
 import sys
 from pathlib import Path
@@ -17,249 +14,109 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 DATABASE_DIR = ROOT / "database"
 DATABASE_PATH = DATABASE_DIR / "catalog.sqlite3"
-SCHEMA_PATH = DATABASE_DIR / "schema.sql"
-SEED_PATH = DATABASE_DIR / "seed_recipes.json"
+MIGRATIONS_DIR = DATABASE_DIR / "migrations"
 SITE_DATA_PATH = ROOT / "data.js"
 SOURCE_ID = "witcher_core_ru"
-SOURCE_TITLE = "Основная книга правил НРИ «Ведьмак»"
-
-RECIPE_TYPE_LABELS = {
-    "alchemy": "Алхимия",
-    "material": "Материалы",
-    "weapon": "Оружие",
-    "armor": "Броня",
-}
-ITEM_TYPE_LABELS = {
-    "ingredient": "Ингредиент",
-    "alchemical": "Алхимическое средство",
-    "material": "Ремесленный материал",
-    "weapon": "Оружие",
-    "armor": "Броня",
-}
-OUTPUT_ITEM_TYPES = {
-    "alchemy": "alchemical",
-    "material": "material",
-    "weapon": "weapon",
-    "armor": "armor",
-}
-TIER_ORDER = {
-    "Новичок": 1,
-    "Подмастерье": 2,
-    "Мастер": 3,
-    "Великий мастер": 4,
-}
-TIER_CODES = {
-    "Новичок": "novice",
-    "Подмастерье": "apprentice",
-    "Мастер": "master",
-    "Великий мастер": "grandmaster",
-}
-ITEM_MATCH_PRIORITY = {
-    "material": 0,
-    "ingredient": 1,
-    "alchemical": 2,
-    "weapon": 3,
-    "armor": 4,
-}
 
 
-def stable_id(prefix: str, *parts: str) -> str:
-    key = "\x1f".join(parts)
-    digest = hashlib.sha256(key.encode("utf-8")).hexdigest()[:20]
-    return f"{prefix}_{digest}"
+def migrate_database(connection: sqlite3.Connection) -> None:
+    """Apply ordered, atomic schema changes to the existing catalog only."""
+    current = connection.execute("PRAGMA user_version").fetchone()[0]
+    migrations = sorted(MIGRATIONS_DIR.glob("[0-9][0-9][0-9]_*.sql"))
+    if not migrations or current < 1:
+        raise sqlite3.DatabaseError("Missing baseline database or migrations")
+    latest = int(migrations[-1].name[:3])
+    if current > latest:
+        raise sqlite3.DatabaseError(f"Database version {current} is newer than code version {latest}")
+    for path in migrations:
+        version = int(path.name[:3])
+        if version <= current:
+            continue
+        if version != current + 1:
+            raise sqlite3.DatabaseError(f"Missing migration {current + 1}")
+        try:
+            connection.executescript(path.read_text(encoding="utf-8"))
+        except Exception:
+            if connection.in_transaction:
+                connection.rollback()
+            raise
+        actual = connection.execute("PRAGMA user_version").fetchone()[0]
+        if actual != version:
+            raise sqlite3.DatabaseError(f"Migration {path.name} did not set user_version")
+        current = version
+        print(f"Applied migration {path.name}.")
 
 
-def split_output_quantity(title: str) -> tuple[str, int]:
-    match = re.search(r"\s+×\s*(\d+)$", title)
-    if not match:
-        return title, 1
-    return title[: match.start()].rstrip(), int(match.group(1))
-
-
-def parse_page_numbers(value: Any) -> list[int]:
-    pages = [int(number) for number in re.findall(r"\d+", str(value or ""))]
-    if not pages:
-        raise ValueError(f"Recipe source page is missing or invalid: {value!r}")
-    return list(dict.fromkeys(pages))
-
-
-def insert_reference_rows(connection: sqlite3.Connection, recipes: list[dict[str, Any]]) -> None:
-    connection.execute(
-        "INSERT INTO sources (source_id, title) VALUES (?, ?)",
-        (SOURCE_ID, SOURCE_TITLE),
-    )
-    connection.executemany(
-        "INSERT INTO recipe_types (recipe_type, label) VALUES (?, ?)",
-        RECIPE_TYPE_LABELS.items(),
-    )
-    connection.executemany(
-        "INSERT INTO item_types (item_type, label) VALUES (?, ?)",
-        ITEM_TYPE_LABELS.items(),
-    )
-
-    tiers = sorted({str(recipe.get("tier", "")) for recipe in recipes if recipe.get("tier")})
-    for tier in tiers:
-        tier_code = TIER_CODES.get(tier, stable_id("tier", tier))
-        connection.execute(
-            "INSERT INTO skill_tiers (tier_code, label, sort_order) VALUES (?, ?, ?)",
-            (tier_code, tier, TIER_ORDER.get(tier, 100)),
-        )
-
-    categories: dict[tuple[str, str], str] = {}
-    for recipe in recipes:
-        recipe_type = str(recipe["type"])
-        if recipe_type not in RECIPE_TYPE_LABELS:
-            raise ValueError(f"Unknown recipe type: {recipe_type}")
-        category = str(recipe.get("category") or RECIPE_TYPE_LABELS[recipe_type])
-        key = (recipe_type, category)
-        if key not in categories:
-            category_id = stable_id("cat", recipe_type, category)
-            categories[key] = category_id
-            connection.execute(
-                "INSERT INTO recipe_categories (category_id, recipe_type, label) VALUES (?, ?, ?)",
-                (category_id, recipe_type, category),
-            )
-
-
-def initialize_database(path: Path) -> None:
-    if not SCHEMA_PATH.exists() or not SEED_PATH.exists():
-        raise FileNotFoundError("Both database/schema.sql and database/seed_recipes.json are required.")
-
-    recipes: list[dict[str, Any]] = json.loads(SEED_PATH.read_text(encoding="utf-8"))
-    if not isinstance(recipes, list):
-        raise ValueError("The recipe seed must be a JSON array.")
-
-    temporary_path = path.with_suffix(".tmp.sqlite3")
-    temporary_path.unlink(missing_ok=True)
-    connection = sqlite3.connect(temporary_path)
-    connection.row_factory = sqlite3.Row
-    connection.execute("PRAGMA foreign_keys = ON")
-    try:
-        connection.executescript(SCHEMA_PATH.read_text(encoding="utf-8"))
-        insert_reference_rows(connection, recipes)
-
-        output_items: dict[tuple[str, str], str] = {}
-        items_by_name: dict[str, list[tuple[str, str]]] = {}
-        recipe_output_items: list[tuple[str, int]] = []
-
-        for recipe in recipes:
-            recipe_type = str(recipe["type"])
-            item_type = OUTPUT_ITEM_TYPES[recipe_type]
-            item_name, output_quantity = split_output_quantity(str(recipe["name"]))
-            item_key = (item_type, item_name)
-            item_id = output_items.get(item_key)
-            if item_id is None:
-                item_id = stable_id("item", item_type, item_name)
-                output_items[item_key] = item_id
-                connection.execute(
-                    "INSERT INTO items (item_id, name, item_type) VALUES (?, ?, ?)",
-                    (item_id, item_name, item_type),
-                )
-                items_by_name.setdefault(item_name, []).append((item_id, item_type))
-            recipe_output_items.append((item_id, output_quantity))
-
-        for recipe in recipes:
-            for ingredient in recipe.get("ingredients", []):
-                name = str(ingredient["name"])
-                if name in items_by_name:
-                    continue
-                item_id = stable_id("item", "ingredient", name)
-                connection.execute(
-                    "INSERT INTO items (item_id, name, item_type) VALUES (?, ?, 'ingredient')",
-                    (item_id, name),
-                )
-                items_by_name.setdefault(name, []).append((item_id, "ingredient"))
-
-        connection.execute(
-            """INSERT INTO ingredient_details (item_id)
-               SELECT item_id FROM items WHERE item_type = 'ingredient'"""
-        )
-
-        for order, recipe in enumerate(recipes, start=1):
-            recipe_type = str(recipe["type"])
-            category = str(recipe.get("category") or RECIPE_TYPE_LABELS[recipe_type])
-            category_id = stable_id("cat", recipe_type, category)
-            tier = str(recipe.get("tier") or "")
-            tier_code = TIER_CODES.get(tier, stable_id("tier", tier)) if tier else None
-            recipe_id = stable_id(
-                "recipe",
-                str(order),
-                recipe_type,
-                category,
-                str(recipe["name"]),
-                str(recipe.get("page", "")),
-            )
-            dc = recipe.get("dc")
-            connection.execute(
-                """INSERT INTO recipes
-                   (recipe_id, title, recipe_type, category_id, tier_code, craft_dc,
-                    crafting_time, sort_order)
-                   VALUES (?, ?, ?, ?, ?, ?, ?, ?)""",
-                (
-                    recipe_id,
-                    str(recipe["name"]),
-                    recipe_type,
-                    category_id,
-                    tier_code,
-                    int(dc) if dc not in (None, "") else None,
-                    recipe.get("time"),
-                    order,
-                ),
-            )
-            source_pages = parse_page_numbers(recipe.get("page"))
-            connection.executemany(
-                """INSERT INTO recipe_sources (recipe_id, source_id, page_number)
-                   VALUES (?, ?, ?)""",
-                [(recipe_id, SOURCE_ID, page) for page in source_pages],
-            )
-            output_item_id, output_quantity = recipe_output_items[order - 1]
-            connection.execute(
-                "INSERT INTO recipe_outputs (recipe_id, item_id, quantity) VALUES (?, ?, ?)",
-                (recipe_id, output_item_id, output_quantity),
-            )
-            connection.executemany(
-                """INSERT OR IGNORE INTO item_sources
-                   (item_id, source_id, page_number, source_role)
-                   VALUES (?, ?, ?, 'recipe_output')""",
-                [(output_item_id, SOURCE_ID, page) for page in source_pages],
-            )
-
-            for line_number, ingredient in enumerate(recipe.get("ingredients", []), start=1):
-                name = str(ingredient["name"])
-                candidates = items_by_name[name]
-                item_id, _ = min(
-                    candidates,
-                    key=lambda candidate: (ITEM_MATCH_PRIORITY[candidate[1]], candidate[0]),
-                )
-                quantity = float(ingredient.get("quantity", 1))
-                connection.execute(
-                    """INSERT INTO recipe_ingredients
-                       (recipe_id, line_number, item_id, quantity)
-                       VALUES (?, ?, ?, ?)""",
-                    (recipe_id, line_number, item_id, quantity),
-                )
-                connection.executemany(
-                    """INSERT OR IGNORE INTO item_sources
-                       (item_id, source_id, page_number, source_role)
-                       VALUES (?, ?, ?, 'recipe_ingredient')""",
-                    [(item_id, SOURCE_ID, page) for page in source_pages],
-                )
-
-        connection.execute(
-            """INSERT INTO alchemical_details (item_id)
-               SELECT item_id FROM items WHERE item_type = 'alchemical'"""
-        )
-        connection.commit()
-        integrity = connection.execute("PRAGMA integrity_check").fetchone()[0]
-        if integrity != "ok":
-            raise sqlite3.DatabaseError(f"SQLite integrity check failed: {integrity}")
-        foreign_key_errors = connection.execute("PRAGMA foreign_key_check").fetchall()
-        if foreign_key_errors:
-            raise sqlite3.DatabaseError(f"Foreign key check failed: {foreign_key_errors}")
-    finally:
-        connection.close()
-
-    os.replace(temporary_path, path)
+def validate_catalog(connection: sqlite3.Connection) -> None:
+    integrity = connection.execute("PRAGMA integrity_check").fetchone()[0]
+    if integrity != "ok":
+        raise sqlite3.DatabaseError(f"SQLite integrity check failed: {integrity}")
+    errors = connection.execute("PRAGMA foreign_key_check").fetchall()
+    if errors:
+        raise sqlite3.DatabaseError(f"Foreign key check failed: {errors}")
+    conflicting_aliases = connection.execute("""
+        SELECT a.retired_item_id FROM item_id_aliases a
+        WHERE EXISTS (SELECT 1 FROM items i WHERE i.item_id=a.retired_item_id)
+           OR EXISTS (SELECT 1 FROM item_id_aliases next
+                      WHERE next.retired_item_id=a.current_item_id)
+    """).fetchall()
+    if conflicting_aliases:
+        raise sqlite3.DatabaseError(f"Retired item ID is live or aliases form a chain: {conflicting_aliases[:5]}")
+    ambiguous = connection.execute("""
+        SELECT r.title, ri.line_number, i.name
+        FROM recipe_ingredients ri
+        JOIN recipes r ON r.recipe_id = ri.recipe_id
+        JOIN items i ON i.item_id = ri.item_id
+        LEFT JOIN ingredient_link_decisions d
+            ON d.recipe_id = ri.recipe_id AND d.line_number = ri.line_number
+        WHERE (SELECT COUNT(*) FROM items candidate WHERE candidate.name = i.name) > 1
+          AND (d.item_id IS NULL OR d.item_id != ri.item_id)
+    """).fetchall()
+    if ambiguous:
+        raise sqlite3.DatabaseError(f"Ambiguous ingredient links need explicit decisions: {ambiguous[:5]}")
+    dangling = connection.execute("""
+        SELECT d.recipe_id, d.line_number FROM ingredient_link_decisions d
+        JOIN recipe_ingredients ri
+            ON ri.recipe_id = d.recipe_id AND ri.line_number = d.line_number
+        WHERE d.item_id != ri.item_id
+    """).fetchall()
+    if dangling:
+        raise sqlite3.DatabaseError(f"Ingredient link decisions disagree with recipe lines: {dangling[:5]}")
+    missing = connection.execute("""
+        SELECT r.recipe_id FROM recipes r
+        WHERE NOT EXISTS (SELECT 1 FROM recipe_outputs o WHERE o.recipe_id = r.recipe_id)
+           OR NOT EXISTS (SELECT 1 FROM recipe_sources s WHERE s.recipe_id = r.recipe_id)
+    """).fetchall()
+    if missing:
+        raise sqlite3.DatabaseError(f"Recipes without outputs or source pages: {missing[:5]}")
+    for table, fields in {
+        "items": ("weight_kg", "cost_crowns", "description"),
+        "ingredient_details": ("habitat", "rarity", "acquisition_method", "alchemy_group", "notes"),
+        "alchemical_details": ("effect", "duration", "toxicity", "application", "notes"),
+    }.items():
+        for field in fields:
+            unsourced = connection.execute(f"""
+                SELECT item_id FROM {table} v WHERE v.{field} IS NOT NULL
+                  AND NOT EXISTS (SELECT 1 FROM item_field_sources s
+                                  WHERE s.item_id = v.item_id AND s.field_name = ?)
+            """, (field,)).fetchall()
+            if unsourced:
+                raise sqlite3.DatabaseError(f"Unsourced {table}.{field}: {unsourced[:5]}")
+    for table in ("item_attributes", "item_effects"):
+        unsourced = connection.execute(f"""
+            SELECT item_id FROM {table} WHERE source_id IS NULL OR source_page IS NULL
+        """).fetchall()
+        if unsourced:
+            raise sqlite3.DatabaseError(f"Unsourced {table}: {unsourced[:5]}")
+    group_count = connection.execute("SELECT COUNT(*) FROM alchemy_group_symbols").fetchone()[0]
+    if group_count != 9:
+        raise sqlite3.DatabaseError(f"Expected nine source-backed alchemy symbols; found {group_count}")
+    bad_symbol = connection.execute("""
+        SELECT s.item_id FROM alchemy_group_symbols s JOIN items i ON i.item_id=s.item_id
+        WHERE i.item_type != 'ingredient'
+    """).fetchall()
+    if bad_symbol:
+        raise sqlite3.DatabaseError(f"Alchemy symbols must refer to ingredients: {bad_symbol}")
 
 
 def export_site_data(connection: sqlite3.Connection) -> int:
@@ -282,9 +139,9 @@ def export_site_data(connection: sqlite3.Connection) -> int:
             )
         ]
         ingredients = [
-            {"name": ingredient["name"], "quantity": ingredient["quantity"]}
+            {"name": ingredient["name"], "quantity": ingredient["quantity"], "itemId": ingredient["item_id"]}
             for ingredient in connection.execute(
-                """SELECT i.name, ri.quantity
+                """SELECT i.item_id, i.name, ri.quantity
                    FROM recipe_ingredients ri
                    JOIN items i ON i.item_id = ri.item_id
                    WHERE ri.recipe_id = ?
@@ -308,10 +165,20 @@ def export_site_data(connection: sqlite3.Connection) -> int:
         )
 
     payload = json.dumps(result, ensure_ascii=False, separators=(",", ":"))
+    symbols = {
+        row["item_id"]: {"name": row["name"], "color": row["color"], "path": row["svg_path"]}
+        for row in connection.execute("""
+            SELECT s.item_id, i.name, s.color, s.svg_path
+            FROM alchemy_group_symbols s JOIN items i ON i.item_id=s.item_id
+            ORDER BY s.symbol_code
+        """)
+    }
     SITE_DATA_PATH.write_text(
         "// Generated from database/catalog.sqlite3 by tools/build_catalog.py.\n"
         "window.RECIPES = "
         + payload
+        + ";\nwindow.ALCHEMY_SYMBOLS = "
+        + json.dumps(symbols, ensure_ascii=False, separators=(",", ":"))
         + ";\n",
         encoding="utf-8",
     )
@@ -335,38 +202,26 @@ def report_database(connection: sqlite3.Connection, recipe_count: int) -> None:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument(
-        "--rebuild-db",
-        action="store_true",
-        help="recreate the SQLite file from schema.sql and the original seed snapshot",
-    )
-    parser.add_argument(
         "--check",
         action="store_true",
         help="check SQLite integrity and foreign keys without exporting site data",
     )
     args = parser.parse_args()
 
-    DATABASE_DIR.mkdir(parents=True, exist_ok=True)
-    if args.rebuild_db or not DATABASE_PATH.exists():
-        initialize_database(DATABASE_PATH)
     if not DATABASE_PATH.exists():
-        print(f"Database not found: {DATABASE_PATH}", file=sys.stderr)
+        print(f"Database not found: restore {DATABASE_PATH} from Git; legacy seed is incomplete.", file=sys.stderr)
         return 1
 
     connection = sqlite3.connect(DATABASE_PATH)
     connection.row_factory = sqlite3.Row
     connection.execute("PRAGMA foreign_keys = ON")
     try:
-        integrity = connection.execute("PRAGMA integrity_check").fetchone()[0]
-        if integrity != "ok":
-            raise sqlite3.DatabaseError(f"SQLite integrity check failed: {integrity}")
-        foreign_key_errors = connection.execute("PRAGMA foreign_key_check").fetchall()
-        if foreign_key_errors:
-            raise sqlite3.DatabaseError(f"Foreign key check failed: {foreign_key_errors}")
+        migrate_database(connection)
+        validate_catalog(connection)
         recipe_count = connection.execute("SELECT COUNT(*) FROM recipes").fetchone()[0]
         if args.check:
             report_database(connection, recipe_count)
-            print("SQLite integrity and foreign key checks passed.")
+            print("SQLite integrity, sources and ingredient links checked.")
             return 0
         exported_count = export_site_data(connection)
         if exported_count != recipe_count:

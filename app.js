@@ -1,5 +1,6 @@
 (() => {
   const recipes = window.RECIPES || [];
+  const alchemySymbols = window.ALCHEMY_SYMBOLS || {};
   const list = document.querySelector("#recipe-list");
   const search = document.querySelector("#search");
   const tierSelect = document.querySelector("#tier-filter");
@@ -14,6 +15,17 @@
 
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
   const normalize = value => String(value ?? "").toLocaleLowerCase("ru-RU").replaceAll("ё", "е");
+
+  function formula(ingredients) {
+    const symbols = ingredients.filter(x => alchemySymbols[x.itemId]);
+    if (!symbols.length) return "";
+    return `<span class="formula" role="img" aria-label="Формула: ${escapeHtml(symbols.map(x => `${alchemySymbols[x.itemId].name}, ${x.quantity} шт.`).join("; "))}">${symbols.map(x => {
+      const symbol = alchemySymbols[x.itemId];
+      const count = Number(x.quantity);
+      if (!Number.isInteger(count) || count < 1 || count > 30) return "";
+      return Array.from({ length: count }, () => `<svg class="alchemy-symbol" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="${escapeHtml(symbol.color)}"/><path d="${escapeHtml(symbol.path)}" fill="none" stroke="white" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/></svg>`).join("");
+    }).join("")}</span>`;
+  }
 
   function getCategories() {
     const candidates = recipes.filter(item => activeSection === "all" || item.type === activeSection);
@@ -33,19 +45,20 @@
 
   function recipeCard(item) {
     const ingredients = item.ingredients || [];
-    const preview = ingredients.slice(0, 3).map(x => x.name).join(" · ") + (ingredients.length > 3 ? ` · +${ingredients.length - 3}` : "");
+    const preview = item.type === "alchemy" ? formula(ingredients) : ingredients.slice(0, 3).map(x => x.name).join(" · ") + (ingredients.length > 3 ? ` · +${ingredients.length - 3}` : "");
     const time = item.time ? `<span class="meta-pill time"><strong>Время</strong>${escapeHtml(item.time)}</span>` : "";
     const dc = item.dc ? `<span class="meta-pill"><strong>СЛ</strong>${escapeHtml(item.dc)}</span>` : "";
     return `<details class="recipe-card">
       <summary class="recipe-summary">
         <span class="recipe-title-block"><span class="recipe-title">${escapeHtml(item.name)}</span><span class="recipe-subtitle">${escapeHtml(item.category || item.typeLabel || "")}</span></span>
-        <span class="ingredient-preview">${escapeHtml(preview || "Состав не указан")}</span>
+        <span class="ingredient-preview">${item.type === "alchemy" ? preview : escapeHtml(preview || "Состав не указан")}</span>
         ${dc}${time}<span class="card-arrow" aria-hidden="true">⌄</span>
       </summary>
       <div class="recipe-details"><div class="detail-grid">
         <div><span class="detail-label">Уровень</span><span class="detail-value">${escapeHtml(item.tier || "—")}</span></div>
         ${item.dc ? `<div><span class="detail-label">Сложность изготовления</span><span class="detail-value">${escapeHtml(item.dc)}</span></div>` : ""}
         ${item.time ? `<div><span class="detail-label">Время изготовления</span><span class="detail-value">${escapeHtml(item.time)}</span></div>` : ""}
+        ${item.type === "alchemy" ? `<div class="full-width"><span class="detail-label">Формула · символы ингредиентов</span>${formula(ingredients)}</div>` : ""}
         <div class="full-width"><span class="detail-label">Компоненты</span><span class="ingredient-list">${ingredients.map(x => `<span class="ingredient-tag">${escapeHtml(x.name)}${x.quantity ? ` ×${escapeHtml(x.quantity)}` : ""}</span>`).join("") || `<span class="detail-value">Не указаны</span>`}</span></div>
       </div><div class="source-page">Источник: книга правил, стр. ${escapeHtml(item.page || "—")}</div></div>
     </details>`;
