@@ -48,6 +48,10 @@ h1 { margin: 9px 0 5px; font: 600 clamp(29px,3.6vw,40px)/1.14 var(--serif); lett
 .recipe-controls .searchbox { flex: 2 1 240px; }
 .recipe-controls .select-wrap { flex: 1 0 132px; }
 .recipe-controls .select-wrap select { width: 100%; min-width: 0; }
+.item-controls { flex-wrap: wrap; }
+.item-controls .searchbox { flex: 2 1 280px; }
+.item-controls .select-wrap { flex: 1 1 150px; }
+.item-controls .select-wrap select { width: 100%; min-width: 0; }
 .searchbox { flex: 1; min-width: 150px; display: flex; align-items: center; gap: 10px; height: 44px; padding: 0 12px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); color: var(--teal); }
 .searchbox:focus-within { border-color: var(--teal); box-shadow: 0 0 0 3px rgba(7,140,142,.12); }
 .searchbox > span { font-size: 20px; }
@@ -59,6 +63,7 @@ kbd { padding: 1px 6px 2px; border: 1px solid var(--line); border-radius: 4px; c
 .select-wrap select:focus-visible, .clear-button:focus-visible, .nav-item:focus-visible, .recipe-summary:focus-visible, .button:focus-visible, .text-button:focus-visible { outline: 2px solid var(--teal); outline-offset: 2px; }
 .clear-button { color: var(--muted); cursor: pointer; }
 .clear-button:hover { border-color: #a9b8b2; color: var(--text); }
+.clear-button:disabled { color: var(--faint); opacity: .65; cursor: default; }
 .list-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 12px 0 9px; border-bottom: 1px solid var(--line); color: var(--text); font: 500 16px var(--serif); }
 .recipe-list { display: grid; gap: 8px; margin-top: 18px; }
 .recipe-card, .item-card { overflow: hidden; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); transition: border-color .16s ease, box-shadow .16s ease; }
@@ -167,6 +172,8 @@ kbd { padding: 1px 6px 2px; border: 1px solid var(--line); border-radius: 4px; c
   .select-wrap { flex: 1; }
   .select-wrap select { width: 100%; min-width: 0; }
   .recipe-controls .select-wrap { flex: 1 1 calc(50% - 8px); }
+  .item-controls .select-wrap { flex: 1 1 calc(50% - 8px); }
+  .item-controls .clear-button { flex: 1 1 calc(50% - 8px); }
   .recipe-controls .clear-button { flex: 1 1 calc(50% - 8px); }
   .clear-button { min-width: 78px; }
   .list-heading { align-items: flex-start; flex-direction: row; font-size: 15px; }

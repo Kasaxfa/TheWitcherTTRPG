@@ -102,16 +102,44 @@
       <div class="item-details">${description}${narrative}${attributes}${effects}</div></details>`;
   }
 
+  function setItemFilterOptions(select, placeholder, values) {
+    const previous = select.value;
+    select.innerHTML = `<option value="">${placeholder}</option>${values.map(value => `<option value="${escapeHtml(value)}">${escapeHtml(value)}</option>`).join("")}`;
+    select.value = values.includes(previous) ? previous : "";
+  }
+
+  function updateItemFilters() {
+    const isIngredient = $("#item-type-filter").value === "ingredient";
+    const ingredients = items.filter(item => item.type === "ingredient");
+    const rarities = [...new Set(ingredients.map(item => item.details?.rarity).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ru"));
+    const groups = [...new Set(ingredients.map(item => item.details?.alchemy_group).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ru"));
+    setItemFilterOptions($("#item-rarity-filter"), "Любая редкость", rarities);
+    setItemFilterOptions($("#item-group-filter"), "Любая группа", groups);
+    $("#item-rarity-wrap").hidden = !isIngredient || rarities.length < 2;
+    $("#item-group-wrap").hidden = !isIngredient || groups.length < 2;
+  }
+
   function renderItems() {
-    const query = normalize($("#item-search").value.trim());
+    const terms = normalize($("#item-search").value.trim()).split(/\s+/).filter(Boolean);
     const type = $("#item-type-filter").value;
+    const rarity = $("#item-rarity-filter").value;
+    const group = $("#item-group-filter").value;
     const visible = items.filter(item => {
       if (type && item.type !== type) return false;
-      const searchable = [item.name, item.typeLabel, item.description, ...Object.values(item.details || {}), ...(item.attributes || []).map(attribute => `${attribute.label} ${attribute.value}`), ...(item.effects || []).map(effect => effect.text)].join(" ");
-      return !query || normalize(searchable).includes(query);
+      if (rarity && item.details?.rarity !== rarity) return false;
+      if (group && item.details?.alchemy_group !== group) return false;
+      const detailLabels = { habitat: "место обитания", rarity: "редкость", acquisition_method: "где найти", alchemy_group: "алхимическая группа", effect: "эффект", duration: "длительность", toxicity: "токсичность", application: "применение", notes: "примечание" };
+      const searchable = normalize([
+        item.name, item.typeLabel, item.description,
+        ...Object.entries(item.details || {}).flatMap(([key, value]) => [detailLabels[key] || key, value]),
+        ...(item.attributes || []).flatMap(attribute => [attribute.label, attribute.value]),
+        ...(item.effects || []).flatMap(effect => [effect.text, effect.duration]),
+      ].join(" "));
+      return terms.every(term => searchable.includes(term));
     });
     $("#item-list").innerHTML = visible.map(itemCard).join("");
     $("#item-empty").hidden = visible.length > 0;
+    $("#clear-item-filters").disabled = !$("#item-search").value && !type && !rarity && !group;
   }
 
   function resolveItemId(itemId) {
@@ -242,7 +270,16 @@
     $("#search").focus();
   });
   $("#item-search").addEventListener("input", renderItems);
-  $("#item-type-filter").addEventListener("change", renderItems);
+  $("#item-type-filter").addEventListener("change", () => { updateItemFilters(); renderItems(); });
+  $("#item-rarity-filter").addEventListener("change", renderItems);
+  $("#item-group-filter").addEventListener("change", renderItems);
+  $("#clear-item-filters").addEventListener("click", () => {
+    $("#item-search").value = "";
+    $("#item-type-filter").value = "";
+    updateItemFilters();
+    renderItems();
+    $("#item-search").focus();
+  });
   document.addEventListener("keydown", event => {
     if (event.key === "/" && !["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement.tagName)) {
       event.preventDefault();
@@ -349,6 +386,7 @@
 
   setupInventorySelect();
   updateRecipeFilters();
+  updateItemFilters();
   renderRecipes();
   renderItems();
   renderInventory();
