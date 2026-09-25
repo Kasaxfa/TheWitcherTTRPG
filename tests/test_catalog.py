@@ -1,6 +1,7 @@
 """Regression checks for persistent identities, ambiguous links and symbol counts."""
 
 import json
+import re
 import sqlite3
 import sys
 import tempfile
@@ -78,6 +79,29 @@ class CatalogTests(unittest.TestCase):
         ))
         exported = SITE_DATA_PATH.read_text(encoding="utf-8")
         self.assertEqual(exported, render_site_data(data))
+
+    def test_localized_item_names_keep_their_ids_and_source_spelling(self):
+        data = build_site_data(self.connection)
+        by_id = {item["id"]: item["name"] for item in data["items"]}
+        expected = {
+            "item_047fda02ae7041f398379db95ef16133": ("Лошадиная известь", "Calcium equum"),
+            "item_524a9eabd5bf45d4ab85e3fbb88783ed": ("Оптима матер", "Optima mater"),
+        }
+        verified = {
+            item["item_id"]: item for item in json.loads(
+                (ROOT / "database" / "verified_items.json").read_text(encoding="utf-8")
+            )["items"]
+        }
+        for item_id, (name, original_name) in expected.items():
+            self.assertEqual(by_id[item_id], name)
+            self.assertEqual(verified[item_id]["name"], name)
+            self.assertEqual(verified[item_id]["original_name"], original_name)
+        self.assertTrue(all(not re.search(r"[A-Za-z]", name) for name in by_id.values()))
+        self.assertTrue(all(
+            not re.search(r"[A-Za-z]", part["name"])
+            for recipe in data["recipes"]
+            for part in recipe["ingredients"] + recipe["outputs"]
+        ))
 
     def test_renames_and_reordering_do_not_change_ids_or_details(self):
         with tempfile.TemporaryDirectory() as directory:
