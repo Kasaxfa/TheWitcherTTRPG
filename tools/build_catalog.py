@@ -131,14 +131,6 @@ def build_site_data(connection: sqlite3.Connection) -> dict[str, Any]:
     """
     result: list[dict[str, Any]] = []
     for recipe in connection.execute(query):
-        source_pages = [
-            row["page_number"]
-            for row in connection.execute(
-                """SELECT page_number FROM recipe_sources
-                   WHERE recipe_id = ? ORDER BY page_number""",
-                (recipe["recipe_id"],),
-            )
-        ]
         ingredients = [
             {"name": ingredient["name"], "quantity": ingredient["quantity"], "itemId": ingredient["item_id"]}
             for ingredient in connection.execute(
@@ -172,10 +164,6 @@ def build_site_data(connection: sqlite3.Connection) -> dict[str, Any]:
                 "time": recipe["crafting_time"] or "",
                 "ingredients": ingredients,
                 "outputs": outputs,
-                "sourcePages": source_pages,
-                "page": source_pages[0] if len(source_pages) == 1 else ", ".join(
-                    str(page) for page in source_pages
-                ),
             }
         )
 
@@ -208,10 +196,10 @@ def build_site_data(connection: sqlite3.Connection) -> dict[str, Any]:
         attributes = [
             {"code": row["attribute_code"], "label": row["label"],
              "value": row["text_value"] if row["text_value"] is not None else row["numeric_value"],
-             "unit": row["unit"], "ordinal": row["ordinal"], "sourcePage": row["source_page"]}
+             "unit": row["unit"], "ordinal": row["ordinal"]}
             for row in connection.execute("""
                 SELECT a.attribute_code, d.label, d.unit, a.text_value,
-                       a.numeric_value, a.ordinal, a.source_page
+                       a.numeric_value, a.ordinal
                 FROM item_attributes a JOIN attribute_definitions d USING(attribute_code)
                 WHERE a.item_id=? ORDER BY d.label, a.ordinal
             """, (item["item_id"],))
@@ -219,22 +207,18 @@ def build_site_data(connection: sqlite3.Connection) -> dict[str, Any]:
         effects = [
             {"order": row["effect_order"], "text": row["effect_text"],
              "duration": row["duration"], "toxicity": row["toxicity"],
-             "application": row["application"], "sourcePage": row["source_page"]}
+             "application": row["application"]}
             for row in connection.execute("""
-                SELECT effect_order, effect_text, duration, toxicity, application, source_page
+                SELECT effect_order, effect_text, duration, toxicity, application
                 FROM item_effects WHERE item_id=? ORDER BY effect_order
             """, (item["item_id"],))
         ]
-        pages = [row["page_number"] for row in connection.execute(
-            "SELECT DISTINCT page_number FROM item_sources WHERE item_id=? ORDER BY page_number",
-            (item["item_id"],),
-        )]
         items.append({
             "id": item["item_id"], "name": item["name"], "type": item["item_type"],
             "typeLabel": item["type_label"], "description": item["description"],
             "weightKg": item["weight_kg"], "costCrowns": item["cost_crowns"],
             "details": details, "attributes": attributes, "effects": effects,
-            "sourcePages": pages, "symbol": symbols.get(item["item_id"]),
+            "symbol": symbols.get(item["item_id"]),
         })
     aliases = {
         row["retired_item_id"]: row["current_item_id"]

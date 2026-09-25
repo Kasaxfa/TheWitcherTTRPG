@@ -23,16 +23,10 @@
     <aside class="sidebar" aria-label="Разделы сайта">
       <div class="sidebar-label">Мастерская</div>
       <nav class="section-nav" aria-label="Разделы">
-        <button class="nav-item active" data-page="recipes" aria-current="page"><span class="nav-icon">⌕</span>Рецепты<span class="nav-count" id="count-recipes">0</span></button>
-        <button class="nav-item" data-page="items"><span class="nav-icon">◇</span>Предметы<span class="nav-count" id="count-items">0</span></button>
-        <button class="nav-item" data-page="inventory"><span class="nav-icon">▤</span>Инвентарь<span class="nav-count" id="count-inventory">0</span></button>
+        <button class="nav-item active" data-page="recipes" aria-current="page"><span class="nav-icon">⌕</span>Рецепты</button>
+        <button class="nav-item" data-page="items"><span class="nav-icon">◇</span>Предметы</button>
+        <button class="nav-item" data-page="inventory"><span class="nav-icon">▤</span>Инвентарь</button>
       </nav>
-      <div class="sidebar-rule"></div>
-      <div class="source-card">
-        <span class="source-kicker">Источник</span>
-        <p>Основная книга правил</p>
-        <span class="source-detail">Страницы указаны в карточках</span>
-      </div>
     </aside>
 
     <div class="workspace">
@@ -40,27 +34,25 @@
         <div class="workspace-head">
           <div>
             <div class="eyebrow"><span class="eyebrow-line"></span>Архив мастерской</div>
-            <h1 id="recipe-title">Рецепты и чертежи</h1>
-            <p class="intro">Найдите формулу, снаряжение или нужный компонент.</p>
+            <h1 id="recipe-title">Алхимия</h1>
+            <p class="intro" id="recipe-intro">Формулы алхимических средств и их состав.</p>
           </div>
-          <div class="result-badge"><strong id="result-count">0</strong><span>рецептов</span></div>
         </div>
-        <div class="controls">
+        <div class="controls recipe-controls">
           <label class="searchbox"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Название или компонент…" autocomplete="off" aria-label="Поиск по рецептам"><kbd>/</kbd></label>
+          <label class="select-wrap"><span class="sr-only">Раздел рецептов</span><select id="recipe-domain"><option value="alchemy">Алхимия</option><option value="craft">Ремесло</option></select></label>
+          <label class="select-wrap" id="craft-type-wrap" hidden><span class="sr-only">Категория ремесла</span><select id="craft-type-filter"><option value="">Всё ремесло</option><option value="weapon">Оружие</option><option value="armor">Броня</option><option value="material">Материалы</option></select></label>
+          <label class="select-wrap" id="craft-category-wrap" hidden><span class="sr-only">Подкатегория ремесла</span><select id="craft-category-filter"><option value="">Любая подкатегория</option></select></label>
           <label class="select-wrap"><span class="sr-only">Уровень ремесла</span><select id="tier-filter"><option value="">Любой уровень</option><option value="Новичок">Новичок</option><option value="Подмастерье">Подмастерье</option><option value="Мастер">Мастер</option><option value="Великий мастер">Великий мастер</option></select></label>
           <button class="clear-button" id="clear-filters" type="button">Сбросить</button>
         </div>
-        <div class="quick-filters" id="quick-filters" aria-label="Быстрые категории"></div>
-        <div class="list-heading"><span id="list-label">Все рецепты</span><span class="list-hint">Нажмите на карточку, чтобы раскрыть детали</span></div>
         <div id="recipe-list" class="recipe-list" aria-live="polite"></div>
         <div id="recipe-empty" class="empty-state" hidden><div class="empty-glyph">⌕</div><h2>Ничего не найдено</h2><p>Измените запрос или сбросьте фильтры.</p></div>
-        <footer class="footer-note"><span class="footer-symbol">✦</span><span>Формулы показаны символами алхимических групп. Страница книги указана у каждого рецепта.</span></footer>
       </section>
 
       <section id="items-page" class="page-view" aria-labelledby="items-title" hidden>
         <div class="workspace-head">
           <div><div class="eyebrow"><span class="eyebrow-line"></span>Каталог</div><h1 id="items-title">Предметы</h1><p class="intro">Ингредиенты, алхимия, материалы, оружие и броня.</p></div>
-          <div class="result-badge"><strong id="item-result-count">0</strong><span>предметов</span></div>
         </div>
         <div class="controls">
           <label class="searchbox"><span aria-hidden="true">⌕</span><input id="item-search" type="search" placeholder="Найти предмет…" autocomplete="off" aria-label="Поиск по предметам"></label>

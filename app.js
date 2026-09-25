@@ -6,15 +6,11 @@
   const itemById = new Map(items.map(item => [item.id, item]));
   const storageKey = "witcher-workshop-inventory-v1";
   const sections = { recipes: "Рецепты", items: "Предметы", inventory: "Инвентарь" };
-  const recipeTypes = ["alchemy", "weapon", "armor", "material"];
-  const recipeNames = { all: "Все рецепты", alchemy: "Алхимия", weapon: "Оружие", armor: "Броня", material: "Материалы" };
   const $ = selector => document.querySelector(selector);
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
   const normalize = value => String(value ?? "").toLocaleLowerCase("ru-RU").replaceAll("ё", "е");
   const numberText = value => new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(value);
   let activePage = "recipes";
-  let activeRecipeType = "all";
-  let activeCategory = "";
 
   function formula(ingredients) {
     const relevant = ingredients.filter(ingredient => alchemySymbols[ingredient.itemId]);
@@ -38,7 +34,7 @@
     const time = recipe.time ? `<span class="meta-pill time"><strong>Время</strong>${escapeHtml(recipe.time)}</span>` : "";
     const outputs = (recipe.outputs || []).map(output => `${escapeHtml(output.name)}${output.quantity !== 1 ? ` ×${escapeHtml(output.quantity)}` : ""}`).join(", ");
     return `<details class="recipe-card" data-recipe-id="${escapeHtml(recipe.id)}">
-      <summary class="recipe-summary"><span class="recipe-title-block"><span class="recipe-title">${escapeHtml(recipe.name)}</span><span class="recipe-subtitle">${escapeHtml(recipe.category || recipeNames[recipe.type] || "")}</span></span>
+      <summary class="recipe-summary"><span class="recipe-title-block"><span class="recipe-title">${escapeHtml(recipe.name)}</span></span>
         <span class="ingredient-preview">${preview || "Состав не указан"}</span>${dc}${time}<span class="card-arrow" aria-hidden="true">⌄</span></summary>
       <div class="recipe-details"><div class="detail-grid">
         <div><span class="detail-label">Уровень</span><span class="detail-value">${escapeHtml(recipe.tier || "—")}</span></div>
@@ -47,49 +43,42 @@
         ${(recipe.outputs || []).length ? `<div class="full-width"><span class="detail-label">Результат</span><span class="detail-value">${outputs}</span></div>` : ""}
         ${recipe.type === "alchemy" ? `<div class="full-width"><span class="detail-label">Формула · символы ингредиентов</span>${formula(ingredients)}</div>` : ""}
         <div class="full-width"><span class="detail-label">Компоненты</span><span class="ingredient-list">${ingredients.map(ingredient => `<span class="ingredient-tag">${escapeHtml(ingredient.name)}${ingredient.quantity ? ` ×${escapeHtml(ingredient.quantity)}` : ""}</span>`).join("") || `<span class="detail-value">Не указаны</span>`}</span></div>
-      </div><div class="source-page">Источник: книга правил, стр. ${escapeHtml(recipe.sourcePages?.join(", ") || recipe.page || "—")}</div></div>
+      </div></div>
     </details>`;
   }
 
-  function recipeCategories() {
-    const relevant = recipes.filter(recipe => activeRecipeType === "all" || recipe.type === activeRecipeType);
-    return [...new Set(relevant.map(recipe => recipe.category).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ru"));
-  }
-
-  function renderQuickFilters() {
-    const categories = recipeCategories();
-    const controls = [{ value: "all", label: "Все рецепты" }, ...recipeTypes.map(type => ({ value: type, label: recipeNames[type] }))];
-    const typeButtons = controls.map(option => `<button class="category-chip ${option.value === activeRecipeType ? "active" : ""}" data-recipe-type="${option.value}">${option.label}</button>`).join("");
-    const categoryButtons = activeRecipeType === "all" ? "" : categories.map(category => `<button class="category-chip ${category === activeCategory ? "active" : ""}" data-category="${escapeHtml(category)}">${escapeHtml(category)}</button>`).join("");
-    const allCategories = activeRecipeType !== "all" && categories.length ? `<button class="category-chip ${activeCategory ? "" : "active"}" data-category="">Все подкатегории</button>` : "";
-    $("#quick-filters").innerHTML = typeButtons + allCategories + categoryButtons;
-    $("#quick-filters").querySelectorAll("[data-recipe-type]").forEach(button => button.addEventListener("click", () => {
-      activeRecipeType = button.dataset.recipeType;
-      activeCategory = "";
-      renderQuickFilters();
-      renderRecipes();
-    }));
-    $("#quick-filters").querySelectorAll("[data-category]").forEach(button => button.addEventListener("click", () => {
-      activeCategory = button.dataset.category;
-      renderQuickFilters();
-      renderRecipes();
-    }));
+  function updateRecipeFilters() {
+    const craft = $("#recipe-domain").value === "craft";
+    const type = $("#craft-type-filter").value;
+    $("#craft-type-wrap").hidden = !craft;
+    $("#recipe-title").textContent = craft ? "Ремесло" : "Алхимия";
+    $("#recipe-intro").textContent = craft ? "Чертежи оружия, брони и материалов." : "Формулы алхимических средств и их состав.";
+    const categories = craft && type
+      ? [...new Set(recipes.filter(recipe => recipe.type === type).map(recipe => recipe.category).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ru"))
+      : [];
+    const categorySelect = $("#craft-category-filter");
+    const previous = categorySelect.value;
+    categorySelect.innerHTML = `<option value="">Любая подкатегория</option>${categories.map(category => `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`).join("")}`;
+    categorySelect.value = categories.includes(previous) ? previous : "";
+    $("#craft-category-wrap").hidden = categories.length < 2;
   }
 
   function renderRecipes() {
     const query = normalize($("#search").value.trim());
     const tier = $("#tier-filter").value;
+    const domain = $("#recipe-domain").value;
+    const craftType = $("#craft-type-filter").value;
+    const category = $("#craft-category-filter").value;
     const visible = recipes.filter(recipe => {
-      if (activeRecipeType !== "all" && recipe.type !== activeRecipeType) return false;
-      if (activeCategory && recipe.category !== activeCategory) return false;
+      if (domain === "alchemy" ? recipe.type !== "alchemy" : recipe.type === "alchemy") return false;
+      if (domain === "craft" && craftType && recipe.type !== craftType) return false;
+      if (domain === "craft" && craftType && category && recipe.category !== category) return false;
       if (tier && recipe.tier !== tier) return false;
       const text = normalize([recipe.name, recipe.category, recipe.tier, ...(recipe.ingredients || []).map(ingredient => ingredient.name)].join(" "));
       return !query || text.includes(query);
     });
     $("#recipe-list").innerHTML = visible.map(recipeCard).join("");
     $("#recipe-empty").hidden = visible.length > 0;
-    $("#result-count").textContent = String(visible.length);
-    $("#list-label").textContent = activeCategory ? `${recipeNames[activeRecipeType]} · ${activeCategory}` : recipeNames[activeRecipeType];
   }
 
   function fieldValue(value, unit) {
@@ -109,9 +98,8 @@
     const attributes = item.attributes?.length ? `<div class="detail-block"><span class="detail-label">Характеристики</span><div class="attribute-list">${item.attributes.map(attribute => `<div class="attribute-row"><span>${escapeHtml(attribute.label)}</span><strong>${fieldValue(attribute.value, attribute.unit)}</strong></div>`).join("")}</div></div>` : "";
     const effects = item.effects?.length ? `<div class="detail-block"><span class="detail-label">Эффекты</span>${item.effects.map(effect => `<p>${escapeHtml(effect.text)}${effect.duration ? ` · ${escapeHtml(effect.duration)}` : ""}</p>`).join("")}</div>` : "";
     const description = item.description ? `<div class="detail-block"><span class="detail-label">Описание</span><p>${escapeHtml(item.description)}</p></div>` : "";
-    const source = item.sourcePages?.length ? `Источник: книга правил, стр. ${item.sourcePages.map(escapeHtml).join(", ")}` : "Страница источника не указана";
     return `<details class="item-card" data-item-id="${escapeHtml(item.id)}"><summary class="item-summary"><span class="item-name">${escapeHtml(item.name)}</span><span class="card-arrow" aria-hidden="true">⌄</span><span class="item-kind">${escapeHtml(item.typeLabel)}</span><span class="item-quick-meta">${quick.join("") || "Сведения о весе и цене отсутствуют"}</span></summary>
-      <div class="item-details">${description}${narrative}${attributes}${effects}<div class="source-page">${source} · ID: ${escapeHtml(item.id)}</div></div></details>`;
+      <div class="item-details">${description}${narrative}${attributes}${effects}</div></details>`;
   }
 
   function renderItems() {
@@ -124,7 +112,6 @@
     });
     $("#item-list").innerHTML = visible.map(itemCard).join("");
     $("#item-empty").hidden = visible.length > 0;
-    $("#item-result-count").textContent = String(visible.length);
   }
 
   function resolveItemId(itemId) {
@@ -212,7 +199,6 @@
         <span class="inventory-weight">${total}</span><button class="remove-item" type="button" data-remove="${escapeHtml(entry.id)}" aria-label="Удалить ${escapeHtml(entry.name)}">×</button></div>`;
     }).join("");
     $("#inventory-empty").hidden = inventory.items.length > 0;
-    $("#count-inventory").textContent = String(inventory.items.length);
   }
 
   function addInventoryEntry(entry) {
@@ -239,13 +225,19 @@
 
   document.querySelectorAll(".nav-item").forEach(button => button.addEventListener("click", () => showPage(button.dataset.page)));
   $("#search").addEventListener("input", renderRecipes);
+  $("#recipe-domain").addEventListener("change", () => {
+    $("#craft-type-filter").value = "";
+    updateRecipeFilters();
+    renderRecipes();
+  });
+  $("#craft-type-filter").addEventListener("change", () => { updateRecipeFilters(); renderRecipes(); });
+  $("#craft-category-filter").addEventListener("change", renderRecipes);
   $("#tier-filter").addEventListener("change", renderRecipes);
   $("#clear-filters").addEventListener("click", () => {
     $("#search").value = "";
     $("#tier-filter").value = "";
-    activeRecipeType = "all";
-    activeCategory = "";
-    renderQuickFilters();
+    $("#craft-type-filter").value = "";
+    updateRecipeFilters();
     renderRecipes();
     $("#search").focus();
   });
@@ -355,10 +347,8 @@
     } finally { event.target.value = ""; }
   });
 
-  $("#count-recipes").textContent = String(recipes.length);
-  $("#count-items").textContent = String(items.length);
   setupInventorySelect();
-  renderQuickFilters();
+  updateRecipeFilters();
   renderRecipes();
   renderItems();
   renderInventory();

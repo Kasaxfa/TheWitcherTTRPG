@@ -64,6 +64,13 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(len(data["symbols"]), 9)
         self.assertEqual(len(data["itemIdAliases"]), 4)
         self.assertTrue(all(recipe["id"] and recipe["categoryId"] for recipe in data["recipes"]))
+        self.assertTrue(all("sourcePages" not in recipe and "page" not in recipe for recipe in data["recipes"]))
+        self.assertTrue(all(
+            "sourcePage" not in item and "page" not in item
+            and all("sourcePage" not in attribute for attribute in item["attributes"])
+            and all("sourcePage" not in effect for effect in item["effects"])
+            for item in data["items"]
+        ))
         self.assertTrue(all(
             link["itemId"] in {item["id"] for item in data["items"]}
             for recipe in data["recipes"]
