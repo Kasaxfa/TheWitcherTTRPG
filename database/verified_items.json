@@ -1,0 +1,3552 @@
+{
+  "source": "Основная книга правил НРИ «Ведьмак»",
+  "items": [
+    {
+      "item_id": "item_6282540f5cf5a0f9692d",
+      "name": "Пепел",
+      "type": "ingredient",
+      "page": 128,
+      "weight_kg": 0.1,
+      "cost_crowns": 1,
+      "rarity": "Повсеместный",
+      "habitat": "Костёр и старые предметы"
+    },
+    {
+      "item_id": "item_c12c6c04f3be5da62954",
+      "name": "Уголь",
+      "type": "ingredient",
+      "page": 128,
+      "weight_kg": 0.1,
+      "cost_crowns": 1,
+      "rarity": "Обычный",
+      "habitat": "Костёр, горы и подземелья"
+    },
+    {
+      "item_id": "item_cd1d56cdaded5b72d17c",
+      "name": "Хлопок",
+      "type": "ingredient",
+      "page": 128,
+      "weight_kg": 0.1,
+      "cost_crowns": 1,
+      "rarity": "Обычный",
+      "habitat": "Поля и плантации"
+    },
+    {
+      "item_id": "item_943f28742416c0cab69e",
+      "name": "Двойное полотно",
+      "type": "material",
+      "page": 128,
+      "weight_kg": 0.1,
+      "cost_crowns": 22,
+      "attributes": {
+        "availability": "Р"
+      },
+      "description": "Получение: Покупается или изготавливается"
+    },
+    {
+      "item_id": "item_80cd54b3df11e7d67dc5",
+      "name": "Укреплённое дерево",
+      "type": "material",
+      "page": 128,
+      "weight_kg": 0.1,
+      "cost_crowns": 16,
+      "attributes": {
+        "availability": "Р"
+      },
+      "description": "Получение: Покупается или изготавливается"
+    },
+    {
+      "item_id": "item_f63e2f5416a2679961eb",
+      "name": "Полотно",
+      "type": "material",
+      "page": 128,
+      "weight_kg": 0.1,
+      "cost_crowns": 9,
+      "attributes": {
+        "availability": "О"
+      },
+      "description": "Получение: Покупается или изготавливается"
+    },
+    {
+      "item_id": "item_25b42504503f4aafea64",
+      "name": "Масло",
+      "type": "ingredient",
+      "page": 128,
+      "weight_kg": 0.1,
+      "cost_crowns": 3,
+      "rarity": "Обычный",
+      "habitat": "Покупается или изготавливается"
+    },
+    {
+      "item_id": "item_3b050052261f116f3d6b",
+      "name": "Смола",
+      "type": "ingredient",
+      "page": 128,
+      "weight_kg": 0.1,
+      "cost_crowns": 2,
+      "rarity": "Обычный",
+      "habitat": "Лес"
+    },
+    {
+      "item_id": "item_50ad2bc572fde0cd5f4a",
+      "name": "Шёлк",
+      "type": "ingredient",
+      "page": 128,
+      "weight_kg": 0.1,
+      "cost_crowns": 50,
+      "rarity": "Редкий",
+      "habitat": "Покупается"
+    },
+    {
+      "item_id": "item_7b34ef808e8ceb056383",
+      "name": "Нитки",
+      "type": "material",
+      "page": 128,
+      "weight_kg": 0.1,
+      "cost_crowns": 3,
+      "attributes": {
+        "availability": "О"
+      },
+      "description": "Получение: Покупается или изготавливается"
+    },
+    {
+      "item_id": "item_f4f4235fd165de089a87",
+      "name": "Древесина",
+      "type": "ingredient",
+      "page": 128,
+      "weight_kg": 1.0,
+      "cost_crowns": 3,
+      "rarity": "Повсеместный",
+      "habitat": "Лес"
+    },
+    {
+      "item_id": "item_1ebc5e3c852b8437ea5f",
+      "name": "Воск",
+      "type": "ingredient",
+      "page": 128,
+      "weight_kg": 0.1,
+      "cost_crowns": 2,
+      "rarity": "Обычный",
+      "habitat": "Лес и поля"
+    },
+    {
+      "item_id": "item_a27ffa903164ed2b379f",
+      "name": "Кости животных",
+      "type": "ingredient",
+      "page": 128,
+      "weight_kg": 4.0,
+      "cost_crowns": 8,
+      "rarity": "Обычный",
+      "habitat": "Чудовища и животные"
+    },
+    {
+      "item_id": "item_c737c6a2a556a51cb011",
+      "name": "Коровья шкура",
+      "type": "ingredient",
+      "page": 128,
+      "weight_kg": 5.0,
+      "cost_crowns": 10,
+      "rarity": "Обычный",
+      "habitat": "Покупается"
+    },
+    {
+      "item_id": "item_4e9c7897668eb8f07d87",
+      "name": "Кожа драконида",
+      "type": "ingredient",
+      "page": 128,
+      "weight_kg": 5.0,
+      "cost_crowns": 58,
+      "rarity": "Уникальный",
+      "habitat": "Покупается или изготавливается"
+    },
+    {
+      "item_id": "item_1781fa7129746a8ff9b7",
+      "name": "Чешуя драконида",
+      "type": "ingredient",
+      "page": 128,
+      "weight_kg": 5.0,
+      "cost_crowns": 30,
+      "rarity": "Уникальный",
+      "habitat": "Виверны"
+    },
+    {
+      "item_id": "item_313c800569d6d1e83503",
+      "name": "Перья",
+      "type": "ingredient",
+      "page": 128,
+      "weight_kg": 0.1,
+      "cost_crowns": 4,
+      "rarity": "Повсеместный",
+      "habitat": "Птицы"
+    },
+    {
+      "item_id": "item_168a2bcfd9fac25bc7b9",
+      "name": "Укреплённая кожа",
+      "type": "material",
+      "page": 128,
+      "weight_kg": 3.0,
+      "cost_crowns": 48,
+      "attributes": {
+        "availability": "Р"
+      },
+      "description": "Получение: Покупается или изготавливается"
+    },
+    {
+      "item_id": "item_d2af6098f1038f868865",
+      "name": "Кожа",
+      "type": "material",
+      "page": 128,
+      "weight_kg": 2.0,
+      "cost_crowns": 28,
+      "attributes": {
+        "availability": "О"
+      },
+      "description": "Получение: Покупается или изготавливается"
+    },
+    {
+      "item_id": "item_6e87e6a1e2cb3ac57706",
+      "name": "Лирийская кожа",
+      "type": "material",
+      "page": 128,
+      "weight_kg": 2.0,
+      "cost_crowns": 60,
+      "attributes": {
+        "availability": "Р"
+      },
+      "description": "Получение: Покупается или изготавливается"
+    },
+    {
+      "item_id": "item_ed5c14d9ae9f525301b9",
+      "name": "Волчья шкура",
+      "type": "ingredient",
+      "page": 128,
+      "weight_kg": 3.0,
+      "cost_crowns": 14,
+      "rarity": "Обычный",
+      "habitat": "Волки"
+    },
+    {
+      "item_id": "item_50b397130f0d5008561e",
+      "name": "Чернящее масло",
+      "type": "ingredient",
+      "page": 129,
+      "weight_kg": 0.1,
+      "cost_crowns": 24,
+      "rarity": "Редкий",
+      "habitat": "Лес"
+    },
+    {
+      "item_id": "item_bc0f3cc9e770c6a9c608",
+      "name": "Масло из дрейка",
+      "type": "ingredient",
+      "page": 129,
+      "weight_kg": 0.1,
+      "cost_crowns": 45,
+      "rarity": "Редкий",
+      "habitat": "Реки и морское побережье"
+    },
+    {
+      "item_id": "item_803aeb9e60ba3d98cce6",
+      "name": "Эфирная смазка",
+      "type": "ingredient",
+      "page": 129,
+      "weight_kg": 0.1,
+      "cost_crowns": 8,
+      "rarity": "Обычный",
+      "habitat": "Леса и поля"
+    },
+    {
+      "item_id": "item_2bd4350dc3d6704f69ba",
+      "name": "Травильная кислота",
+      "type": "ingredient",
+      "page": 129,
+      "weight_kg": 0.1,
+      "cost_crowns": 2,
+      "rarity": "Обычный",
+      "habitat": "Пещеры и горы"
+    },
+    {
+      "item_id": "item_4a02870e3faf31239541",
+      "name": "Пятая эссенция",
+      "type": "ingredient",
+      "page": 129,
+      "weight_kg": 0.1,
+      "cost_crowns": 82,
+      "rarity": "Уникальный",
+      "habitat": "Места силы, маги и бесы"
+    },
+    {
+      "item_id": "item_d1e0bda6bf59017a2b70",
+      "name": "Огров воск",
+      "type": "ingredient",
+      "page": 129,
+      "weight_kg": 0.1,
+      "cost_crowns": 10,
+      "rarity": "Обычный",
+      "habitat": "Пещеры"
+    },
+    {
+      "item_id": "item_29a8990ffa9fb4714ae0",
+      "name": "Точильный порошок",
+      "type": "ingredient",
+      "page": 129,
+      "weight_kg": 0.1,
+      "cost_crowns": 32,
+      "rarity": "Редкий",
+      "habitat": "Горы и пещеры"
+    },
+    {
+      "item_id": "item_5c0d3c551fbafefdf16c",
+      "name": "Дубильные травы",
+      "type": "ingredient",
+      "page": 129,
+      "weight_kg": 0.1,
+      "cost_crowns": 3,
+      "rarity": "Обычный",
+      "habitat": "Поля и леса"
+    },
+    {
+      "item_id": "item_e849994381906e37fb45",
+      "name": "Тёмное железо",
+      "type": "ingredient",
+      "page": 129,
+      "weight_kg": 1.5,
+      "cost_crowns": 52,
+      "rarity": "Уникальный",
+      "habitat": "Горы и подземелья"
+    },
+    {
+      "item_id": "item_79dd0bd6bd427d246d46",
+      "name": "Тёмная сталь",
+      "type": "material",
+      "page": 129,
+      "weight_kg": 1.0,
+      "cost_crowns": 82,
+      "attributes": {
+        "availability": "У"
+      },
+      "description": "Получение: Покупается или изготавливается"
+    },
+    {
+      "item_id": "item_750e7ca248c20931af6b",
+      "name": "Диммерит",
+      "type": "material",
+      "page": 129,
+      "weight_kg": 1.0,
+      "cost_crowns": 240,
+      "attributes": {
+        "availability": "У"
+      },
+      "description": "Получение: Покупается или изготавливается"
+    },
+    {
+      "item_id": "item_74e9b1c64311635ec1de",
+      "name": "Самоцвет",
+      "type": "ingredient",
+      "page": 129,
+      "weight_kg": 0.1,
+      "cost_crowns": 100,
+      "rarity": "Уникальный",
+      "habitat": "Горы и подземелья"
+    },
+    {
+      "item_id": "item_36cccc09d1a0a8178973",
+      "name": "Светящаяся руда",
+      "type": "ingredient",
+      "page": 129,
+      "weight_kg": 1.0,
+      "cost_crowns": 80,
+      "rarity": "Уникальный",
+      "habitat": "Горы и подземелья"
+    },
+    {
+      "item_id": "item_7d81cf69336ffbc78975",
+      "name": "Золото",
+      "type": "ingredient",
+      "page": 129,
+      "weight_kg": 1.0,
+      "cost_crowns": 85,
+      "rarity": "Уникальный",
+      "habitat": "Горы и подземелья"
+    },
+    {
+      "item_id": "item_70c291fabb398e93eaa4",
+      "name": "Железо",
+      "type": "ingredient",
+      "page": 129,
+      "weight_kg": 1.5,
+      "cost_crowns": 30,
+      "rarity": "Редкий",
+      "habitat": "Горы и подземелья"
+    },
+    {
+      "item_id": "item_8fc9d1da3476bea64e22",
+      "name": "Махакемский диммерит",
+      "type": "material",
+      "page": 129,
+      "weight_kg": 1.0,
+      "cost_crowns": 300,
+      "attributes": {
+        "availability": "У"
+      },
+      "description": "Получение: Покупается или изготавливается"
+    },
+    {
+      "item_id": "item_d747d12d6dec4318743c",
+      "name": "Махакемская сталь",
+      "type": "material",
+      "page": 129,
+      "weight_kg": 1.0,
+      "cost_crowns": 114,
+      "attributes": {
+        "availability": "Р"
+      },
+      "description": "Получение: Покупается или изготавливается"
+    },
+    {
+      "item_id": "item_9c1d7465660566859512",
+      "name": "Метеорит",
+      "type": "ingredient",
+      "page": 129,
+      "weight_kg": 1.0,
+      "cost_crowns": 98,
+      "rarity": "Уникальный",
+      "habitat": "Место падения на поверхности земли"
+    },
+    {
+      "item_id": "item_1e4b7676aaa84c2b1095",
+      "name": "Речная глина",
+      "type": "ingredient",
+      "page": 129,
+      "weight_kg": 1.5,
+      "cost_crowns": 5,
+      "rarity": "Редкий",
+      "habitat": "Реки или их берега"
+    },
+    {
+      "item_id": "item_b02e519f43dc0fdfb1f6",
+      "name": "Сталь",
+      "type": "material",
+      "page": 129,
+      "weight_kg": 1.0,
+      "cost_crowns": 48,
+      "attributes": {
+        "availability": "Р"
+      },
+      "description": "Получение: Покупается или изготавливается"
+    },
+    {
+      "item_id": "item_639060dfddf5da8869e4",
+      "name": "Терегорская сталь",
+      "type": "material",
+      "page": 129,
+      "weight_kg": 1.0,
+      "cost_crowns": 64,
+      "attributes": {
+        "availability": "Р"
+      },
+      "description": "Получение: Покупается или изготавливается"
+    },
+    {
+      "item_id": "item_e39a387d168cfbb37745",
+      "name": "Купорос",
+      "type": "ingredient",
+      "page": 142,
+      "description": "Алхимическая категория ингредиентов; не отдельный переносимый предмет.",
+      "alchemy_group": "Купорос"
+    },
+    {
+      "item_id": "item_e04a3dbe2837488f320b",
+      "name": "Ребис",
+      "type": "ingredient",
+      "page": 142,
+      "description": "Алхимическая категория ингредиентов; не отдельный переносимый предмет.",
+      "alchemy_group": "Ребис"
+    },
+    {
+      "item_id": "item_40a6272eea71edf138f1",
+      "name": "Эфир",
+      "type": "ingredient",
+      "page": 142,
+      "description": "Алхимическая категория ингредиентов; не отдельный переносимый предмет.",
+      "alchemy_group": "Эфир"
+    },
+    {
+      "item_id": "item_49a451fb424e81f75ddf",
+      "name": "Квебрит",
+      "type": "ingredient",
+      "page": 142,
+      "description": "Алхимическая категория ингредиентов; не отдельный переносимый предмет.",
+      "alchemy_group": "Квебрит"
+    },
+    {
+      "item_id": "item_2b7f860c3c28685f9fb2",
+      "name": "Гидраген",
+      "type": "ingredient",
+      "page": 142,
+      "description": "Алхимическая категория ингредиентов; не отдельный переносимый предмет.",
+      "alchemy_group": "Гидраген"
+    },
+    {
+      "item_id": "item_211436f6a609f3fe6fe9",
+      "name": "Киноварь",
+      "type": "ingredient",
+      "page": 142,
+      "description": "Алхимическая категория ингредиентов; не отдельный переносимый предмет.",
+      "alchemy_group": "Киноварь"
+    },
+    {
+      "item_id": "item_0ba4e48c06b2d28f0992",
+      "name": "Солнце",
+      "type": "ingredient",
+      "page": 142,
+      "description": "Алхимическая категория ингредиентов; не отдельный переносимый предмет.",
+      "alchemy_group": "Солнце"
+    },
+    {
+      "item_id": "item_c62d139c085df06e48df",
+      "name": "Аер",
+      "type": "ingredient",
+      "page": 142,
+      "description": "Алхимическая категория ингредиентов; не отдельный переносимый предмет.",
+      "alchemy_group": "Аер"
+    },
+    {
+      "item_id": "item_bfa0b0e4198fb6814f06",
+      "name": "Фульгор",
+      "type": "ingredient",
+      "page": 142,
+      "description": "Алхимическая категория ингредиентов; не отдельный переносимый предмет.",
+      "alchemy_group": "Фульгор"
+    },
+    {
+      "item_id": "item_98ad9121fcda4e179fe3d6bf236bf28a",
+      "name": "Плод балиссы",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 8,
+      "rarity": "Обычный",
+      "habitat": "Поля",
+      "alchemy_group": "Купорос"
+    },
+    {
+      "item_id": "item_27a32e419e2b4304bd3ae25b13b373fc",
+      "name": "Ячмень",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 9,
+      "rarity": "Обычный",
+      "habitat": "Поля",
+      "alchemy_group": "Купорос"
+    },
+    {
+      "item_id": "item_047fda02ae7041f398379db95ef16133",
+      "name": "Calcium equum",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 12,
+      "rarity": "Обычный",
+      "habitat": "Горы и под землёй",
+      "alchemy_group": "Купорос"
+    },
+    {
+      "item_id": "item_14ea378f0fa048ce8912a44b7be43363",
+      "name": "Вороний глаз",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 17,
+      "rarity": "Редкий",
+      "habitat": "Поля и леса",
+      "alchemy_group": "Купорос"
+    },
+    {
+      "item_id": "item_6d1ed957a691465f80a5ee5e43936fda",
+      "name": "Коготь гуля",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 1.0,
+      "cost_crowns": 60,
+      "rarity": "Уникальный",
+      "habitat": "Гули",
+      "alchemy_group": "Купорос"
+    },
+    {
+      "item_id": "item_afafd427b46b4197bd5bc9b37e542d9c",
+      "name": "Зубы накера",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 30,
+      "rarity": "Редкий",
+      "habitat": "Накеры",
+      "alchemy_group": "Купорос"
+    },
+    {
+      "item_id": "item_9dcbea61205c4ec193b70267cba81a00",
+      "name": "Грибы-шибальцы",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 17,
+      "rarity": "Редкий",
+      "habitat": "Пещеры",
+      "alchemy_group": "Купорос"
+    },
+    {
+      "item_id": "item_53428a3284534a3db21ca0edb9fde3b3",
+      "name": "Шкура тролля",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 4.5,
+      "cost_crowns": 147,
+      "rarity": "Уникальный",
+      "habitat": "Скальные тролли",
+      "alchemy_group": "Купорос"
+    },
+    {
+      "item_id": "item_80da0ebb0c4f4c0eb6e156a6332162e1",
+      "name": "Лепестки белого мирта",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 8,
+      "rarity": "Обычный",
+      "habitat": "Поля",
+      "alchemy_group": "Купорос"
+    },
+    {
+      "item_id": "item_f428d200c86340a08286703128acba70",
+      "name": "Ласточкина трава",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 8,
+      "rarity": "Обычный",
+      "habitat": "Поля и леса",
+      "alchemy_group": "Ребис"
+    },
+    {
+      "item_id": "item_063c15ac385448298badf88130aa1cca",
+      "name": "Мозг утопца",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 1.0,
+      "cost_crowns": 80,
+      "rarity": "Редкий",
+      "habitat": "Утопцы",
+      "alchemy_group": "Ребис"
+    },
+    {
+      "item_id": "item_0a962d3626264f84909c124776b3207d",
+      "name": "Волокна хана",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 17,
+      "rarity": "Редкий",
+      "habitat": "Поля",
+      "alchemy_group": "Ребис"
+    },
+    {
+      "item_id": "item_4ac911238a6d46c5a8e82a3a59af697b",
+      "name": "Зубы кладбищенской бабы",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 90,
+      "rarity": "Уникальный",
+      "habitat": "Кладбищенские бабы",
+      "alchemy_group": "Ребис"
+    },
+    {
+      "item_id": "item_f883c2f6f1d449bba67eab0822c7e019",
+      "name": "Лунная крошка",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 91,
+      "rarity": "Уникальный",
+      "habitat": "Горы или под землёй",
+      "alchemy_group": "Ребис"
+    },
+    {
+      "item_id": "item_0fe4b37028634c329c2378074cac3070",
+      "name": "Сердце накера",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 0.5,
+      "cost_crowns": 30,
+      "rarity": "Редкий",
+      "habitat": "Накеры",
+      "alchemy_group": "Ребис"
+    },
+    {
+      "item_id": "item_b08a43de90044ecd958ee0b8c607fcfe",
+      "name": "Винный камень",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 0.5,
+      "cost_crowns": 88,
+      "rarity": "Уникальный",
+      "habitat": "Винокурни",
+      "alchemy_group": "Ребис"
+    },
+    {
+      "item_id": "item_92daab898cdb4518b223f3863fe22228",
+      "name": "Корень зарника",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 18,
+      "rarity": "Редкий",
+      "habitat": "Поля",
+      "alchemy_group": "Эфир"
+    },
+    {
+      "item_id": "item_93fa614c521f4b91928ec8ce2b289534",
+      "name": "Плод берберки",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 9,
+      "rarity": "Обычный",
+      "habitat": "Горы и болота",
+      "alchemy_group": "Эфир"
+    },
+    {
+      "item_id": "item_c3c9296c6c1240e9b4a03f2e98dbbbdf",
+      "name": "Эссенция призрака",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 95,
+      "rarity": "Уникальный",
+      "habitat": "Призраки",
+      "alchemy_group": "Эфир"
+    },
+    {
+      "item_id": "item_84a6ed6993ff43af8a6fdcc51b58d18f",
+      "name": "Лепестки гинации",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 17,
+      "rarity": "Редкий",
+      "habitat": "Поля",
+      "alchemy_group": "Эфир"
+    },
+    {
+      "item_id": "item_b7497a300a4545c2922cb72259ad53f7",
+      "name": "Лепестки морозника",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 19,
+      "rarity": "Редкий",
+      "habitat": "Леса",
+      "alchemy_group": "Эфир"
+    },
+    {
+      "item_id": "item_4764e37eb98d451d83d27c65d0338d07",
+      "name": "Жемчуг",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 100,
+      "rarity": "Уникальный",
+      "habitat": "Дно океана и побережье",
+      "alchemy_group": "Эфир"
+    },
+    {
+      "item_id": "item_78f5f494a7d84441accbeab119b10277",
+      "name": "Ртутный раствор",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 77,
+      "rarity": "Уникальный",
+      "habitat": "Горы или под землёй",
+      "alchemy_group": "Эфир"
+    },
+    {
+      "item_id": "item_b350baf23cff4cbd88ae1bd1369098b4",
+      "name": "Склеродерм",
+      "type": "ingredient",
+      "page": 143,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 5,
+      "rarity": "Повсеместный",
+      "habitat": "Леса и пещеры",
+      "alchemy_group": "Эфир"
+    },
+    {
+      "item_id": "item_128583c9dfeb4ff6b64d62e8ee624664",
+      "name": "Листья балиссы",
+      "type": "ingredient",
+      "page": 144,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 8,
+      "rarity": "Обычный",
+      "habitat": "Поля",
+      "alchemy_group": "Квебрит"
+    },
+    {
+      "item_id": "item_b508f4eae7ca4c718205c04052cd623f",
+      "name": "Царская водка",
+      "type": "ingredient",
+      "page": 144,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 20,
+      "rarity": "Обычный",
+      "habitat": "Горы и под землёй",
+      "alchemy_group": "Квебрит"
+    },
+    {
+      "item_id": "item_5d54cf9db90744418ef0b2a8eaa00af8",
+      "name": "Собачья петрушка",
+      "type": "ingredient",
+      "page": 144,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 2,
+      "rarity": "Повсеместный",
+      "habitat": "Поля",
+      "alchemy_group": "Квебрит"
+    },
+    {
+      "item_id": "item_e84b7bfd4d414b62ad9f7dbbacae0431",
+      "name": "Костный мозг гуля",
+      "type": "ingredient",
+      "page": 144,
+      "new": true,
+      "weight_kg": 0.5,
+      "cost_crowns": 80,
+      "rarity": "Уникальный",
+      "habitat": "Гули",
+      "alchemy_group": "Квебрит"
+    },
+    {
+      "item_id": "item_1070a6ea5e9c434bb194d738ab205cb3",
+      "name": "Жимолость",
+      "type": "ingredient",
+      "page": 144,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 21,
+      "rarity": "Обычный",
+      "habitat": "Поля",
+      "alchemy_group": "Квебрит"
+    },
+    {
+      "item_id": "item_524a9eabd5bf45d4ab85e3fbb88783ed",
+      "name": "Optima mater",
+      "type": "ingredient",
+      "page": 144,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 100,
+      "rarity": "Уникальный",
+      "habitat": "Горы и под землёй",
+      "alchemy_group": "Квебрит"
+    },
+    {
+      "item_id": "item_596934530a04476b9a024b8ec2930e7b",
+      "name": "Сера",
+      "type": "ingredient",
+      "page": 144,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 14,
+      "rarity": "Обычный",
+      "habitat": "Горы и под землёй",
+      "alchemy_group": "Квебрит"
+    },
+    {
+      "item_id": "item_cc5c1fc26688478cb0e98435c63ab104",
+      "name": "Паутинник",
+      "type": "ingredient",
+      "page": 144,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 18,
+      "rarity": "Редкий",
+      "habitat": "Лес",
+      "alchemy_group": "Гидраген"
+    },
+    {
+      "item_id": "item_3614a5d095fd4363b5db896a6773513a",
+      "name": "Эссенция воды",
+      "type": "ingredient",
+      "page": 144,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 46,
+      "rarity": "Уникальный",
+      "habitat": "Утопцы и сирены",
+      "alchemy_group": "Гидраген"
+    },
+    {
+      "item_id": "item_6d7d13ad514948a8956e080e56192b56",
+      "name": "Дымная пыль",
+      "type": "ingredient",
+      "page": 144,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 146,
+      "rarity": "Уникальный",
+      "habitat": "Призраки, полуденницы, грифоны и големы",
+      "alchemy_group": "Гидраген"
+    },
+    {
+      "item_id": "item_d61b7507cc0a488c9c4bf39b94a53443",
+      "name": "Омела",
+      "type": "ingredient",
+      "page": 144,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 8,
+      "rarity": "Редкий",
+      "habitat": "Поля и леса",
+      "alchemy_group": "Гидраген"
+    },
+    {
+      "item_id": "item_0228377dfcf44c3dbe4dc389daad2545",
+      "name": "Коготь накера",
+      "type": "ingredient",
+      "page": 144,
+      "new": true,
+      "weight_kg": 0.5,
+      "cost_crowns": 40,
+      "rarity": "Редкий",
+      "habitat": "Накеры",
+      "alchemy_group": "Гидраген"
+    },
+    {
+      "item_id": "item_072f0d0b97974e94a1b8ff0e0e8f66c5",
+      "name": "Печень тролля",
+      "type": "ingredient",
+      "page": 144,
+      "new": true,
+      "weight_kg": 1.0,
+      "cost_crowns": 87,
+      "rarity": "Уникальный",
+      "habitat": "Скальные тролли",
+      "alchemy_group": "Гидраген"
+    },
+    {
+      "item_id": "item_f171d00e83a34a6a8054b042228eebc7",
+      "name": "Слюна волколака",
+      "type": "ingredient",
+      "page": 144,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 60,
+      "rarity": "Уникальный",
+      "habitat": "Волколаки",
+      "alchemy_group": "Гидраген"
+    },
+    {
+      "item_id": "item_41cb74080ece4cff9ff6f10f1df5ccd5",
+      "name": "Хитин",
+      "type": "ingredient",
+      "page": 144,
+      "new": true,
+      "weight_kg": 5.0,
+      "cost_crowns": 106,
+      "rarity": "Уникальный",
+      "habitat": "Главоглазы и эндриаги",
+      "alchemy_group": "Киноварь"
+    },
+    {
+      "item_id": "item_66905460fec846298de055bd3deb2a44",
+      "name": "Слюна эндриаги",
+      "type": "ingredient",
+      "page": 144,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 38,
+      "rarity": "Редкий",
+      "habitat": "Эндриаги",
+      "alchemy_group": "Киноварь"
+    },
+    {
+      "item_id": "item_e704898071174555b8331716b6214713",
+      "name": "Яйцо грифона",
+      "type": "ingredient",
+      "page": 144,
+      "new": true,
+      "weight_kg": 1.0,
+      "cost_crowns": 150,
+      "rarity": "Уникальный",
+      "habitat": "Грифоны и грифоньи гнёзда",
+      "alchemy_group": "Киноварь"
+    },
+    {
+      "item_id": "item_a5fa68c1e60b40c78d33957de820777a",
+      "name": "Перья грифона",
+      "type": "ingredient",
+      "page": 144,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 148,
+      "rarity": "Уникальный",
+      "habitat": "Грифоны",
+      "alchemy_group": "Киноварь"
+    },
+    {
+      "item_id": "item_7e149596c2764804aec2baa1ae77635d",
+      "name": "Корень мандрагоры",
+      "type": "ingredient",
+      "page": 144,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 65,
+      "rarity": "Уникальный",
+      "habitat": "Поля и леса",
+      "alchemy_group": "Киноварь"
+    },
+    {
+      "item_id": "item_205f7478a37d4e4a8983b1e9ea51d2b0",
+      "name": "Фосфор",
+      "type": "ingredient",
+      "page": 144,
+      "new": true,
+      "weight_kg": 0.5,
+      "cost_crowns": 20,
+      "rarity": "Редкий",
+      "habitat": "Горы и под землёй",
+      "alchemy_group": "Киноварь"
+    },
+    {
+      "item_id": "item_c8a3a16dbf624ac3ac873b163b6b9074",
+      "name": "Аконит",
+      "type": "ingredient",
+      "page": 144,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 9,
+      "rarity": "Редкий",
+      "habitat": "Поля, леса и горы",
+      "alchemy_group": "Киноварь"
+    },
+    {
+      "item_id": "item_90140c66830d4af393f846d2476d9a1a",
+      "name": "Глаз беса",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 0.5,
+      "cost_crowns": 149,
+      "rarity": "Уникальный",
+      "habitat": "Бесы",
+      "alchemy_group": "Солнце"
+    },
+    {
+      "item_id": "item_229c29faf1a34d2ebac859e8debd5435",
+      "name": "Эссенция света",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 43,
+      "rarity": "Редкий",
+      "habitat": "Полуденницы",
+      "alchemy_group": "Солнце"
+    },
+    {
+      "item_id": "item_2b5fa08d56554cbca956297f00b1adc6",
+      "name": "Голосовые связки сирены",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 65,
+      "rarity": "Уникальный",
+      "habitat": "Сирены",
+      "alchemy_group": "Солнце"
+    },
+    {
+      "item_id": "item_1a9bde9bb09042e6b5619161919d8313",
+      "name": "Слюна вампира",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 0.5,
+      "cost_crowns": 155,
+      "rarity": "Уникальный",
+      "habitat": "Катаканы",
+      "alchemy_group": "Солнце"
+    },
+    {
+      "item_id": "item_92cccf3e846640868a19411d0bcce4a6",
+      "name": "Вербена",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 18,
+      "rarity": "Редкий",
+      "habitat": "Поля",
+      "alchemy_group": "Солнце"
+    },
+    {
+      "item_id": "item_bd589e6864ab4e7f8d8f71fd5a9e0790",
+      "name": "Листья волчьего алоэ",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 39,
+      "rarity": "Редкий",
+      "habitat": "Синие горы",
+      "alchemy_group": "Солнце"
+    },
+    {
+      "item_id": "item_aaf948439d8940ab90f685053a8c9bd5",
+      "name": "Глаза виверны",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 75,
+      "rarity": "Уникальный",
+      "habitat": "Виверны",
+      "alchemy_group": "Солнце"
+    },
+    {
+      "item_id": "item_ce1dd77aaaeb4c749c7bd7774b4565c7",
+      "name": "Яд главоглаза",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 0.5,
+      "cost_crowns": 76,
+      "rarity": "Уникальный",
+      "habitat": "Главоглазы",
+      "alchemy_group": "Аер"
+    },
+    {
+      "item_id": "item_31dc85756ad74b87b26a10f45a8ba827",
+      "name": "Переступень",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 8,
+      "rarity": "Обычный",
+      "habitat": "Горы и города",
+      "alchemy_group": "Аер"
+    },
+    {
+      "item_id": "item_4b32deb6558b47049e0a619287f196c8",
+      "name": "Язык утопца",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 0.5,
+      "cost_crowns": 86,
+      "rarity": "Уникальный",
+      "habitat": "Утопцы",
+      "alchemy_group": "Аер"
+    },
+    {
+      "item_id": "item_3ec5da0a51b044d1b940a441748a5fbd",
+      "name": "Помёт беса",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 1.0,
+      "cost_crowns": 106,
+      "rarity": "Уникальный",
+      "habitat": "Территория бесов или бесы",
+      "alchemy_group": "Аер"
+    },
+    {
+      "item_id": "item_528fa8ac01c94c7b859e583983393dea",
+      "name": "Язык кладбищенской бабы",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 0.5,
+      "cost_crowns": 80,
+      "rarity": "Уникальный",
+      "habitat": "Кладбищенские бабы",
+      "alchemy_group": "Аер"
+    },
+    {
+      "item_id": "item_03ec7e73ce9b409ab259e75005d803e2",
+      "name": "Зелёная плесень",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 8,
+      "rarity": "Обычный",
+      "habitat": "Пещеры",
+      "alchemy_group": "Аер"
+    },
+    {
+      "item_id": "item_d712fd54e3af4f15ab549f8bb9e1d5c8",
+      "name": "Зубы вампира",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 150,
+      "rarity": "Уникальный",
+      "habitat": "Катаканы",
+      "alchemy_group": "Аер"
+    },
+    {
+      "item_id": "item_eec078bddfca4202bbe61d461152ea27",
+      "name": "Экстракт яда",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 38,
+      "rarity": "Редкий",
+      "habitat": "Гули, кладбищенские бабы, эндриаги, главоглазы, виверны",
+      "alchemy_group": "Аер"
+    },
+    {
+      "item_id": "item_4063131b89fa48bba52e4aea2376c607",
+      "name": "Глаза",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 0.5,
+      "cost_crowns": 95,
+      "rarity": "Уникальный",
+      "habitat": "Главоглазы и эндриаги",
+      "alchemy_group": "Фульгор"
+    },
+    {
+      "item_id": "item_06f2733011b643d8a171864b1bc1a2cd",
+      "name": "Собачье сало",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 10,
+      "rarity": "Обычный",
+      "habitat": "Собаки и волки",
+      "alchemy_group": "Фульгор"
+    },
+    {
+      "item_id": "item_018fff991d3b44c9a425c62ca71ef0a3",
+      "name": "Краснолюдский бессмертник",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 75,
+      "rarity": "Уникальный",
+      "habitat": "Под землёй",
+      "alchemy_group": "Фульгор"
+    },
+    {
+      "item_id": "item_350887c119d74390977270584c916b78",
+      "name": "Эмбрион эндриаги",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 1.5,
+      "cost_crowns": 55,
+      "rarity": "Уникальный",
+      "habitat": "Гнёзда эндриаг",
+      "alchemy_group": "Фульгор"
+    },
+    {
+      "item_id": "item_d75be594d82b41619aca94057ace3fa1",
+      "name": "Сердце голема",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 1.0,
+      "cost_crowns": 167,
+      "rarity": "Уникальный",
+      "habitat": "Големы",
+      "alchemy_group": "Фульгор"
+    },
+    {
+      "item_id": "item_d0f35adbe5104ec0a9d2691ac3442349",
+      "name": "Ухо кладбищенской бабы",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 134,
+      "rarity": "Уникальный",
+      "habitat": "Кладбищенские бабы",
+      "alchemy_group": "Фульгор"
+    },
+    {
+      "item_id": "item_04f5854aa0cd47109d5d8040acb38211",
+      "name": "Призрачная пыль",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 30,
+      "rarity": "Редкий",
+      "habitat": "Призраки",
+      "alchemy_group": "Фульгор"
+    },
+    {
+      "item_id": "item_5b72f5549c2741229ca333d65517a177",
+      "name": "Яйцо виверны",
+      "type": "ingredient",
+      "page": 145,
+      "new": true,
+      "weight_kg": 2.0,
+      "cost_crowns": 150,
+      "rarity": "Уникальный",
+      "habitat": "Виверны",
+      "alchemy_group": "Фульгор"
+    },
+    {
+      "item_id": "item_66227b1dbd606bdb24ac",
+      "name": "Железный полуторный меч",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 1.5,
+      "cost_crowns": 160,
+      "attributes": {
+        "availability": "П",
+        "damage": "2d6+2",
+        "accuracy": "+0",
+        "reliability": 10,
+        "hands": 2,
+        "enhancement_slots": 0
+      }
+    },
+    {
+      "item_id": "item_dd4406aa3b7e34dbbcb3",
+      "name": "Рыцарский меч",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 2.5,
+      "cost_crowns": 270,
+      "attributes": {
+        "availability": "О",
+        "damage": "2d6+4",
+        "accuracy": "+0",
+        "reliability": 15,
+        "hands": 1,
+        "enhancement_slots": 0
+      }
+    },
+    {
+      "item_id": "item_b3c5249ae26fd634dd79",
+      "name": "Гледдиф",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 3.0,
+      "cost_crowns": 285,
+      "attributes": {
+        "availability": "О",
+        "damage": "3d6+2",
+        "accuracy": "+0",
+        "reliability": 5,
+        "hands": 2,
+        "enhancement_slots": 0
+      }
+    },
+    {
+      "item_id": "item_0019f4044d9e7cbda7d8",
+      "name": "Охотничий фальшион",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 2.0,
+      "cost_crowns": 325,
+      "attributes": {
+        "availability": "О",
+        "damage": "3d6",
+        "accuracy": "+0",
+        "reliability": 15,
+        "hands": 1,
+        "enhancement_slots": 0
+      }
+    },
+    {
+      "item_id": "item_c5575c849263a4c692b6",
+      "name": "Кригсверд",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 2.0,
+      "cost_crowns": 570,
+      "attributes": {
+        "availability": "О",
+        "damage": "4d6+4",
+        "accuracy": "+2",
+        "reliability": 10,
+        "hands": 1,
+        "enhancement_slots": 0
+      }
+    },
+    {
+      "item_id": "item_7c213bf083b31c269062",
+      "name": "Эсбода",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 1.5,
+      "cost_crowns": 650,
+      "attributes": {
+        "availability": "Р",
+        "damage": "5d6",
+        "accuracy": "+1",
+        "reliability": 10,
+        "hands": 1,
+        "enhancement_slots": 1
+      }
+    },
+    {
+      "item_id": "item_7913e3e1ff87eb039bfd",
+      "name": "Корд",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 1.5,
+      "cost_crowns": 725,
+      "attributes": {
+        "availability": "У",
+        "damage": "5d6",
+        "accuracy": "+0",
+        "reliability": 15,
+        "hands": 1,
+        "enhancement_slots": 1
+      },
+      "effects": [
+        "Кровопускающее (25 %)"
+      ]
+    },
+    {
+      "item_id": "item_ee837e2daed9957715c3",
+      "name": "Клинок из Викваро",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 2.0,
+      "cost_crowns": 955,
+      "attributes": {
+        "availability": "У",
+        "damage": "6d6+4",
+        "accuracy": "+0",
+        "reliability": 15,
+        "hands": 2,
+        "enhancement_slots": 2
+      },
+      "effects": [
+        "Сбалансированное"
+      ]
+    },
+    {
+      "item_id": "item_be6f52b6c66733ee5876",
+      "name": "Торрур",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 2.0,
+      "cost_crowns": 1075,
+      "attributes": {
+        "availability": "У",
+        "damage": "6d6",
+        "accuracy": "+0",
+        "reliability": 15,
+        "hands": 2,
+        "enhancement_slots": 2
+      },
+      "effects": [
+        "Кровопускающее (50 %)"
+      ]
+    },
+    {
+      "item_id": "item_3dc820ec908f8f2f3bfd",
+      "name": "Кинжал",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 0.5,
+      "cost_crowns": 50,
+      "attributes": {
+        "availability": "П",
+        "damage": "1d6+2",
+        "accuracy": "+0",
+        "reliability": 10,
+        "hands": 1,
+        "enhancement_slots": 0
+      }
+    },
+    {
+      "item_id": "item_68b1b25bf94591e9a4a5",
+      "name": "Стилет",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 0.5,
+      "cost_crowns": 275,
+      "attributes": {
+        "availability": "О",
+        "damage": "1d6",
+        "accuracy": "+2",
+        "reliability": 5,
+        "hands": 1,
+        "enhancement_slots": 1
+      },
+      "effects": [
+        "Незаметное"
+      ]
+    },
+    {
+      "item_id": "item_732559527362b13f209a",
+      "name": "Короткий кинжал",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 1.0,
+      "cost_crowns": 350,
+      "attributes": {
+        "availability": "Р",
+        "damage": "2d6+2",
+        "accuracy": "+1",
+        "reliability": 10,
+        "hands": 1,
+        "enhancement_slots": 0
+      },
+      "effects": [
+        "Кровопускающее (25 %)"
+      ]
+    },
+    {
+      "item_id": "item_45a08ea4b3f20f66cbae",
+      "name": "Джамия",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 0.5,
+      "cost_crowns": 440,
+      "attributes": {
+        "availability": "У",
+        "damage": "2d6",
+        "accuracy": "+2",
+        "reliability": 10,
+        "hands": 1,
+        "enhancement_slots": 1
+      },
+      "effects": [
+        "Кровопускающее (25 %), пробивающее броню"
+      ]
+    },
+    {
+      "item_id": "item_f318be338c4090ac97b1",
+      "name": "Топор",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 1.0,
+      "cost_crowns": 205,
+      "attributes": {
+        "availability": "П",
+        "damage": "2d6+1",
+        "accuracy": "+0",
+        "reliability": 10,
+        "hands": 1,
+        "enhancement_slots": 0
+      }
+    },
+    {
+      "item_id": "item_d08a10a133d2e7b188da",
+      "name": "Боевой топор",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 2.0,
+      "cost_crowns": 525,
+      "attributes": {
+        "availability": "О",
+        "damage": "5d6",
+        "accuracy": "+0",
+        "reliability": 15,
+        "hands": 1,
+        "enhancement_slots": 0
+      }
+    },
+    {
+      "item_id": "item_67d64ce3903ff8a713a2",
+      "name": "Топор берсерка",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 3.0,
+      "cost_crowns": 960,
+      "attributes": {
+        "availability": "Р",
+        "damage": "6d6",
+        "accuracy": "+0",
+        "reliability": 15,
+        "hands": 2,
+        "enhancement_slots": 1
+      },
+      "effects": [
+        "Разрушающее, кровопускающее (25 %)"
+      ]
+    },
+    {
+      "item_id": "item_3c92ffe38703d17b766c",
+      "name": "Кастет",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 0.5,
+      "cost_crowns": 50,
+      "attributes": {
+        "availability": "П",
+        "damage": "1d6",
+        "accuracy": "+1",
+        "reliability": 15,
+        "hands": 1,
+        "enhancement_slots": 1
+      },
+      "effects": [
+        "Рукопашное"
+      ]
+    },
+    {
+      "item_id": "item_8b2d946207987d26433b",
+      "name": "Булава",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 2.0,
+      "cost_crowns": 525,
+      "attributes": {
+        "availability": "О",
+        "damage": "5d6",
+        "accuracy": "+0",
+        "reliability": 15,
+        "hands": 1,
+        "enhancement_slots": 0
+      }
+    },
+    {
+      "item_id": "item_58dcb13b52d32be4fd5e",
+      "name": "Молот горца",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 3.0,
+      "cost_crowns": 1100,
+      "attributes": {
+        "availability": "У",
+        "damage": "6d6+2",
+        "accuracy": "+0",
+        "reliability": 20,
+        "hands": 2,
+        "enhancement_slots": 1
+      },
+      "effects": [
+        "Дезориентирующее (-2), метеоритное"
+      ]
+    },
+    {
+      "item_id": "item_94e963e163330159db27",
+      "name": "Копьё",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 3.5,
+      "cost_crowns": 375,
+      "attributes": {
+        "availability": "П",
+        "damage": "3d6",
+        "accuracy": "+0",
+        "reliability": 10,
+        "hands": 2,
+        "enhancement_slots": 1
+      },
+      "effects": [
+        "Длинное"
+      ]
+    },
+    {
+      "item_id": "item_b26d998af3a1c0ba9ba0",
+      "name": "Секира",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 3.0,
+      "cost_crowns": 460,
+      "attributes": {
+        "availability": "Р",
+        "damage": "4d6+2",
+        "accuracy": "+0",
+        "reliability": 10,
+        "hands": 2,
+        "enhancement_slots": 0
+      },
+      "effects": [
+        "Длинное"
+      ]
+    },
+    {
+      "item_id": "item_5693c45ff67736485a9d",
+      "name": "Красная алебарда",
+      "type": "weapon",
+      "page": 73,
+      "weight_kg": 4.0,
+      "cost_crowns": 865,
+      "attributes": {
+        "availability": "Р",
+        "damage": "6d6+3",
+        "accuracy": "+0",
+        "reliability": 10,
+        "hands": 2,
+        "enhancement_slots": 1
+      },
+      "effects": [
+        "Длинное"
+      ]
+    },
+    {
+      "item_id": "item_df60d5128dc9a1a6e3d5",
+      "name": "Посох",
+      "type": "weapon",
+      "page": 74,
+      "weight_kg": 3.0,
+      "cost_crowns": 335,
+      "attributes": {
+        "availability": "О",
+        "damage": "1d6+2",
+        "accuracy": "+0",
+        "reliability": 10,
+        "hands": 2,
+        "enhancement_slots": 1
+      },
+      "effects": [
+        "Длинное, фокусирующее (1)"
+      ]
+    },
+    {
+      "item_id": "item_a9c6b5ce92c37f2b7cf0",
+      "name": "Посох с крюком",
+      "type": "weapon",
+      "page": 74,
+      "weight_kg": 3.5,
+      "cost_crowns": 550,
+      "attributes": {
+        "availability": "Р",
+        "damage": "2d6",
+        "accuracy": "+0",
+        "reliability": 10,
+        "hands": 2,
+        "enhancement_slots": 1
+      },
+      "effects": [
+        "Длинное, фокусирующее (1), захватное"
+      ]
+    },
+    {
+      "item_id": "item_450e73804b4ed452faa7",
+      "name": "Железный посох",
+      "type": "weapon",
+      "page": 74,
+      "weight_kg": 4.0,
+      "cost_crowns": 675,
+      "attributes": {
+        "availability": "Р",
+        "damage": "3d6",
+        "accuracy": "+0",
+        "reliability": 15,
+        "hands": 2,
+        "enhancement_slots": 1
+      },
+      "effects": [
+        "Длинное, фокусирующее (2)"
+      ]
+    },
+    {
+      "item_id": "item_f0574b3bdc30c3cabb60",
+      "name": "Посох с кристаллом",
+      "type": "weapon",
+      "page": 74,
+      "weight_kg": 2.5,
+      "cost_crowns": 835,
+      "attributes": {
+        "availability": "У",
+        "damage": "2d6+2",
+        "accuracy": "+0",
+        "reliability": 5,
+        "hands": 2,
+        "enhancement_slots": 2
+      },
+      "effects": [
+        "Длинное, фокусирующее (3), улучшенное фокусирующее"
+      ]
+    },
+    {
+      "item_id": "item_21da425750b97a2c7b78",
+      "name": "Метательные ножи",
+      "type": "weapon",
+      "page": 74,
+      "weight_kg": 0.5,
+      "cost_crowns": 50,
+      "attributes": {
+        "availability": "П",
+        "damage": "1d6",
+        "accuracy": "+0",
+        "range": "Тел × 4 м",
+        "reliability": 5,
+        "hands": 1,
+        "enhancement_slots": 0
+      }
+    },
+    {
+      "item_id": "item_ba0f74e0f1fd31cd1455",
+      "name": "Метательные топоры",
+      "type": "weapon",
+      "page": 74,
+      "weight_kg": 1.0,
+      "cost_crowns": 75,
+      "attributes": {
+        "availability": "П",
+        "damage": "2d6",
+        "accuracy": "+0",
+        "range": "Тел × 2 м",
+        "reliability": 10,
+        "hands": 1,
+        "enhancement_slots": 0
+      }
+    },
+    {
+      "item_id": "item_7a1355b547c00e76a9af",
+      "name": "Орионы",
+      "type": "weapon",
+      "page": 74,
+      "weight_kg": 0.1,
+      "cost_crowns": 100,
+      "attributes": {
+        "availability": "Р",
+        "damage": "1d6",
+        "accuracy": "+1",
+        "range": "Тел × 4 м",
+        "reliability": 5,
+        "hands": 1,
+        "enhancement_slots": 0
+      }
+    },
+    {
+      "item_id": "item_6c390c22e0c32ae44960",
+      "name": "Короткий лук",
+      "type": "weapon",
+      "page": 74,
+      "weight_kg": 1.0,
+      "cost_crowns": 290,
+      "attributes": {
+        "availability": "П",
+        "damage": "3d6+3",
+        "accuracy": "+0",
+        "range": "100 м",
+        "reliability": 10,
+        "hands": 2,
+        "enhancement_slots": 0
+      }
+    },
+    {
+      "item_id": "item_c4a98dd580ee92748e50",
+      "name": "Длинный лук",
+      "type": "weapon",
+      "page": 74,
+      "weight_kg": 2.0,
+      "cost_crowns": 475,
+      "attributes": {
+        "availability": "П",
+        "damage": "4d6",
+        "accuracy": "+0",
+        "range": "200 м",
+        "reliability": 10,
+        "hands": 2,
+        "enhancement_slots": 1
+      }
+    },
+    {
+      "item_id": "item_6233561e9712fd059b13",
+      "name": "Армейский лук",
+      "type": "weapon",
+      "page": 74,
+      "weight_kg": 3.0,
+      "cost_crowns": 835,
+      "attributes": {
+        "availability": "О",
+        "damage": "6d6",
+        "accuracy": "+0",
+        "range": "300 м",
+        "reliability": 15,
+        "hands": 2,
+        "enhancement_slots": 1
+      }
+    },
+    {
+      "item_id": "item_e6f5024c0238d94c8c6a",
+      "name": "Ручной арбалет",
+      "type": "weapon",
+      "page": 74,
+      "weight_kg": 0.5,
+      "cost_crowns": 285,
+      "attributes": {
+        "availability": "П",
+        "damage": "2d6+2",
+        "accuracy": "+1",
+        "range": "50 м",
+        "reliability": 5,
+        "hands": 1,
+        "enhancement_slots": 1
+      },
+      "effects": [
+        "Медленно перезаряжающееся"
+      ]
+    },
+    {
+      "item_id": "item_71031a968acef410ca33",
+      "name": "Арбалет",
+      "type": "weapon",
+      "page": 74,
+      "weight_kg": 3.0,
+      "cost_crowns": 455,
+      "attributes": {
+        "availability": "П",
+        "damage": "4d6+2",
+        "accuracy": "+1",
+        "range": "100 м",
+        "reliability": 5,
+        "hands": 2,
+        "enhancement_slots": 1
+      },
+      "effects": [
+        "Медленно перезаряжающееся"
+      ]
+    },
+    {
+      "item_id": "item_0e26f57d0a08f61e554d",
+      "name": "Арбалет охотника на чудовищ",
+      "type": "weapon",
+      "page": 74,
+      "weight_kg": 4.0,
+      "cost_crowns": 1125,
+      "attributes": {
+        "availability": "У",
+        "damage": "6d6",
+        "accuracy": "+1",
+        "range": "200 м",
+        "reliability": 15,
+        "hands": 2,
+        "enhancement_slots": 1
+      },
+      "effects": [
+        "Медленно перезаряжающееся, пробивающее броню"
+      ]
+    },
+    {
+      "item_id": "item_86693cb17438240ec6a0",
+      "name": "Боеприпасы стандартные",
+      "type": "weapon",
+      "page": 74,
+      "weight_kg": 0.5,
+      "cost_crowns": 10,
+      "attributes": {
+        "availability": "П"
+      }
+    },
+    {
+      "item_id": "item_dad5d55d92d9a361763b",
+      "name": "Боеприпасы с затупленным наконечником",
+      "type": "weapon",
+      "page": 74,
+      "weight_kg": 0.1,
+      "cost_crowns": 5,
+      "attributes": {
+        "availability": "О"
+      },
+      "effects": [
+        "Несмертельное"
+      ]
+    },
+    {
+      "item_id": "item_3fed0bf1e76793611f11",
+      "name": "Боеприпасы с широким наконечником",
+      "type": "weapon",
+      "page": 74,
+      "weight_kg": 0.1,
+      "cost_crowns": 10,
+      "attributes": {
+        "availability": "О"
+      },
+      "effects": [
+        "Кровопускающее (100 %)"
+      ]
+    },
+    {
+      "item_id": "item_0d2f6fcf7655b8cf6288",
+      "name": "Боеприпасы бронебойные",
+      "type": "weapon",
+      "page": 74,
+      "weight_kg": 0.1,
+      "cost_crowns": 15,
+      "attributes": {
+        "availability": "О"
+      },
+      "effects": [
+        "Пробивающее броню"
+      ]
+    },
+    {
+      "item_id": "item_242ee72a760982dc255e",
+      "name": "Эльфский мессер",
+      "type": "weapon",
+      "page": 83,
+      "weight_kg": 2.0,
+      "cost_crowns": 595,
+      "attributes": {
+        "availability": "У",
+        "damage": "3d6+4",
+        "accuracy": "+2",
+        "reliability": 15,
+        "hands": 1,
+        "enhancement_slots": 2
+      }
+    },
+    {
+      "item_id": "item_09dd41c61be9dbf82437",
+      "name": "Клинок бригады «Врихед»",
+      "type": "weapon",
+      "page": 83,
+      "weight_kg": 2.5,
+      "cost_crowns": 745,
+      "attributes": {
+        "availability": "У",
+        "damage": "4d6+4",
+        "accuracy": "+3",
+        "reliability": 15,
+        "hands": 1,
+        "enhancement_slots": 0
+      },
+      "effects": [
+        "Кровопускающее (25 %)"
+      ]
+    },
+    {
+      "item_id": "item_fa2a4e97efc829528aeb",
+      "name": "Меч из метеоритной стали",
+      "type": "weapon",
+      "page": 83,
+      "weight_kg": 3.0,
+      "cost_crowns": 875,
+      "attributes": {
+        "availability": "У",
+        "damage": "5d6",
+        "accuracy": "+1",
+        "reliability": 20,
+        "hands": 2,
+        "enhancement_slots": 2
+      },
+      "effects": [
+        "Сбалансированное, метеоритное"
+      ]
+    },
+    {
+      "item_id": "item_f87bc997f2df96e3cb0a",
+      "name": "Гномий гвихир",
+      "type": "weapon",
+      "page": 83,
+      "weight_kg": 2.5,
+      "cost_crowns": 1090,
+      "attributes": {
+        "availability": "У",
+        "damage": "5d6+3",
+        "accuracy": "+3",
+        "reliability": 15,
+        "hands": 2,
+        "enhancement_slots": 2
+      },
+      "effects": [
+        "Кровопускающее (50 %)"
+      ]
+    },
+    {
+      "item_id": "item_2784b063d2dedaf667cf",
+      "name": "Клинок из Тир Тохаира",
+      "type": "weapon",
+      "page": 83,
+      "weight_kg": 3.0,
+      "cost_crowns": 1175,
+      "attributes": {
+        "availability": "У",
+        "damage": "6d6",
+        "accuracy": "+3",
+        "reliability": 15,
+        "hands": 2,
+        "enhancement_slots": 2
+      },
+      "effects": [
+        "Кровопускающее (25 %)"
+      ]
+    },
+    {
+      "item_id": "item_76a576d770afb2dfb737",
+      "name": "Низушечий рондель",
+      "type": "weapon",
+      "page": 83,
+      "weight_kg": 1.0,
+      "cost_crowns": 485,
+      "attributes": {
+        "availability": "У",
+        "damage": "2d6+2",
+        "accuracy": "+2",
+        "reliability": 10,
+        "hands": 1,
+        "enhancement_slots": 1
+      },
+      "effects": [
+        "Пробивающее броню"
+      ]
+    },
+    {
+      "item_id": "item_4e8420c10fd69bfc4451",
+      "name": "Краснолюдский тесак",
+      "type": "weapon",
+      "page": 83,
+      "weight_kg": 1.5,
+      "cost_crowns": 500,
+      "attributes": {
+        "availability": "У",
+        "damage": "3d6",
+        "accuracy": "+2",
+        "reliability": 15,
+        "hands": 1,
+        "enhancement_slots": 1
+      }
+    },
+    {
+      "item_id": "item_80d700c282827f61e05b",
+      "name": "Краснолюдский топор",
+      "type": "weapon",
+      "page": 83,
+      "weight_kg": 4.0,
+      "cost_crowns": 740,
+      "attributes": {
+        "availability": "У",
+        "damage": "5d6+3",
+        "accuracy": "+3",
+        "reliability": 15,
+        "hands": 1,
+        "enhancement_slots": 1
+      }
+    },
+    {
+      "item_id": "item_d40dd59a2e7b04517476",
+      "name": "Гномий чёрный топор",
+      "type": "weapon",
+      "page": 83,
+      "weight_kg": 2.5,
+      "cost_crowns": 910,
+      "attributes": {
+        "availability": "У",
+        "damage": "6d6+2",
+        "accuracy": "+2",
+        "reliability": 15,
+        "hands": 2,
+        "enhancement_slots": 2
+      }
+    },
+    {
+      "item_id": "item_2ce91c1d348060d35dac",
+      "name": "Махакемский мартель",
+      "type": "weapon",
+      "page": 83,
+      "weight_kg": 3.5,
+      "cost_crowns": 750,
+      "attributes": {
+        "availability": "У",
+        "damage": "5d6",
+        "accuracy": "+0",
+        "reliability": 15,
+        "hands": 2,
+        "enhancement_slots": 1
+      },
+      "effects": [
+        "Пробивающее броню"
+      ]
+    },
+    {
+      "item_id": "item_323e0cc67e710ebc3acb",
+      "name": "Кистень из метеоритной стали",
+      "type": "weapon",
+      "page": 83,
+      "weight_kg": 4.0,
+      "cost_crowns": 900,
+      "attributes": {
+        "availability": "У",
+        "damage": "6d6",
+        "accuracy": "+2",
+        "reliability": 20,
+        "hands": 1,
+        "enhancement_slots": 2
+      },
+      "effects": [
+        "Захватное, метеоритное"
+      ]
+    },
+    {
+      "item_id": "item_4f027a298e0cc969bdb6",
+      "name": "Краснолюдский боевой молот",
+      "type": "weapon",
+      "page": 83,
+      "weight_kg": 4.0,
+      "cost_crowns": 835,
+      "attributes": {
+        "availability": "У",
+        "damage": "5d6+2",
+        "accuracy": "+0",
+        "reliability": 15,
+        "hands": 2,
+        "enhancement_slots": 1
+      },
+      "effects": [
+        "Длинное, дезориентирующее (-2)"
+      ]
+    },
+    {
+      "item_id": "item_eaa5e3e30b09b022cfc2",
+      "name": "Эльфская глефа",
+      "type": "weapon",
+      "page": 83,
+      "weight_kg": 3.0,
+      "cost_crowns": 925,
+      "attributes": {
+        "availability": "У",
+        "damage": "4d6+3",
+        "accuracy": "+2",
+        "reliability": 10,
+        "hands": 2,
+        "enhancement_slots": 2
+      },
+      "effects": [
+        "Длинное, кровопускающее (25 %)"
+      ]
+    },
+    {
+      "item_id": "item_5f126cf9b0d62e5d0c33",
+      "name": "Гномий посох",
+      "type": "weapon",
+      "page": 83,
+      "weight_kg": 2.5,
+      "cost_crowns": 910,
+      "attributes": {
+        "availability": "У",
+        "damage": "3d6+2",
+        "accuracy": "+1",
+        "reliability": 15,
+        "hands": 2,
+        "enhancement_slots": 2
+      },
+      "effects": [
+        "Длинное, фокусирующее (3)"
+      ]
+    },
+    {
+      "item_id": "item_6ff5203d72cd3c483f3a",
+      "name": "Эльфский дорожный посох",
+      "type": "weapon",
+      "page": 83,
+      "weight_kg": 1.5,
+      "cost_crowns": 975,
+      "attributes": {
+        "availability": "У",
+        "damage": "3d6",
+        "accuracy": "+1",
+        "reliability": 10,
+        "hands": 2,
+        "enhancement_slots": 2
+      },
+      "effects": [
+        "Длинное, фокусирующее (3), улучшенное фокусирующее"
+      ]
+    },
+    {
+      "item_id": "item_3ad9306a714309e48c18",
+      "name": "Эльфский походный лук",
+      "type": "weapon",
+      "page": 83,
+      "weight_kg": 1.0,
+      "cost_crowns": 575,
+      "attributes": {
+        "availability": "У",
+        "damage": "4d6",
+        "accuracy": "+1",
+        "range": "200 м",
+        "reliability": 10,
+        "hands": 2,
+        "enhancement_slots": 1
+      }
+    },
+    {
+      "item_id": "item_7a6edfa51bcdd5a7735d",
+      "name": "Эльфский зефар",
+      "type": "weapon",
+      "page": 83,
+      "weight_kg": 2.5,
+      "cost_crowns": 1100,
+      "attributes": {
+        "availability": "У",
+        "damage": "6d6",
+        "accuracy": "+2",
+        "range": "350 м",
+        "reliability": 10,
+        "hands": 2,
+        "enhancement_slots": 2
+      },
+      "effects": [
+        "Улучшенное пробивающее броню"
+      ]
+    },
+    {
+      "item_id": "item_b0a07e34ce82d8003016",
+      "name": "Гномий ручной арбалет",
+      "type": "weapon",
+      "page": 83,
+      "weight_kg": 1.0,
+      "cost_crowns": 425,
+      "attributes": {
+        "availability": "У",
+        "damage": "2d6",
+        "accuracy": "+3",
+        "range": "100 м",
+        "reliability": 10,
+        "hands": 1,
+        "enhancement_slots": 1
+      },
+      "effects": [
+        "Медленно перезаряжающееся"
+      ]
+    },
+    {
+      "item_id": "item_633492c9ae818f68b0c3",
+      "name": "Краснолюдский тяжёлый арбалет",
+      "type": "weapon",
+      "page": 83,
+      "weight_kg": 3.5,
+      "cost_crowns": 850,
+      "attributes": {
+        "availability": "У",
+        "damage": "5d6",
+        "accuracy": "+3",
+        "range": "300 м",
+        "reliability": 15,
+        "hands": 2,
+        "enhancement_slots": 2
+      },
+      "effects": [
+        "Медленно перезаряжающееся"
+      ]
+    },
+    {
+      "item_id": "item_6d82db782aabe22ad36d",
+      "name": "Эльфские ввинчивающиеся",
+      "type": "weapon",
+      "page": 84,
+      "weight_kg": 0.1,
+      "cost_crowns": 50,
+      "attributes": {
+        "availability": "У"
+      },
+      "effects": [
+        "Кровопускающее (100 %)"
+      ]
+    },
+    {
+      "item_id": "item_0af9b67395bce80fd8c3",
+      "name": "Краснолюдские пробивные",
+      "type": "weapon",
+      "page": 84,
+      "weight_kg": 0.1,
+      "cost_crowns": 50,
+      "attributes": {
+        "availability": "У"
+      },
+      "effects": [
+        "Разрушающее"
+      ]
+    },
+    {
+      "item_id": "item_e421f303955f0febc6fe",
+      "name": "Капюшон верденского лучника",
+      "type": "armor",
+      "page": 79,
+      "weight_kg": 0.5,
+      "cost_crowns": 100,
+      "attributes": {
+        "availability": "О",
+        "armor_region": "Голова",
+        "armor_slots": 1,
+        "encumbrance": 0,
+        "armor_rating": 3
+      }
+    },
+    {
+      "item_id": "item_9f17a4ef6651b7ea8bf9",
+      "name": "Двуслойный капюшон",
+      "type": "armor",
+      "page": 79,
+      "weight_kg": 1.0,
+      "cost_crowns": 175,
+      "attributes": {
+        "availability": "Р",
+        "armor_region": "Голова",
+        "armor_slots": 1,
+        "encumbrance": 0,
+        "armor_rating": 5
+      }
+    },
+    {
+      "item_id": "item_3946d489b44cc7c7ee31",
+      "name": "Каркасный шлем с полумаской",
+      "type": "armor",
+      "page": 79,
+      "weight_kg": 1.0,
+      "cost_crowns": 200,
+      "attributes": {
+        "availability": "О",
+        "armor_region": "Голова",
+        "armor_slots": 0,
+        "encumbrance": 0,
+        "armor_rating": 8
+      }
+    },
+    {
+      "item_id": "item_609ccf42fe59fa89cad3",
+      "name": "Кольчужный капюшон",
+      "type": "armor",
+      "page": 79,
+      "weight_kg": 1.5,
+      "cost_crowns": 250,
+      "attributes": {
+        "availability": "П",
+        "armor_region": "Голова",
+        "armor_slots": 0,
+        "encumbrance": 0,
+        "armor_rating": 12
+      }
+    },
+    {
+      "item_id": "item_36099ef7de9fa2cfe54b",
+      "name": "Усиленный капюшон",
+      "type": "armor",
+      "page": 79,
+      "weight_kg": 2.0,
+      "cost_crowns": 250,
+      "attributes": {
+        "availability": "О",
+        "armor_region": "Голова",
+        "armor_slots": 0,
+        "encumbrance": 0,
+        "armor_rating": 14
+      }
+    },
+    {
+      "item_id": "item_26c532b9a0d2fb76ef6b",
+      "name": "Темерский армет",
+      "type": "armor",
+      "page": 79,
+      "weight_kg": 1.5,
+      "cost_crowns": 475,
+      "attributes": {
+        "availability": "Р",
+        "armor_region": "Голова",
+        "armor_slots": 1,
+        "encumbrance": 0,
+        "armor_rating": 16
+      },
+      "effects": [
+        "Ограничение зрения"
+      ]
+    },
+    {
+      "item_id": "item_2256454f6112c20693b7",
+      "name": "Топфхельм",
+      "type": "armor",
+      "page": 79,
+      "weight_kg": 3.5,
+      "cost_crowns": 575,
+      "attributes": {
+        "availability": "У",
+        "armor_region": "Голова",
+        "armor_slots": 1,
+        "encumbrance": 0,
+        "armor_rating": 20
+      },
+      "effects": [
+        "Ограничение зрения"
+      ]
+    },
+    {
+      "item_id": "item_c508dfd7c602f57b8a21",
+      "name": "Скеллигский шлем",
+      "type": "armor",
+      "page": 79,
+      "weight_kg": 3.5,
+      "cost_crowns": 700,
+      "attributes": {
+        "availability": "Р",
+        "armor_region": "Голова",
+        "armor_slots": 1,
+        "encumbrance": 0,
+        "armor_rating": 25
+      },
+      "effects": [
+        "Ограничение зрения"
+      ]
+    },
+    {
+      "item_id": "item_f41214c6cd7a531c05c7",
+      "name": "Нильфгаардский шлем",
+      "type": "armor",
+      "page": 79,
+      "weight_kg": 3.0,
+      "cost_crowns": 800,
+      "attributes": {
+        "availability": "У",
+        "armor_region": "Голова",
+        "armor_slots": 2,
+        "encumbrance": 0,
+        "armor_rating": 30
+      },
+      "effects": [
+        "Ограничение зрения"
+      ]
+    },
+    {
+      "item_id": "item_2a34efa50f99b812394d",
+      "name": "Гамбезон",
+      "type": "armor",
+      "page": 79,
+      "weight_kg": 1.0,
+      "cost_crowns": 100,
+      "attributes": {
+        "availability": "П",
+        "armor_region": "Туловище и руки",
+        "armor_slots": 0,
+        "encumbrance": 0,
+        "armor_rating": 3
+      }
+    },
+    {
+      "item_id": "item_11540f318b2d1ba3dd7f",
+      "name": "Аэдирнский гамбезон",
+      "type": "armor",
+      "page": 79,
+      "weight_kg": 1.5,
+      "cost_crowns": 175,
+      "attributes": {
+        "availability": "Р",
+        "armor_region": "Туловище и руки",
+        "armor_slots": 1,
+        "encumbrance": 0,
+        "armor_rating": 5
+      }
+    },
+    {
+      "item_id": "item_938fb52376a1ef3fe7ea",
+      "name": "Двуслойный гамбезон",
+      "type": "armor",
+      "page": 79,
+      "weight_kg": 2.5,
+      "cost_crowns": 250,
+      "attributes": {
+        "availability": "Р",
+        "armor_region": "Туловище и руки",
+        "armor_slots": 1,
+        "encumbrance": 0,
+        "armor_rating": 8
+      }
+    },
+    {
+      "item_id": "item_4ec4a12c02f886584fc5",
+      "name": "Бригантина",
+      "type": "armor",
+      "page": 79,
+      "weight_kg": 7.0,
+      "cost_crowns": 300,
+      "attributes": {
+        "availability": "О",
+        "armor_region": "Туловище и руки",
+        "armor_slots": 0,
+        "encumbrance": 1,
+        "armor_rating": 12
+      }
+    },
+    {
+      "item_id": "item_5b6b2fef40fb6a2c4f0f",
+      "name": "Броня реданского алебардщика",
+      "type": "armor",
+      "page": 79,
+      "weight_kg": 8.5,
+      "cost_crowns": 400,
+      "attributes": {
+        "availability": "Р",
+        "armor_region": "Туловище и руки",
+        "armor_slots": 1,
+        "encumbrance": 1,
+        "armor_rating": 14
+      }
+    },
+    {
+      "item_id": "item_85aad69f117f67ffd422",
+      "name": "Кожаная куртка из Лирии",
+      "type": "armor",
+      "page": 79,
+      "weight_kg": 6.5,
+      "cost_crowns": 525,
+      "attributes": {
+        "availability": "У",
+        "armor_region": "Туловище и руки",
+        "armor_slots": 1,
+        "encumbrance": 1,
+        "armor_rating": 16
+      }
+    },
+    {
+      "item_id": "item_05b99a4b9672539375ff",
+      "name": "Латный доспех",
+      "type": "armor",
+      "page": 79,
+      "weight_kg": 14.0,
+      "cost_crowns": 625,
+      "attributes": {
+        "availability": "У",
+        "armor_region": "Туловище и руки",
+        "armor_slots": 1,
+        "encumbrance": 2,
+        "armor_rating": 20
+      }
+    },
+    {
+      "item_id": "item_a751b0e80dcdcf54d0f1",
+      "name": "Хиндарсфьяльский тяжёлый доспех",
+      "type": "armor",
+      "page": 79,
+      "weight_kg": 15.0,
+      "cost_crowns": 750,
+      "attributes": {
+        "availability": "У",
+        "armor_region": "Туловище и руки",
+        "armor_slots": 3,
+        "encumbrance": 2,
+        "armor_rating": 25
+      }
+    },
+    {
+      "item_id": "item_2b7df7b079f564a9875d",
+      "name": "Нильфгаардский латный доспех",
+      "type": "armor",
+      "page": 79,
+      "weight_kg": 12.0,
+      "cost_crowns": 850,
+      "attributes": {
+        "availability": "У",
+        "armor_region": "Туловище и руки",
+        "armor_slots": 2,
+        "encumbrance": 2,
+        "armor_rating": 30
+      }
+    },
+    {
+      "item_id": "item_005edcbc3b4dd7235026",
+      "name": "Кавалерийские штаны",
+      "type": "armor",
+      "page": 80,
+      "weight_kg": 0.5,
+      "cost_crowns": 75,
+      "attributes": {
+        "availability": "О",
+        "armor_region": "Ноги",
+        "armor_slots": 0,
+        "encumbrance": 0,
+        "armor_rating": 3
+      }
+    },
+    {
+      "item_id": "item_1d3a90053c29f17aa802",
+      "name": "Стёганые штаны",
+      "type": "armor",
+      "page": 80,
+      "weight_kg": 1.0,
+      "cost_crowns": 125,
+      "attributes": {
+        "availability": "О",
+        "armor_region": "Ноги",
+        "armor_slots": 1,
+        "encumbrance": 0,
+        "armor_rating": 5
+      }
+    },
+    {
+      "item_id": "item_157fadc56bccdd53744e",
+      "name": "Двуслойные штаны",
+      "type": "armor",
+      "page": 80,
+      "weight_kg": 1.5,
+      "cost_crowns": 225,
+      "attributes": {
+        "availability": "Р",
+        "armor_region": "Ноги",
+        "armor_slots": 0,
+        "encumbrance": 0,
+        "armor_rating": 8
+      }
+    },
+    {
+      "item_id": "item_b67b49de0bd3c47fafad",
+      "name": "Усиленные штаны",
+      "type": "armor",
+      "page": 80,
+      "weight_kg": 3.5,
+      "cost_crowns": 250,
+      "attributes": {
+        "availability": "П",
+        "armor_region": "Ноги",
+        "armor_slots": 0,
+        "encumbrance": 0,
+        "armor_rating": 12
+      }
+    },
+    {
+      "item_id": "item_39da9b7c95296d1ac689",
+      "name": "Реданские поножи",
+      "type": "armor",
+      "page": 80,
+      "weight_kg": 4.0,
+      "cost_crowns": 400,
+      "attributes": {
+        "availability": "Р",
+        "armor_region": "Ноги",
+        "armor_slots": 1,
+        "encumbrance": 0,
+        "armor_rating": 14
+      }
+    },
+    {
+      "item_id": "item_cc38154baa78cc8c031a",
+      "name": "Кожаные штаны из Лирии",
+      "type": "armor",
+      "page": 80,
+      "weight_kg": 3.5,
+      "cost_crowns": 525,
+      "attributes": {
+        "availability": "У",
+        "armor_region": "Ноги",
+        "armor_slots": 1,
+        "encumbrance": 0,
+        "armor_rating": 16
+      }
+    },
+    {
+      "item_id": "item_2600862fe9731bea6815",
+      "name": "Латные поножи",
+      "type": "armor",
+      "page": 80,
+      "weight_kg": 7.5,
+      "cost_crowns": 625,
+      "attributes": {
+        "availability": "У",
+        "armor_region": "Ноги",
+        "armor_slots": 1,
+        "encumbrance": 1,
+        "armor_rating": 20
+      }
+    },
+    {
+      "item_id": "item_16cd7482ecdd9ef4213d",
+      "name": "Хиндарсфьяльские тяжёлые штаны",
+      "type": "armor",
+      "page": 80,
+      "weight_kg": 5.0,
+      "cost_crowns": 650,
+      "attributes": {
+        "availability": "У",
+        "armor_region": "Ноги",
+        "armor_slots": 3,
+        "encumbrance": 1,
+        "armor_rating": 25
+      }
+    },
+    {
+      "item_id": "item_ba700315eba53589997f",
+      "name": "Нильфгаардские поножи",
+      "type": "armor",
+      "page": 80,
+      "weight_kg": 6.0,
+      "cost_crowns": 850,
+      "attributes": {
+        "availability": "У",
+        "armor_region": "Ноги",
+        "armor_slots": 2,
+        "encumbrance": 1,
+        "armor_rating": 30
+      }
+    },
+    {
+      "item_id": "item_9296bfa56c94f52832ea",
+      "name": "Кожаный щит",
+      "type": "armor",
+      "page": 80,
+      "weight_kg": 0.5,
+      "cost_crowns": 50,
+      "attributes": {
+        "availability": "П",
+        "armor_region": "Щит",
+        "armor_slots": 0,
+        "encumbrance": 0,
+        "reliability": 4
+      }
+    },
+    {
+      "item_id": "item_9d46914d773581857e02",
+      "name": "Стальной баклер",
+      "type": "armor",
+      "page": 80,
+      "weight_kg": 1.0,
+      "cost_crowns": 150,
+      "attributes": {
+        "availability": "О",
+        "armor_region": "Щит",
+        "armor_slots": 0,
+        "encumbrance": 0,
+        "reliability": 6
+      }
+    },
+    {
+      "item_id": "item_16f8d695f4107876d08d",
+      "name": "Темерский щит",
+      "type": "armor",
+      "page": 80,
+      "weight_kg": 1.5,
+      "cost_crowns": 225,
+      "attributes": {
+        "availability": "О",
+        "armor_region": "Щит",
+        "armor_slots": 1,
+        "encumbrance": 0,
+        "reliability": 8
+      }
+    },
+    {
+      "item_id": "item_8e9922a795b697e8ab6e",
+      "name": "Щит налётчика со Скеллиге",
+      "type": "armor",
+      "page": 80,
+      "weight_kg": 2.0,
+      "cost_crowns": 325,
+      "attributes": {
+        "availability": "Р",
+        "armor_region": "Щит",
+        "armor_slots": 1,
+        "encumbrance": 0,
+        "reliability": 10
+      }
+    },
+    {
+      "item_id": "item_010f8e54ccd4c3d0a3b6",
+      "name": "Кэдвенский щит",
+      "type": "armor",
+      "page": 80,
+      "weight_kg": 2.5,
+      "cost_crowns": 400,
+      "attributes": {
+        "availability": "Р",
+        "armor_region": "Щит",
+        "armor_slots": 1,
+        "encumbrance": 0,
+        "reliability": 14
+      }
+    },
+    {
+      "item_id": "item_fc1bf6cf5c357ffbc6ec",
+      "name": "Стальной каплевидный щит",
+      "type": "armor",
+      "page": 80,
+      "weight_kg": 3.0,
+      "cost_crowns": 400,
+      "attributes": {
+        "availability": "О",
+        "armor_region": "Щит",
+        "armor_slots": 0,
+        "encumbrance": 0,
+        "reliability": 16
+      }
+    },
+    {
+      "item_id": "item_85141b15216c12a1fd09",
+      "name": "Павеза",
+      "type": "armor",
+      "page": 80,
+      "weight_kg": 4.0,
+      "cost_crowns": 500,
+      "attributes": {
+        "availability": "Р",
+        "armor_region": "Щит",
+        "armor_slots": 0,
+        "encumbrance": 1,
+        "reliability": 20
+      },
+      "effects": [
+        "Полное укрытие"
+      ]
+    },
+    {
+      "item_id": "item_5f91a8ddc7abffa50de9",
+      "name": "Нильфгаардская павеза",
+      "type": "armor",
+      "page": 80,
+      "weight_kg": 5.0,
+      "cost_crowns": 600,
+      "attributes": {
+        "availability": "У",
+        "armor_region": "Щит",
+        "armor_slots": 1,
+        "encumbrance": 1,
+        "reliability": 25
+      },
+      "effects": [
+        "Полное укрытие"
+      ]
+    },
+    {
+      "item_id": "item_dc190e6627ecd06fbbc7",
+      "name": "Низушечий защитный дублет",
+      "type": "armor",
+      "page": 84,
+      "weight_kg": 1.0,
+      "cost_crowns": 375,
+      "attributes": {
+        "availability": "У",
+        "armor_region": "Особая броня",
+        "armor_slots": 1,
+        "encumbrance": 0,
+        "armor_rating": 8
+      },
+      "effects": [
+        "Примечание на полях"
+      ]
+    },
+    {
+      "item_id": "item_b6ce4f4bf21af2b26b2b",
+      "name": "Кольчуга гномьей работы",
+      "type": "armor",
+      "page": 84,
+      "weight_kg": 5.0,
+      "cost_crowns": 975,
+      "attributes": {
+        "availability": "У",
+        "armor_region": "Особая броня",
+        "armor_slots": 1,
+        "encumbrance": 0,
+        "armor_rating": 10
+      },
+      "effects": [
+        "Сопротивление режущему урону"
+      ]
+    },
+    {
+      "item_id": "item_2fc2667265f3fa39d7d8",
+      "name": "Краснолюдский плащ",
+      "type": "armor",
+      "page": 84,
+      "weight_kg": 5.0,
+      "cost_crowns": 1400,
+      "attributes": {
+        "availability": "У",
+        "armor_region": "Особая броня",
+        "armor_slots": 1,
+        "encumbrance": 0,
+        "armor_rating": 16
+      }
+    },
+    {
+      "item_id": "item_17411ca4f734ba75a3f7",
+      "name": "Броня скоя'таэлей",
+      "type": "armor",
+      "page": 84,
+      "weight_kg": 12.0,
+      "cost_crowns": 2325,
+      "attributes": {
+        "availability": "У",
+        "armor_region": "Особая броня",
+        "armor_slots": 2,
+        "encumbrance": 1,
+        "armor_rating": 20
+      },
+      "effects": [
+        "Примечание на полях"
+      ]
+    },
+    {
+      "item_id": "item_646b2ab506d4f535a895",
+      "name": "Драгунская броня гномьей работы",
+      "type": "armor",
+      "page": 84,
+      "weight_kg": 20.0,
+      "cost_crowns": 2850,
+      "attributes": {
+        "availability": "У",
+        "armor_region": "Особая броня",
+        "armor_slots": 2,
+        "encumbrance": 2,
+        "armor_rating": 25
+      },
+      "effects": [
+        "Сопротивление режущему и колющему урону"
+      ]
+    },
+    {
+      "item_id": "item_b8c44c37e3d3d724806f",
+      "name": "Махакемские латы",
+      "type": "armor",
+      "page": 84,
+      "weight_kg": 30.0,
+      "cost_crowns": 3525,
+      "attributes": {
+        "availability": "У",
+        "armor_region": "Особая броня",
+        "armor_slots": 3,
+        "encumbrance": 2,
+        "armor_rating": 30
+      },
+      "effects": [
+        "Сопротивление режущему, колющему и дробящему урону"
+      ]
+    },
+    {
+      "item_id": "item_ddc6acde5e83b8364e0c",
+      "name": "Гномий баклер",
+      "type": "armor",
+      "page": 84,
+      "weight_kg": 1.0,
+      "cost_crowns": 450,
+      "attributes": {
+        "availability": "У",
+        "armor_region": "Щит",
+        "armor_slots": 2,
+        "encumbrance": 0,
+        "reliability": 15
+      }
+    },
+    {
+      "item_id": "item_e33816f1b6f37ffae0da",
+      "name": "Эльфский щит",
+      "type": "armor",
+      "page": 84,
+      "weight_kg": 3.0,
+      "cost_crowns": 700,
+      "attributes": {
+        "availability": "У",
+        "armor_region": "Щит",
+        "armor_slots": 2,
+        "encumbrance": 0,
+        "reliability": 25
+      }
+    },
+    {
+      "item_id": "item_a5f62af7a444e5a8770f",
+      "name": "Махакемская павеза",
+      "type": "armor",
+      "page": 84,
+      "weight_kg": 5.5,
+      "cost_crowns": 1050,
+      "attributes": {
+        "availability": "У",
+        "armor_region": "Щит",
+        "armor_slots": 2,
+        "encumbrance": 1,
+        "reliability": 35
+      },
+      "effects": [
+        "Примечание на полях"
+      ]
+    },
+    {
+      "item_id": "item_a4b23cc4fc89ac238af6",
+      "name": "Кольчужное",
+      "type": "armor",
+      "page": 90,
+      "weight_kg": 3.0,
+      "cost_crowns": 125,
+      "attributes": {
+        "availability": "Р",
+        "protection_bonus": 3,
+        "armor_region": "Усиление брони"
+      }
+    },
+    {
+      "item_id": "item_4f0c9cda422e86759a0f",
+      "name": "Краснолюдское",
+      "type": "armor",
+      "page": 90,
+      "weight_kg": 3.5,
+      "cost_crowns": 195,
+      "attributes": {
+        "availability": "У",
+        "protection_bonus": 5,
+        "armor_region": "Усиление брони"
+      }
+    },
+    {
+      "item_id": "item_e99333571e8c3f52a30e",
+      "name": "Эльфское",
+      "type": "armor",
+      "page": 90,
+      "weight_kg": 0.5,
+      "cost_crowns": 200,
+      "attributes": {
+        "availability": "У",
+        "protection_bonus": 3,
+        "armor_region": "Усиление брони"
+      },
+      "effects": [
+        "+1 к скрытности"
+      ]
+    },
+    {
+      "item_id": "item_572b7efc15d99277c5ce",
+      "name": "Ткань",
+      "type": "armor",
+      "page": 90,
+      "weight_kg": 0.5,
+      "cost_crowns": 40,
+      "attributes": {
+        "availability": "П",
+        "protection_bonus": 1,
+        "armor_region": "Усиление брони"
+      },
+      "effects": [
+        "Сопротивление кровотечению"
+      ]
+    },
+    {
+      "item_id": "item_748971ecfcbcf43630fc",
+      "name": "Укреплённая кожа",
+      "type": "armor",
+      "page": 90,
+      "weight_kg": 1.5,
+      "cost_crowns": 130,
+      "attributes": {
+        "availability": "О",
+        "protection_bonus": 2,
+        "armor_region": "Усиление брони"
+      },
+      "effects": [
+        "Сопротивление огню"
+      ]
+    },
+    {
+      "item_id": "item_1ca3b0989401010ecd47",
+      "name": "Стальное",
+      "type": "armor",
+      "page": 90,
+      "weight_kg": 3.5,
+      "cost_crowns": 145,
+      "attributes": {
+        "availability": "Р",
+        "protection_bonus": 4,
+        "armor_region": "Усиление брони"
+      }
+    },
+    {
+      "item_id": "item_6dbc35f530b338582076",
+      "name": "Клёпаная кожа",
+      "type": "armor",
+      "page": 90,
+      "weight_kg": 1.0,
+      "cost_crowns": 80,
+      "attributes": {
+        "availability": "О",
+        "protection_bonus": 2,
+        "armor_region": "Усиление брони"
+      }
+    },
+    {
+      "item_id": "item_db93c4d074cff8c05214",
+      "name": "Кислотный раствор",
+      "type": "alchemical",
+      "page": 87,
+      "weight_kg": 0.5,
+      "cost_crowns": 56,
+      "attributes": {
+        "availability": "Р"
+      },
+      "effect": "2d6 урона живому существу; 1d6/2 разрушающего урона оружию и броне. Бросок: дистанция Тел × 2 м, площадь 2-метровый конус.",
+      "effects": [
+        "2d6 урона живому существу; 1d6/2 разрушающего урона оружию и броне. Бросок: дистанция Тел × 2 м, площадь 2-метровый конус."
+      ],
+      "application": "Бросить склянку"
+    },
+    {
+      "item_id": "item_c5eeb77997c5109c17f0",
+      "name": "Могила Адды",
+      "type": "alchemical",
+      "page": 87,
+      "weight_kg": 0.1,
+      "cost_crowns": 18,
+      "attributes": {
+        "availability": "О"
+      },
+      "effect": "Консервирует продукты и трупы на 1d10 дней; для тела размером с человека нужны две порции.",
+      "effects": [
+        "Консервирует продукты и трупы на 1d10 дней; для тела размером с человека нужны две порции."
+      ],
+      "application": "Нанести на объект",
+      "duration": "1d10 дней"
+    },
+    {
+      "item_id": "item_e639db7e95c3d8150664",
+      "name": "Алхимический клей",
+      "type": "alchemical",
+      "page": 87,
+      "weight_kg": 0.1,
+      "cost_crowns": 28,
+      "attributes": {
+        "availability": "О"
+      },
+      "effect": "Склеивает предметы или персонажей спустя 2 раунда; разъединение требует проверки Силы СЛ 16.",
+      "effects": [
+        "Склеивает предметы или персонажей спустя 2 раунда; разъединение требует проверки Силы СЛ 16."
+      ],
+      "application": "Вылить или бросить",
+      "duration": "После 2 раундов"
+    },
+    {
+      "item_id": "item_aa53737d65578d7096e1",
+      "name": "Щелочной порошок",
+      "type": "alchemical",
+      "page": 87,
+      "weight_kg": 0.1,
+      "cost_crowns": 18,
+      "attributes": {
+        "availability": "О"
+      },
+      "effect": "Нейтрализует одну порцию кислотного раствора и его воздействие на рану.",
+      "effects": [
+        "Нейтрализует одну порцию кислотного раствора и его воздействие на рану."
+      ],
+      "application": "Нанести на рану"
+    },
+    {
+      "item_id": "item_0bd634921dc7872728d2",
+      "name": "Чёрный яд",
+      "type": "alchemical",
+      "page": 87,
+      "weight_kg": 0.1,
+      "cost_crowns": 45,
+      "attributes": {
+        "availability": "О"
+      },
+      "effect": "Отравляет при попадании в кровь или после проглатывания; сопротивление: Стойкость СЛ 16.",
+      "effects": [
+        "Отравляет при попадании в кровь или после проглатывания; сопротивление: Стойкость СЛ 16."
+      ],
+      "application": "На оружие или в питьё"
+    },
+    {
+      "item_id": "item_ae53589ddcce1c2e9ab5",
+      "name": "Ярость Бредена",
+      "type": "alchemical",
+      "page": 87,
+      "weight_kg": 0.5,
+      "cost_crowns": 95,
+      "attributes": {
+        "availability": "У"
+      },
+      "effect": "Взрывается на воздухе и наносит 2d6 урона в радиусе 2 м; бросок на дистанцию Тел × 2 м.",
+      "effects": [
+        "Взрывается на воздухе и наносит 2d6 урона в радиусе 2 м; бросок на дистанцию Тел × 2 м."
+      ],
+      "application": "Бросить склянку"
+    },
+    {
+      "item_id": "item_33fd24ec684479c61319",
+      "name": "Хлороформ",
+      "type": "alchemical",
+      "page": 87,
+      "weight_kg": 0.1,
+      "cost_crowns": 36,
+      "attributes": {
+        "availability": "О"
+      },
+      "effect": "Цель делает проверку Устойчивости со штрафом −2 или теряет сознание; флакон содержит 25 порций.",
+      "effects": [
+        "Цель делает проверку Устойчивости со штрафом −2 или теряет сознание; флакон содержит 25 порций."
+      ],
+      "application": "Вдыхание или пропитанная ткань"
+    },
+    {
+      "item_id": "item_be70f9a9f07ef034f398",
+      "name": "Кровосвертывающий порошок",
+      "type": "alchemical",
+      "page": 87,
+      "weight_kg": 0.1,
+      "cost_crowns": 20,
+      "attributes": {
+        "availability": "О"
+      },
+      "effect": "Останавливает кровотечение на 2d10 раундов; при возобновлении можно применить ещё порцию.",
+      "effects": [
+        "Останавливает кровотечение на 2d10 раундов; при возобновлении можно применить ещё порцию."
+      ],
+      "application": "Нанести на рану",
+      "duration": "2d10 раундов"
+    },
+    {
+      "item_id": "item_d1c57a0a9a154038897a",
+      "name": "Фистех",
+      "type": "alchemical",
+      "page": 87,
+      "weight_kg": 0.1,
+      "cost_crowns": 80,
+      "attributes": {
+        "availability": "Р"
+      },
+      "effect": "Наркотик; после каждого применения проверка Стойкости СЛ 18 на привыкание.",
+      "effects": [
+        "Наркотик; после каждого применения проверка Стойкости СЛ 18 на привыкание."
+      ],
+      "application": "Вдохнуть или втереть в дёсны"
+    },
+    {
+      "item_id": "item_ada2c1195e5b98ece478",
+      "name": "Галлюциноген",
+      "type": "alchemical",
+      "page": 87,
+      "weight_kg": 0.1,
+      "cost_crowns": 25,
+      "attributes": {
+        "availability": "О"
+      },
+      "effect": "Цель делает проверку Стойкости СЛ 15 или испытывает галлюцинации 1d10 раундов.",
+      "effects": [
+        "Цель делает проверку Стойкости СЛ 15 или испытывает галлюцинации 1d10 раундов."
+      ],
+      "application": "Выпить или разбить склянку",
+      "duration": "1d10 раундов"
+    },
+    {
+      "item_id": "item_af803323466f3442a95a",
+      "name": "Невидимые чернила",
+      "type": "alchemical",
+      "page": 87,
+      "weight_kg": 0.1,
+      "cost_crowns": 15,
+      "attributes": {
+        "availability": "О"
+      },
+      "effect": "Написанный текст становится различим после нагревания.",
+      "effects": [
+        "Написанный текст становится различим после нагревания."
+      ],
+      "application": "Писать",
+      "duration": "После нагревания"
+    },
+    {
+      "item_id": "item_8784ebdce5d9f494be56",
+      "name": "Обеззараживающие травы",
+      "type": "alchemical",
+      "page": 88,
+      "weight_kg": 0.1,
+      "cost_crowns": 12,
+      "attributes": {
+        "availability": "П"
+      },
+      "effect": "Снижают штраф от критических ран на 2 и штраф к состоянию при смерти на 2; действуют 2d10 раундов.",
+      "effects": [
+        "Снижают штраф от критических ран на 2 и штраф к состоянию при смерти на 2; действуют 2d10 раундов."
+      ],
+      "application": "Приложить к ране",
+      "duration": "2d10 раундов"
+    },
+    {
+      "item_id": "item_24bb9b77836403ac2e64",
+      "name": "Эликсир Пантаграна",
+      "type": "alchemical",
+      "page": 88,
+      "weight_kg": 0.5,
+      "cost_crowns": 67,
+      "attributes": {
+        "availability": "Р"
+      },
+      "effect": "Вызывает состояние безумного счастья и повышенную восприимчивость к убеждению.",
+      "effects": [
+        "Вызывает состояние безумного счастья и повышенную восприимчивость к убеждению."
+      ],
+      "application": "Выпить",
+      "duration": "1d6/2 часа"
+    },
+    {
+      "item_id": "item_94195754ebd5040d1f0d",
+      "name": "Ароматное зелье",
+      "type": "alchemical",
+      "page": 88,
+      "weight_kg": 0.5,
+      "cost_crowns": 76,
+      "attributes": {
+        "availability": "Р"
+      },
+      "effect": "При провале проверки Стойкости СЛ 16 вызывает опьянение; снять его могут магия или Слёзы жён.",
+      "effects": [
+        "При провале проверки Стойкости СЛ 16 вызывает опьянение; снять его могут магия или Слёзы жён."
+      ],
+      "application": "Выпить",
+      "duration": "1d10 часов"
+    },
+    {
+      "item_id": "item_3c28b91f54a1207b467a",
+      "name": "Друг отравителя",
+      "type": "alchemical",
+      "page": 88,
+      "weight_kg": 0.1,
+      "cost_crowns": 16,
+      "attributes": {
+        "availability": "О"
+      },
+      "effect": "Увеличивает СЛ обнаружения яда до 20.",
+      "effects": [
+        "Увеличивает СЛ обнаружения яда до 20."
+      ],
+      "application": "Добавить в еду или питьё"
+    },
+    {
+      "item_id": "item_56b1fbf1a5ca90f3874f",
+      "name": "Быстрый огонь",
+      "type": "alchemical",
+      "page": 88,
+      "weight_kg": 0.1,
+      "cost_crowns": 45,
+      "attributes": {
+        "availability": "Р"
+      },
+      "effect": "Высыхает на поверхности и даёт 50%-й шанс возгорания при контакте с огнём или искрой.",
+      "effects": [
+        "Высыхает на поверхности и даёт 50%-й шанс возгорания при контакте с огнём или искрой."
+      ],
+      "application": "Вылить"
+    },
+    {
+      "item_id": "item_727e1a8211c1b9f76142",
+      "name": "Нюхательная соль",
+      "type": "alchemical",
+      "page": 88,
+      "weight_kg": 0.1,
+      "cost_crowns": 25,
+      "attributes": {
+        "availability": "О"
+      },
+      "effect": "Приводит в себя потерявшего сознание или дезориентированного; допускает до 25 применений.",
+      "effects": [
+        "Приводит в себя потерявшего сознание или дезориентированного; допускает до 25 применений."
+      ],
+      "application": "Дать понюхать"
+    },
+    {
+      "item_id": "item_0bbcfeebbb803ae304a6",
+      "name": "Обеззараживающая жидкость",
+      "type": "alchemical",
+      "page": 88,
+      "weight_kg": 0.1,
+      "cost_crowns": 22,
+      "attributes": {
+        "availability": "О"
+      },
+      "effect": "Повышает естественную скорость заживления на 2 и сокращает срок лечения критической раны на 2 дня.",
+      "effects": [
+        "Повышает естественную скорость заживления на 2 и сокращает срок лечения критической раны на 2 дня."
+      ],
+      "application": "Обработать рану"
+    },
+    {
+      "item_id": "item_6940e972562a2e8af301",
+      "name": "Дыхание суккуба",
+      "type": "alchemical",
+      "page": 88,
+      "weight_kg": 0.1,
+      "cost_crowns": 20,
+      "attributes": {
+        "availability": "О"
+      },
+      "effect": "Даёт +2 к Соблазнению при нанесении на кожу; при добавлении в питьё налагает −5 к сопротивлению соблазнению.",
+      "effects": [
+        "Даёт +2 к Соблазнению при нанесении на кожу; при добавлении в питьё налагает −5 к сопротивлению соблазнению."
+      ],
+      "application": "На кожу или в питьё"
+    },
+    {
+      "item_id": "item_77777e10f09d98cec439",
+      "name": "Слёзы Тальгара",
+      "type": "alchemical",
+      "page": 88,
+      "weight_kg": 0.1,
+      "cost_crowns": 79,
+      "attributes": {
+        "availability": "Р"
+      },
+      "effect": "Мгновенно замораживают поверхность; покрытые жидкостью вещи получают двойной разрушающий урон. Бросок: Тел × 2 м, площадь 2-метровый конус.",
+      "effects": [
+        "Мгновенно замораживают поверхность; покрытые жидкостью вещи получают двойной разрушающий урон. Бросок: Тел × 2 м, площадь 2-метровый конус."
+      ],
+      "application": "Бросить склянку"
+    },
+    {
+      "item_id": "item_029f8b5110c26da96de2",
+      "name": "Слёзы жён",
+      "type": "alchemical",
+      "page": 88,
+      "weight_kg": 0.1,
+      "cost_crowns": 56,
+      "attributes": {
+        "availability": "Р"
+      },
+      "effect": "Немедленно снимают опьянение.",
+      "effects": [
+        "Немедленно снимают опьянение."
+      ],
+      "application": "Выпить"
+    },
+    {
+      "item_id": "item_32d31aead9492a2cea96",
+      "name": "Зерриканский огонь",
+      "type": "alchemical",
+      "page": 88,
+      "weight_kg": 0.5,
+      "cost_crowns": 65,
+      "attributes": {
+        "availability": "Р"
+      },
+      "effect": "Мгновенно поджигает цель и всё в пределах 2-метрового конуса; бросок на дистанцию Тел × 2 м.",
+      "effects": [
+        "Мгновенно поджигает цель и всё в пределах 2-метрового конуса; бросок на дистанцию Тел × 2 м."
+      ],
+      "application": "Бросить склянку"
+    }
+  ]
+}

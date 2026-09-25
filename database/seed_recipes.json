@@ -1,0 +1,4475 @@
+[
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Новичок",
+    "name": "Могила Адды",
+    "dc": "13",
+    "time": "5 раундов",
+    "ingredients": [
+      {
+        "name": "Эфир",
+        "quantity": 2
+      },
+      {
+        "name": "Гидраген",
+        "quantity": 1
+      },
+      {
+        "name": "Киноварь",
+        "quantity": 1
+      }
+    ],
+    "page": 146
+  },
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Новичок",
+    "name": "Щелочной порошок",
+    "dc": "12",
+    "time": "5 раундов",
+    "ingredients": [
+      {
+        "name": "Киноварь",
+        "quantity": 1
+      },
+      {
+        "name": "Квебрит",
+        "quantity": 1
+      }
+    ],
+    "page": 146
+  },
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Новичок",
+    "name": "Кровосвертывающий порошок",
+    "dc": "12",
+    "time": "5 раундов",
+    "ingredients": [
+      {
+        "name": "Эфир",
+        "quantity": 1
+      },
+      {
+        "name": "Рубедо",
+        "quantity": 1
+      }
+    ],
+    "page": 146
+  },
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Новичок",
+    "name": "Галлюциноген",
+    "dc": "12",
+    "time": "5 раундов",
+    "ingredients": [
+      {
+        "name": "Купорос",
+        "quantity": 1
+      },
+      {
+        "name": "Рубедо",
+        "quantity": 1
+      }
+    ],
+    "page": 146
+  },
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Новичок",
+    "name": "Невидимые чернила",
+    "dc": "11",
+    "time": "5 раундов",
+    "ingredients": [
+      {
+        "name": "Квебрит",
+        "quantity": 1
+      },
+      {
+        "name": "Эфир",
+        "quantity": 1
+      }
+    ],
+    "page": 146
+  },
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Новичок",
+    "name": "Обеззараживающие травы",
+    "dc": "12",
+    "time": "5 раундов",
+    "ingredients": [
+      {
+        "name": "Квебрит",
+        "quantity": 1
+      },
+      {
+        "name": "Киноварь",
+        "quantity": 1
+      }
+    ],
+    "page": 146
+  },
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Новичок",
+    "name": "Друг отравителя",
+    "dc": "14",
+    "time": "10 минут",
+    "ingredients": [
+      {
+        "name": "Киноварь",
+        "quantity": 2
+      },
+      {
+        "name": "Купорос",
+        "quantity": 1
+      },
+      {
+        "name": "Аер",
+        "quantity": 1
+      }
+    ],
+    "page": 146
+  },
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Новичок",
+    "name": "Нюхательная соль",
+    "dc": "14",
+    "time": "10 минут",
+    "ingredients": [
+      {
+        "name": "Квебрит",
+        "quantity": 1
+      },
+      {
+        "name": "Рубедо",
+        "quantity": 1
+      },
+      {
+        "name": "Аер",
+        "quantity": 2
+      }
+    ],
+    "page": 146
+  },
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Новичок",
+    "name": "Обеззараживающая жидкость",
+    "dc": "12",
+    "time": "5 раундов",
+    "ingredients": [
+      {
+        "name": "Квебрит",
+        "quantity": 1
+      },
+      {
+        "name": "Аер",
+        "quantity": 1
+      }
+    ],
+    "page": 146
+  },
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Новичок",
+    "name": "Дыхание суккуба",
+    "dc": "14",
+    "time": "10 минут",
+    "ingredients": [
+      {
+        "name": "Солнце",
+        "quantity": 1
+      },
+      {
+        "name": "Эфир",
+        "quantity": 2
+      },
+      {
+        "name": "Аер",
+        "quantity": 1
+      }
+    ],
+    "page": 146
+  },
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Новичок",
+    "name": "Слёзы жён",
+    "dc": "14",
+    "time": "10 минут",
+    "ingredients": [
+      {
+        "name": "Гидраген",
+        "quantity": 1
+      },
+      {
+        "name": "Эфир",
+        "quantity": 2
+      },
+      {
+        "name": "Купорос",
+        "quantity": 1
+      }
+    ],
+    "page": 146
+  },
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Подмастерье",
+    "name": "Кислотный раствор",
+    "dc": "16",
+    "time": "15 минут",
+    "ingredients": [
+      {
+        "name": "Эфир",
+        "quantity": 1
+      },
+      {
+        "name": "Квебрит",
+        "quantity": 1
+      },
+      {
+        "name": "Киноварь",
+        "quantity": 1
+      },
+      {
+        "name": "Купорос",
+        "quantity": 3
+      }
+    ],
+    "page": 146
+  },
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Подмастерье",
+    "name": "Алхимический клей",
+    "dc": "15",
+    "time": "10 минут",
+    "ingredients": [
+      {
+        "name": "Квебрит",
+        "quantity": 1
+      },
+      {
+        "name": "Гидраген",
+        "quantity": 1
+      },
+      {
+        "name": "Аер",
+        "quantity": 2
+      },
+      {
+        "name": "Купорос",
+        "quantity": 1
+      }
+    ],
+    "page": 146
+  },
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Подмастерье",
+    "name": "Чёрный яд",
+    "dc": "15",
+    "time": "10 минут",
+    "ingredients": [
+      {
+        "name": "Квебрит",
+        "quantity": 2
+      },
+      {
+        "name": "Эфир",
+        "quantity": 2
+      },
+      {
+        "name": "Рубедо",
+        "quantity": 1
+      }
+    ],
+    "page": 146
+  },
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Подмастерье",
+    "name": "Хлороформ",
+    "dc": "16",
+    "time": "15 минут",
+    "ingredients": [
+      {
+        "name": "Квебрит",
+        "quantity": 2
+      },
+      {
+        "name": "Киноварь",
+        "quantity": 2
+      },
+      {
+        "name": "Эфир",
+        "quantity": 1
+      },
+      {
+        "name": "Купорос",
+        "quantity": 1
+      }
+    ],
+    "page": 146
+  },
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Подмастерье",
+    "name": "Быстрый огонь",
+    "dc": "16",
+    "time": "15 минут",
+    "ingredients": [
+      {
+        "name": "Квебрит",
+        "quantity": 1
+      },
+      {
+        "name": "Рубедо",
+        "quantity": 2
+      },
+      {
+        "name": "Аер",
+        "quantity": 1
+      },
+      {
+        "name": "Купорос",
+        "quantity": 1
+      },
+      {
+        "name": "Киноварь",
+        "quantity": 1
+      }
+    ],
+    "page": 146
+  },
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Мастер",
+    "name": "Ярость Бредена",
+    "dc": "22",
+    "time": "30 минут",
+    "ingredients": [
+      {
+        "name": "Солнце",
+        "quantity": 3
+      },
+      {
+        "name": "Фульгор",
+        "quantity": 3
+      },
+      {
+        "name": "Аер",
+        "quantity": 1
+      },
+      {
+        "name": "Киноварь",
+        "quantity": 1
+      }
+    ],
+    "page": 147
+  },
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Мастер",
+    "name": "Фистех",
+    "dc": "18",
+    "time": "30 минут",
+    "ingredients": [
+      {
+        "name": "Рубедо",
+        "quantity": 3
+      },
+      {
+        "name": "Гидраген",
+        "quantity": 2
+      },
+      {
+        "name": "Купорос",
+        "quantity": 2
+      },
+      {
+        "name": "Киноварь",
+        "quantity": 1
+      }
+    ],
+    "page": 147
+  },
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Мастер",
+    "name": "Эликсир Пантангара",
+    "dc": "17",
+    "time": "15 минут",
+    "ingredients": [
+      {
+        "name": "Киноварь",
+        "quantity": 2
+      },
+      {
+        "name": "Эфир",
+        "quantity": 2
+      },
+      {
+        "name": "Аер",
+        "quantity": 1
+      },
+      {
+        "name": "Солнце",
+        "quantity": 1
+      },
+      {
+        "name": "Фульгор",
+        "quantity": 1
+      }
+    ],
+    "page": 147
+  },
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Мастер",
+    "name": "Ароматное зелье",
+    "dc": "18",
+    "time": "30 минут",
+    "ingredients": [
+      {
+        "name": "Квебрит",
+        "quantity": 2
+      },
+      {
+        "name": "Эфир",
+        "quantity": 1
+      },
+      {
+        "name": "Купорос",
+        "quantity": 2
+      },
+      {
+        "name": "Киноварь",
+        "quantity": 1
+      },
+      {
+        "name": "Гидраген",
+        "quantity": 2
+      }
+    ],
+    "page": 147
+  },
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Мастер",
+    "name": "Слёзы Тальгра",
+    "dc": "20",
+    "time": "30 минут",
+    "ingredients": [
+      {
+        "name": "Гидраген",
+        "quantity": 3
+      },
+      {
+        "name": "Эфир",
+        "quantity": 2
+      },
+      {
+        "name": "Киноварь",
+        "quantity": 1
+      },
+      {
+        "name": "Купорос",
+        "quantity": 2
+      }
+    ],
+    "page": 147
+  },
+  {
+    "type": "alchemy",
+    "category": "Алхимические формулы",
+    "tier": "Мастер",
+    "name": "Зеркальный огонь",
+    "dc": "17",
+    "time": "15 минут",
+    "ingredients": [
+      {
+        "name": "Солнце",
+        "quantity": 2
+      },
+      {
+        "name": "Рубедо",
+        "quantity": 3
+      },
+      {
+        "name": "Фульгор",
+        "quantity": 1
+      },
+      {
+        "name": "Купорос",
+        "quantity": 1
+      }
+    ],
+    "page": 147
+  },
+  {
+    "type": "material",
+    "category": "Материалы",
+    "tier": "Новичок",
+    "name": "Двойное полотно",
+    "dc": "14",
+    "time": "30 минут",
+    "ingredients": [
+      {
+        "name": "Полотно",
+        "quantity": 1
+      },
+      {
+        "name": "Нитки",
+        "quantity": 2
+      }
+    ],
+    "page": 130
+  },
+  {
+    "type": "material",
+    "category": "Материалы",
+    "tier": "Новичок",
+    "name": "Укреплённая кожа",
+    "dc": "14",
+    "time": "30 минут",
+    "ingredients": [
+      {
+        "name": "Кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Воск",
+        "quantity": 2
+      }
+    ],
+    "page": 130
+  },
+  {
+    "type": "material",
+    "category": "Материалы",
+    "tier": "Новичок",
+    "name": "Укреплённое дерево",
+    "dc": "12",
+    "time": "30 минут",
+    "ingredients": [
+      {
+        "name": "Древесина",
+        "quantity": 2
+      },
+      {
+        "name": "Смола",
+        "quantity": 4
+      }
+    ],
+    "page": 130
+  },
+  {
+    "type": "material",
+    "category": "Материалы",
+    "tier": "Новичок",
+    "name": "Кожа",
+    "dc": "12",
+    "time": "1 час",
+    "ingredients": [
+      {
+        "name": "Коровья шкура",
+        "quantity": 1
+      },
+      {
+        "name": "Дубильные травы",
+        "quantity": 3
+      }
+    ],
+    "page": 130
+  },
+  {
+    "type": "material",
+    "category": "Материалы",
+    "tier": "Новичок",
+    "name": "Полотно",
+    "dc": "10",
+    "time": "15 минут",
+    "ingredients": [
+      {
+        "name": "Нитки",
+        "quantity": 2
+      }
+    ],
+    "page": 130
+  },
+  {
+    "type": "material",
+    "category": "Материалы",
+    "tier": "Новичок",
+    "name": "Нитки",
+    "dc": "10",
+    "time": "15 минут",
+    "ingredients": [
+      {
+        "name": "Хлопок",
+        "quantity": 2
+      }
+    ],
+    "page": 130
+  },
+  {
+    "type": "material",
+    "category": "Материалы",
+    "tier": "Подмастерье",
+    "name": "Тёмная сталь",
+    "dc": "17",
+    "time": "1 час",
+    "ingredients": [
+      {
+        "name": "Тёмное железо",
+        "quantity": 1
+      },
+      {
+        "name": "Уголь",
+        "quantity": 3
+      }
+    ],
+    "page": 130
+  },
+  {
+    "type": "material",
+    "category": "Материалы",
+    "tier": "Подмастерье",
+    "name": "Лирийская кожа",
+    "dc": "17",
+    "time": "1 час",
+    "ingredients": [
+      {
+        "name": "Кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 1
+      },
+      {
+        "name": "Уголь",
+        "quantity": 2
+      }
+    ],
+    "page": 130
+  },
+  {
+    "type": "material",
+    "category": "Материалы",
+    "tier": "Подмастерье",
+    "name": "Сталь",
+    "dc": "15",
+    "time": "1 час",
+    "ingredients": [
+      {
+        "name": "Железо",
+        "quantity": 1
+      },
+      {
+        "name": "Уголь",
+        "quantity": 5
+      }
+    ],
+    "page": 130
+  },
+  {
+    "type": "material",
+    "category": "Материалы",
+    "tier": "Подмастерье",
+    "name": "Терегорская сталь",
+    "dc": "16",
+    "time": "1 час",
+    "ingredients": [
+      {
+        "name": "Железо",
+        "quantity": 1
+      },
+      {
+        "name": "Уголь",
+        "quantity": 5
+      },
+      {
+        "name": "Перья",
+        "quantity": 2
+      }
+    ],
+    "page": 130
+  },
+  {
+    "type": "material",
+    "category": "Материалы",
+    "tier": "Мастер",
+    "name": "Диммерит",
+    "dc": "20",
+    "time": "1 час",
+    "ingredients": [
+      {
+        "name": "Светящаяся руда",
+        "quantity": 2
+      }
+    ],
+    "page": 130
+  },
+  {
+    "type": "material",
+    "category": "Материалы",
+    "tier": "Мастер",
+    "name": "Кожа дракона",
+    "dc": "18",
+    "time": "1 час",
+    "ingredients": [
+      {
+        "name": "Чешуя дракона",
+        "quantity": 1
+      },
+      {
+        "name": "Дубильные травы",
+        "quantity": 3
+      }
+    ],
+    "page": 130
+  },
+  {
+    "type": "material",
+    "category": "Материалы",
+    "tier": "Мастер",
+    "name": "Махакемский диммерит",
+    "dc": "24",
+    "time": "1 час",
+    "ingredients": [
+      {
+        "name": "Светящаяся руда",
+        "quantity": 2
+      },
+      {
+        "name": "Речная глина",
+        "quantity": 3
+      },
+      {
+        "name": "Пепел",
+        "quantity": 2
+      },
+      {
+        "name": "Кости животных",
+        "quantity": 3
+      }
+    ],
+    "page": 130
+  },
+  {
+    "type": "material",
+    "category": "Материалы",
+    "tier": "Мастер",
+    "name": "Махакемская сталь",
+    "dc": "22",
+    "time": "1 час",
+    "ingredients": [
+      {
+        "name": "Железо",
+        "quantity": 1
+      },
+      {
+        "name": "Уголь",
+        "quantity": 5
+      },
+      {
+        "name": "Пепел",
+        "quantity": 2
+      },
+      {
+        "name": "Речная глина",
+        "quantity": 3
+      },
+      {
+        "name": "Кости животных",
+        "quantity": 3
+      }
+    ],
+    "page": 130
+  },
+  {
+    "type": "weapon",
+    "category": "Боеприпасы",
+    "tier": "Новичок",
+    "name": "Боеприпасы с затупленным наконечником ×5",
+    "dc": "12",
+    "time": "1 час",
+    "ingredients": [
+      {
+        "name": "Древесина",
+        "quantity": 1
+      },
+      {
+        "name": "Железо",
+        "quantity": 1
+      },
+      {
+        "name": "Перья",
+        "quantity": 1
+      }
+    ],
+    "page": 131
+  },
+  {
+    "type": "weapon",
+    "category": "Боеприпасы",
+    "tier": "Новичок",
+    "name": "Боеприпасы стандартные ×30",
+    "dc": "10",
+    "time": "2 часа",
+    "ingredients": [
+      {
+        "name": "Древесина",
+        "quantity": 1
+      },
+      {
+        "name": "Железо",
+        "quantity": 1
+      },
+      {
+        "name": "Перья",
+        "quantity": 1
+      }
+    ],
+    "page": 131
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Новичок",
+    "name": "Рыцарский меч",
+    "dc": "13",
+    "time": "7 часов",
+    "ingredients": [
+      {
+        "name": "Древесина",
+        "quantity": 2
+      },
+      {
+        "name": "Нитки",
+        "quantity": 1
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Сталь",
+        "quantity": 2
+      }
+    ],
+    "page": 131
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Новичок",
+    "name": "Кастет",
+    "dc": "10",
+    "time": "2 часа",
+    "ingredients": [
+      {
+        "name": "Сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 1
+      },
+      {
+        "name": "Смола",
+        "quantity": 3
+      },
+      {
+        "name": "Воск",
+        "quantity": 1
+      }
+    ],
+    "page": 131
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Новичок",
+    "name": "Кинжал",
+    "dc": "8",
+    "time": "2 часа",
+    "ingredients": [
+      {
+        "name": "Древесина",
+        "quantity": 1
+      },
+      {
+        "name": "Железо",
+        "quantity": 1
+      }
+    ],
+    "page": 131
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Новичок",
+    "name": "Гледиф",
+    "dc": "14",
+    "time": "7 часов",
+    "ingredients": [
+      {
+        "name": "Древесина",
+        "quantity": 1
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Железо",
+        "quantity": 1
+      },
+      {
+        "name": "Сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Масло",
+        "quantity": 1
+      },
+      {
+        "name": "Смола",
+        "quantity": 1
+      }
+    ],
+    "page": 131
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Новичок",
+    "name": "Топор",
+    "dc": "10",
+    "time": "3 часа",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 1
+      },
+      {
+        "name": "Сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Смола",
+        "quantity": 4
+      }
+    ],
+    "page": 131
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Новичок",
+    "name": "Охотничий фальшион",
+    "dc": "14",
+    "time": "7 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 1
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 4
+      }
+    ],
+    "page": 131
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Новичок",
+    "name": "Железный полуторный меч",
+    "dc": "10",
+    "time": "5 часов",
+    "ingredients": [
+      {
+        "name": "Древесина",
+        "quantity": 1
+      },
+      {
+        "name": "Железо",
+        "quantity": 2
+      },
+      {
+        "name": "Кожа",
+        "quantity": 2
+      }
+    ],
+    "page": 131
+  },
+  {
+    "type": "weapon",
+    "category": "Метательное",
+    "tier": "Новичок",
+    "name": "Орионы ×3",
+    "dc": "12",
+    "time": "1 час",
+    "ingredients": [
+      {
+        "name": "Сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Масло",
+        "quantity": 2
+      },
+      {
+        "name": "Речная глина",
+        "quantity": 1
+      },
+      {
+        "name": "Пепел",
+        "quantity": 3
+      }
+    ],
+    "page": 131
+  },
+  {
+    "type": "weapon",
+    "category": "Дальнобойное",
+    "tier": "Новичок",
+    "name": "Короткий лук",
+    "dc": "15",
+    "time": "8 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 5
+      },
+      {
+        "name": "Нитки",
+        "quantity": 4
+      },
+      {
+        "name": "Воск",
+        "quantity": 2
+      },
+      {
+        "name": "Смола",
+        "quantity": 2
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 3
+      },
+      {
+        "name": "Железо",
+        "quantity": 1
+      },
+      {
+        "name": "Кожа",
+        "quantity": 2
+      }
+    ],
+    "page": 131
+  },
+  {
+    "type": "weapon",
+    "category": "Дальнобойное",
+    "tier": "Новичок",
+    "name": "Копьё",
+    "dc": "12",
+    "time": "6 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 5
+      },
+      {
+        "name": "Сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Смола",
+        "quantity": 2
+      },
+      {
+        "name": "Кожа",
+        "quantity": 3
+      },
+      {
+        "name": "Нитки",
+        "quantity": 4
+      }
+    ],
+    "page": 131
+  },
+  {
+    "type": "weapon",
+    "category": "Метательное",
+    "tier": "Новичок",
+    "name": "Метательные топоры ×3",
+    "dc": "10",
+    "time": "1 час",
+    "ingredients": [
+      {
+        "name": "Древесина",
+        "quantity": 1
+      },
+      {
+        "name": "Сталь",
+        "quantity": 1
+      }
+    ],
+    "page": 131
+  },
+  {
+    "type": "weapon",
+    "category": "Метательное",
+    "tier": "Новичок",
+    "name": "Метательные ножи ×3",
+    "dc": "8",
+    "time": "1 час",
+    "ingredients": [
+      {
+        "name": "Сталь",
+        "quantity": 1
+      }
+    ],
+    "page": 131
+  },
+  {
+    "type": "weapon",
+    "category": "Боеприпасы",
+    "tier": "Мастер",
+    "name": "Боеприпасы бронебойные ×10",
+    "dc": "16",
+    "time": "1 час",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 1
+      },
+      {
+        "name": "Сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Перья",
+        "quantity": 1
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 1
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 1
+      }
+    ],
+    "page": 132
+  },
+  {
+    "type": "weapon",
+    "category": "Боеприпасы",
+    "tier": "Мастер",
+    "name": "Боеприпасы с широким наконечником ×10",
+    "dc": "15",
+    "time": "1 час",
+    "ingredients": [
+      {
+        "name": "Древесина",
+        "quantity": 1
+      },
+      {
+        "name": "Железо",
+        "quantity": 1
+      },
+      {
+        "name": "Перья",
+        "quantity": 1
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 1
+      }
+    ],
+    "page": 132
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Боевой топор",
+    "dc": "17",
+    "time": "9 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 4
+      },
+      {
+        "name": "Сталь",
+        "quantity": 3
+      },
+      {
+        "name": "Кожа",
+        "quantity": 3
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 4
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 4
+      },
+      {
+        "name": "Речная глина",
+        "quantity": 5
+      }
+    ],
+    "page": 132
+  },
+  {
+    "type": "weapon",
+    "category": "Дальнобойное",
+    "tier": "Мастер",
+    "name": "Арбалет",
+    "dc": "17",
+    "time": "9 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 4
+      },
+      {
+        "name": "Нитки",
+        "quantity": 5
+      },
+      {
+        "name": "Воск",
+        "quantity": 1
+      },
+      {
+        "name": "Смола",
+        "quantity": 2
+      },
+      {
+        "name": "Сталь",
+        "quantity": 3
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 2
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 2
+      },
+      {
+        "name": "Железо",
+        "quantity": 1
+      }
+    ],
+    "page": 132
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Эсбода",
+    "dc": "17",
+    "time": "9 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 2
+      },
+      {
+        "name": "Сталь",
+        "quantity": 3
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Масло из дрейка",
+        "quantity": 1
+      }
+    ],
+    "page": 132
+  },
+  {
+    "type": "weapon",
+    "category": "Дальнобойное",
+    "tier": "Мастер",
+    "name": "Ручной арбалет",
+    "dc": "15",
+    "time": "8 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 2
+      },
+      {
+        "name": "Нитки",
+        "quantity": 4
+      },
+      {
+        "name": "Воск",
+        "quantity": 2
+      },
+      {
+        "name": "Смола",
+        "quantity": 2
+      },
+      {
+        "name": "Сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 2
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 2
+      },
+      {
+        "name": "Железо",
+        "quantity": 1
+      }
+    ],
+    "page": 132
+  },
+  {
+    "type": "weapon",
+    "category": "Дальнобойное",
+    "tier": "Мастер",
+    "name": "Посох с крюком",
+    "dc": "18",
+    "time": "9 часов",
+    "ingredients": [
+      {
+        "name": "Древесина",
+        "quantity": 6
+      },
+      {
+        "name": "Сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Пятая эссенция",
+        "quantity": 2
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 2
+      },
+      {
+        "name": "Воск",
+        "quantity": 3
+      },
+      {
+        "name": "Сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Травильная кислота",
+        "quantity": 2
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Нитки",
+        "quantity": 4
+      }
+    ],
+    "page": 132
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Кригсвер",
+    "dc": "16",
+    "time": "8 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 2
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 3
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Смола",
+        "quantity": 4
+      },
+      {
+        "name": "Кости животных",
+        "quantity": 7
+      },
+      {
+        "name": "Сталь",
+        "quantity": 3
+      },
+      {
+        "name": "Пепел",
+        "quantity": 2
+      }
+    ],
+    "page": 132
+  },
+  {
+    "type": "weapon",
+    "category": "Дальнобойное",
+    "tier": "Мастер",
+    "name": "Длинный лук",
+    "dc": "16",
+    "time": "8 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 6
+      },
+      {
+        "name": "Нитки",
+        "quantity": 8
+      },
+      {
+        "name": "Воск",
+        "quantity": 4
+      },
+      {
+        "name": "Смола",
+        "quantity": 2
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 3
+      },
+      {
+        "name": "Сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 1
+      }
+    ],
+    "page": 132
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Булава",
+    "dc": "16",
+    "time": "8 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 2
+      },
+      {
+        "name": "Сталь",
+        "quantity": 3
+      },
+      {
+        "name": "Железо",
+        "quantity": 2
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 5
+      },
+      {
+        "name": "Смола",
+        "quantity": 1
+      }
+    ],
+    "page": 132
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Секира",
+    "dc": "16",
+    "time": "8 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 5
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 1
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 1
+      },
+      {
+        "name": "Полотно",
+        "quantity": 1
+      }
+    ],
+    "page": 132
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Короткий кинжал",
+    "dc": "18",
+    "time": "4 часа",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 1
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 2
+      },
+      {
+        "name": "Травильная кислота",
+        "quantity": 4
+      },
+      {
+        "name": "Кости животных",
+        "quantity": 4
+      }
+    ],
+    "page": 132
+  },
+  {
+    "type": "weapon",
+    "category": "Дальнобойное",
+    "tier": "Мастер",
+    "name": "Плос",
+    "dc": "18",
+    "time": "9 часов",
+    "ingredients": [
+      {
+        "name": "Древесина",
+        "quantity": 6
+      },
+      {
+        "name": "Сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Пятая эссенция",
+        "quantity": 2
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 3
+      },
+      {
+        "name": "Воск",
+        "quantity": 2
+      }
+    ],
+    "page": 132
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Стилет",
+    "dc": "16",
+    "time": "4 часа",
+    "ingredients": [
+      {
+        "name": "Древесина",
+        "quantity": 1
+      },
+      {
+        "name": "Смола",
+        "quantity": 1
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Воск",
+        "quantity": 2
+      },
+      {
+        "name": "Чёрное масло",
+        "quantity": 1
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 2
+      },
+      {
+        "name": "Уголь",
+        "quantity": 5
+      }
+    ],
+    "page": 132
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Топор берсерка",
+    "dc": "25",
+    "time": "13 часов",
+    "ingredients": [
+      {
+        "name": "Махакемская сталь",
+        "quantity": 4
+      },
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 5
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Смола",
+        "quantity": 1
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 1
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 1
+      }
+    ],
+    "page": 133
+  },
+  {
+    "type": "weapon",
+    "category": "Дальнобойное",
+    "tier": "Мастер",
+    "name": "Посох с кристаллом",
+    "dc": "25",
+    "time": "13 часов",
+    "ingredients": [
+      {
+        "name": "Древесина",
+        "quantity": 6
+      },
+      {
+        "name": "Сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Пятая эссенция",
+        "quantity": 4
+      },
+      {
+        "name": "Самоцвет",
+        "quantity": 1
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 3
+      },
+      {
+        "name": "Воск",
+        "quantity": 2
+      },
+      {
+        "name": "Травильная кислота",
+        "quantity": 1
+      },
+      {
+        "name": "Масло из дрейка",
+        "quantity": 1
+      }
+    ],
+    "page": 133
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Молот горца",
+    "dc": "25",
+    "time": "13 часов",
+    "ingredients": [
+      {
+        "name": "Тёмное железо",
+        "quantity": 5
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 10
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 6
+      },
+      {
+        "name": "Травильная кислота",
+        "quantity": 6
+      },
+      {
+        "name": "Кости животных",
+        "quantity": 10
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 4
+      },
+      {
+        "name": "Метеорит",
+        "quantity": 1
+      }
+    ],
+    "page": 133
+  },
+  {
+    "type": "weapon",
+    "category": "Дальнобойное",
+    "tier": "Мастер",
+    "name": "Железный посох",
+    "dc": "20",
+    "time": "10 часов",
+    "ingredients": [
+      {
+        "name": "Тёмное железо",
+        "quantity": 4
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Пятая эссенция",
+        "quantity": 2
+      },
+      {
+        "name": "Кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Травильная кислота",
+        "quantity": 4
+      },
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 1
+      }
+    ],
+    "page": 133
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Джамия",
+    "dc": "20",
+    "time": "5 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 1
+      },
+      {
+        "name": "Кожа драконида",
+        "quantity": 1
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 2
+      },
+      {
+        "name": "Смола",
+        "quantity": 1
+      },
+      {
+        "name": "Чёрное масло",
+        "quantity": 1
+      }
+    ],
+    "page": 133
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Корд",
+    "dc": "22",
+    "time": "11 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 1
+      },
+      {
+        "name": "Шёлк",
+        "quantity": 1
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 3
+      },
+      {
+        "name": "Смола",
+        "quantity": 4
+      },
+      {
+        "name": "Тёмное железо",
+        "quantity": 1
+      },
+      {
+        "name": "Уголь",
+        "quantity": 1
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Кости животных",
+        "quantity": 2
+      }
+    ],
+    "page": 133
+  },
+  {
+    "type": "weapon",
+    "category": "Дальнобойное",
+    "tier": "Мастер",
+    "name": "Арбалет охотника на чудовищ",
+    "dc": "24",
+    "time": "12 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 6
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Нитки",
+        "quantity": 4
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 3
+      },
+      {
+        "name": "Смола",
+        "quantity": 2
+      },
+      {
+        "name": "Воск",
+        "quantity": 3
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 3
+      },
+      {
+        "name": "Тёмное железо",
+        "quantity": 3
+      },
+      {
+        "name": "Кости животных",
+        "quantity": 4
+      }
+    ],
+    "page": 133
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Красная алебарда",
+    "dc": "22",
+    "time": "11 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 6
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 3
+      },
+      {
+        "name": "Терегорская сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 2
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 2
+      }
+    ],
+    "page": 133
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Торру",
+    "dc": "25",
+    "time": "13 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 3
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 5
+      },
+      {
+        "name": "Сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 3
+      },
+      {
+        "name": "Смола",
+        "quantity": 2
+      },
+      {
+        "name": "Пепел",
+        "quantity": 4
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 1
+      }
+    ],
+    "page": 133
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Клинок из Викваро",
+    "dc": "24",
+    "time": "12 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 3
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Тёмное железо",
+        "quantity": 2
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 3
+      },
+      {
+        "name": "Смола",
+        "quantity": 4
+      },
+      {
+        "name": "Пепел",
+        "quantity": 4
+      },
+      {
+        "name": "Кости животных",
+        "quantity": 3
+      }
+    ],
+    "page": 133
+  },
+  {
+    "type": "weapon",
+    "category": "Дальнобойное",
+    "tier": "Мастер",
+    "name": "Армейский лук",
+    "dc": "22",
+    "time": "11 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 6
+      },
+      {
+        "name": "Нитки",
+        "quantity": 8
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 3
+      },
+      {
+        "name": "Воск",
+        "quantity": 4
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 4
+      },
+      {
+        "name": "Смола",
+        "quantity": 2
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Масло из дрейка",
+        "quantity": 2
+      }
+    ],
+    "page": "133, 136"
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Краснолюдский топор",
+    "dc": "24",
+    "time": "12 часов",
+    "ingredients": [
+      {
+        "name": "Махакемская сталь",
+        "quantity": 3
+      },
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 4
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Травильная кислота",
+        "quantity": 4
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 1
+      },
+      {
+        "name": "Речная глина",
+        "quantity": 2
+      },
+      {
+        "name": "Уголь",
+        "quantity": 3
+      }
+    ],
+    "page": 136
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Краснолюдский тесак",
+    "dc": "19",
+    "time": "10 часов",
+    "ingredients": [
+      {
+        "name": "Махакемская сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 1
+      },
+      {
+        "name": "Кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 1
+      },
+      {
+        "name": "Масло из дрейка",
+        "quantity": 1
+      },
+      {
+        "name": "Речная глина",
+        "quantity": 5
+      }
+    ],
+    "page": 136
+  },
+  {
+    "type": "weapon",
+    "category": "Дальнобойное",
+    "tier": "Мастер",
+    "name": "Краснолюдский тяжёлый арбалет",
+    "dc": "24",
+    "time": "12 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 5
+      },
+      {
+        "name": "Махакемская сталь",
+        "quantity": 3
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Нитки",
+        "quantity": 4
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 5
+      },
+      {
+        "name": "Тёмное железо",
+        "quantity": 1
+      }
+    ],
+    "page": 136
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Эльфская глефа",
+    "dc": "19",
+    "time": "10 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 6
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 4
+      },
+      {
+        "name": "Кожа",
+        "quantity": 4
+      },
+      {
+        "name": "Перья",
+        "quantity": 3
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 2
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 4
+      }
+    ],
+    "page": 136
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Эльфский мессер",
+    "dc": "19",
+    "time": "10 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 2
+      },
+      {
+        "name": "Кожа",
+        "quantity": 3
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Шёлк",
+        "quantity": 1
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 1
+      },
+      {
+        "name": "Травильная кислота",
+        "quantity": 1
+      }
+    ],
+    "page": 136
+  },
+  {
+    "type": "weapon",
+    "category": "Дальнобойное",
+    "tier": "Мастер",
+    "name": "Эльфский походный лук",
+    "dc": "22",
+    "time": "11 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 4
+      },
+      {
+        "name": "Нитки",
+        "quantity": 4
+      },
+      {
+        "name": "Воск",
+        "quantity": 4
+      },
+      {
+        "name": "Пятая эссенция",
+        "quantity": 5
+      },
+      {
+        "name": "Кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Перья",
+        "quantity": 3
+      },
+      {
+        "name": "Кости животных",
+        "quantity": 2
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 2
+      },
+      {
+        "name": "Травильная кислота",
+        "quantity": 3
+      }
+    ],
+    "page": 136
+  },
+  {
+    "type": "weapon",
+    "category": "Дальнобойное",
+    "tier": "Мастер",
+    "name": "Гномий посох",
+    "dc": "22",
+    "time": "11 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 6
+      },
+      {
+        "name": "Пятая эссенция",
+        "quantity": 5
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Чёрное масло",
+        "quantity": 3
+      },
+      {
+        "name": "Двойное полотно",
+        "quantity": 1
+      }
+    ],
+    "page": 136
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Низушский рондель",
+    "dc": "19",
+    "time": "10 часов",
+    "ingredients": [
+      {
+        "name": "Тёмная сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 1
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 3
+      },
+      {
+        "name": "Чёрное масло",
+        "quantity": 1
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 2
+      }
+    ],
+    "page": 136
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Махакемский мартель",
+    "dc": "22",
+    "time": "11 часов",
+    "ingredients": [
+      {
+        "name": "Махакемская сталь",
+        "quantity": 3
+      },
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 3
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Волчья шкура",
+        "quantity": 1
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 1
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 3
+      },
+      {
+        "name": "Масло из дрейка",
+        "quantity": 2
+      },
+      {
+        "name": "Речная глина",
+        "quantity": 4
+      },
+      {
+        "name": "Полотно",
+        "quantity": 1
+      }
+    ],
+    "page": 136
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Меч из метеоритной стали",
+    "dc": "20",
+    "time": "10 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 2
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 1
+      },
+      {
+        "name": "Травильная кислота",
+        "quantity": 4
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 4
+      },
+      {
+        "name": "Метеорит",
+        "quantity": 5
+      }
+    ],
+    "page": 136
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Мастер",
+    "name": "Клинок бригады «Вихред»",
+    "dc": "24",
+    "time": "12 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 2
+      },
+      {
+        "name": "Шёлк",
+        "quantity": 1
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 4
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 3
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 4
+      },
+      {
+        "name": "Речная глина",
+        "quantity": 4
+      }
+    ],
+    "page": 136
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Великий мастер",
+    "name": "Краснолюдский боевой молот",
+    "dc": "25",
+    "time": "13 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 6
+      },
+      {
+        "name": "Махакемская сталь",
+        "quantity": 3
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 3
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 1
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 1
+      }
+    ],
+    "page": 137
+  },
+  {
+    "type": "weapon",
+    "category": "Дальнобойное",
+    "tier": "Великий мастер",
+    "name": "Эльфский дорожный посох",
+    "dc": "25",
+    "time": "13 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 6
+      },
+      {
+        "name": "Золото",
+        "quantity": 1
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 6
+      },
+      {
+        "name": "Шёлк",
+        "quantity": 1
+      },
+      {
+        "name": "Волчья шкура",
+        "quantity": 2
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Пятая эссенция",
+        "quantity": 3
+      },
+      {
+        "name": "Самоцвет",
+        "quantity": 1
+      },
+      {
+        "name": "Масло из дрейка",
+        "quantity": 1
+      }
+    ],
+    "page": 137
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Великий мастер",
+    "name": "Эльфский зефар",
+    "dc": "25",
+    "time": "13 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 8
+      },
+      {
+        "name": "Нитки",
+        "quantity": 8
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 8
+      },
+      {
+        "name": "Пятая эссенция",
+        "quantity": 2
+      },
+      {
+        "name": "Кости животных",
+        "quantity": 4
+      },
+      {
+        "name": "Перья",
+        "quantity": 4
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 5
+      },
+      {
+        "name": "Кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 9
+      },
+      {
+        "name": "Травильная кислота",
+        "quantity": 6
+      }
+    ],
+    "page": 137
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Великий мастер",
+    "name": "Гномий чёрный топор",
+    "dc": "25",
+    "time": "13 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 4
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Диммерит",
+        "quantity": 1
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 3
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 1
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 1
+      }
+    ],
+    "page": 137
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Великий мастер",
+    "name": "Гномий гвихир",
+    "dc": "25",
+    "time": "13 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 2
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Диммерит",
+        "quantity": 2
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 3
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 4
+      },
+      {
+        "name": "Чёрное масло",
+        "quantity": 1
+      }
+    ],
+    "page": 137
+  },
+  {
+    "type": "weapon",
+    "category": "Дальнобойное",
+    "tier": "Великий мастер",
+    "name": "Гномий ручной арбалет",
+    "dc": "25",
+    "time": "13 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 2
+      },
+      {
+        "name": "Нитки",
+        "quantity": 4
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Чёрное масло",
+        "quantity": 2
+      },
+      {
+        "name": "Смола",
+        "quantity": 2
+      },
+      {
+        "name": "Масло из дрейка",
+        "quantity": 1
+      },
+      {
+        "name": "Воск",
+        "quantity": 2
+      }
+    ],
+    "page": 137
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Великий мастер",
+    "name": "Кистень из метеоритной стали",
+    "dc": "25",
+    "time": "13 часов",
+    "ingredients": [
+      {
+        "name": "Метеорит",
+        "quantity": 5
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 1
+      },
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 1
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 1
+      }
+    ],
+    "page": 137
+  },
+  {
+    "type": "weapon",
+    "category": "Ближний бой",
+    "tier": "Великий мастер",
+    "name": "Клинок из Тир Тохаира",
+    "dc": "26",
+    "time": "13 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 2
+      },
+      {
+        "name": "Перья",
+        "quantity": 4
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Махакемский диммерит",
+        "quantity": 2
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 4
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 1
+      },
+      {
+        "name": "Кожа дракона",
+        "quantity": 1
+      }
+    ],
+    "page": 137
+  },
+  {
+    "type": "weapon",
+    "category": "Боеприпасы",
+    "tier": "Великий мастер",
+    "name": "Краснолюдские пробивные ×5",
+    "dc": "20",
+    "time": "30 минут",
+    "ingredients": [
+      {
+        "name": "Махакемская сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 1
+      },
+      {
+        "name": "Перья",
+        "quantity": 1
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 2
+      },
+      {
+        "name": "Железо",
+        "quantity": 2
+      }
+    ],
+    "page": 137
+  },
+  {
+    "type": "weapon",
+    "category": "Боеприпасы",
+    "tier": "Великий мастер",
+    "name": "Эльфские ввинчивающиеся ×5",
+    "dc": "20",
+    "time": "30 минут",
+    "ingredients": [
+      {
+        "name": "Тёмная сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Смола",
+        "quantity": 1
+      },
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 1
+      },
+      {
+        "name": "Перья",
+        "quantity": 2
+      },
+      {
+        "name": "Точильный порошок",
+        "quantity": 2
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 1
+      },
+      {
+        "name": "Нитки",
+        "quantity": 1
+      }
+    ],
+    "page": 137
+  },
+  {
+    "type": "armor",
+    "category": "Одежда",
+    "tier": "Новичок",
+    "name": "Аэдирнский гамбезон",
+    "dc": "12",
+    "time": "6 часов",
+    "ingredients": [
+      {
+        "name": "Полотно",
+        "quantity": 6
+      },
+      {
+        "name": "Нитки",
+        "quantity": 6
+      },
+      {
+        "name": "Кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Масло",
+        "quantity": 1
+      }
+    ],
+    "page": 134
+  },
+  {
+    "type": "armor",
+    "category": "Одежда",
+    "tier": "Новичок",
+    "name": "Кавалерийские штаны",
+    "dc": "13",
+    "time": "7 часов",
+    "ingredients": [
+      {
+        "name": "Полотно",
+        "quantity": 5
+      },
+      {
+        "name": "Нитки",
+        "quantity": 4
+      }
+    ],
+    "page": 134
+  },
+  {
+    "type": "armor",
+    "category": "Одежда",
+    "tier": "Новичок",
+    "name": "Двуслойный гамбезон",
+    "dc": "15",
+    "time": "8 часов",
+    "ingredients": [
+      {
+        "name": "Двойное полотно",
+        "quantity": 5
+      },
+      {
+        "name": "Нитки",
+        "quantity": 6
+      },
+      {
+        "name": "Дубильные травы",
+        "quantity": 4
+      },
+      {
+        "name": "Полотно",
+        "quantity": 4
+      },
+      {
+        "name": "Хлопок",
+        "quantity": 11
+      }
+    ],
+    "page": 134
+  },
+  {
+    "type": "armor",
+    "category": "Одежда",
+    "tier": "Новичок",
+    "name": "Двуслойный капюшон",
+    "dc": "13",
+    "time": "4 часа",
+    "ingredients": [
+      {
+        "name": "Двойное полотно",
+        "quantity": 2
+      },
+      {
+        "name": "Кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Нитки",
+        "quantity": 7
+      },
+      {
+        "name": "Воск",
+        "quantity": 4
+      }
+    ],
+    "page": 134
+  },
+  {
+    "type": "armor",
+    "category": "Одежда",
+    "tier": "Новичок",
+    "name": "Двуслойные штаны",
+    "dc": "15",
+    "time": "8 часов",
+    "ingredients": [
+      {
+        "name": "Двойное полотно",
+        "quantity": 6
+      },
+      {
+        "name": "Нитки",
+        "quantity": 6
+      },
+      {
+        "name": "Хлопок",
+        "quantity": 6
+      },
+      {
+        "name": "Полотно",
+        "quantity": 1
+      }
+    ],
+    "page": 134
+  },
+  {
+    "type": "armor",
+    "category": "Одежда",
+    "tier": "Новичок",
+    "name": "Гамбезон",
+    "dc": "10",
+    "time": "5 часов",
+    "ingredients": [
+      {
+        "name": "Полотно",
+        "quantity": 6
+      },
+      {
+        "name": "Нитки",
+        "quantity": 7
+      }
+    ],
+    "page": 134
+  },
+  {
+    "type": "armor",
+    "category": "Щиты",
+    "tier": "Новичок",
+    "name": "Кожаный щит",
+    "dc": "12",
+    "time": "3 часа",
+    "ingredients": [
+      {
+        "name": "Кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Древесина",
+        "quantity": 2
+      },
+      {
+        "name": "Дубильные травы",
+        "quantity": 1
+      }
+    ],
+    "page": 134
+  },
+  {
+    "type": "armor",
+    "category": "Одежда",
+    "tier": "Новичок",
+    "name": "Стёганые штаны",
+    "dc": "14",
+    "time": "7 часов",
+    "ingredients": [
+      {
+        "name": "Полотно",
+        "quantity": 5
+      },
+      {
+        "name": "Нитки",
+        "quantity": 4
+      },
+      {
+        "name": "Хлопок",
+        "quantity": 9
+      },
+      {
+        "name": "Кожа",
+        "quantity": 1
+      }
+    ],
+    "page": 134
+  },
+  {
+    "type": "armor",
+    "category": "Шлемы",
+    "tier": "Новичок",
+    "name": "Каркасный шлем с полумаской",
+    "dc": "15",
+    "time": "4 часа",
+    "ingredients": [
+      {
+        "name": "Сталь",
+        "quantity": 3
+      },
+      {
+        "name": "Кости животных",
+        "quantity": 1
+      }
+    ],
+    "page": 134
+  },
+  {
+    "type": "armor",
+    "category": "Щиты",
+    "tier": "Новичок",
+    "name": "Стальной баклер",
+    "dc": "15",
+    "time": "4 часа",
+    "ingredients": [
+      {
+        "name": "Сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 1
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 1
+      }
+    ],
+    "page": 134
+  },
+  {
+    "type": "armor",
+    "category": "Щиты",
+    "tier": "Новичок",
+    "name": "Темерский щит",
+    "dc": "16",
+    "time": "4 часа",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 4
+      },
+      {
+        "name": "Железо",
+        "quantity": 1
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 3
+      }
+    ],
+    "page": 134
+  },
+  {
+    "type": "armor",
+    "category": "Одежда",
+    "tier": "Новичок",
+    "name": "Капюшон верденского лучника",
+    "dc": "10",
+    "time": "3 часа",
+    "ingredients": [
+      {
+        "name": "Полотно",
+        "quantity": 2
+      },
+      {
+        "name": "Кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Нитки",
+        "quantity": 6
+      },
+      {
+        "name": "Воск",
+        "quantity": 3
+      }
+    ],
+    "page": 134
+  },
+  {
+    "type": "armor",
+    "category": "Одежда",
+    "tier": "Подмастерье",
+    "name": "Усиленный капюшон",
+    "dc": "17",
+    "time": "5 часов",
+    "ingredients": [
+      {
+        "name": "Кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 3
+      },
+      {
+        "name": "Двойное полотно",
+        "quantity": 2
+      },
+      {
+        "name": "Нитки",
+        "quantity": 4
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 1
+      }
+    ],
+    "page": 134
+  },
+  {
+    "type": "armor",
+    "category": "Одежда",
+    "tier": "Подмастерье",
+    "name": "Усиленные штаны",
+    "dc": "16",
+    "time": "8 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Нитки",
+        "quantity": 5
+      }
+    ],
+    "page": 134
+  },
+  {
+    "type": "armor",
+    "category": "Броня",
+    "tier": "Подмастерье",
+    "name": "Бригантина",
+    "dc": "16",
+    "time": "8 часов",
+    "ingredients": [
+      {
+        "name": "Кожа",
+        "quantity": 3
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 3
+      }
+    ],
+    "page": 134
+  },
+  {
+    "type": "armor",
+    "category": "Шлемы",
+    "tier": "Подмастерье",
+    "name": "Кольчужный капюшон",
+    "dc": "16",
+    "time": "4 часа",
+    "ingredients": [
+      {
+        "name": "Сталь",
+        "quantity": 4
+      }
+    ],
+    "page": 134
+  },
+  {
+    "type": "armor",
+    "category": "Щиты",
+    "tier": "Подмастерье",
+    "name": "Кэдвенский щит",
+    "dc": "19",
+    "time": "5 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 5
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Кости животных",
+        "quantity": 7
+      },
+      {
+        "name": "Кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 5
+      },
+      {
+        "name": "Воск",
+        "quantity": 2
+      }
+    ],
+    "page": 134
+  },
+  {
+    "type": "armor",
+    "category": "Броня",
+    "tier": "Подмастерье",
+    "name": "Кожаная куртка из Лирии",
+    "dc": "18",
+    "time": "9 часов",
+    "ingredients": [
+      {
+        "name": "Лирийская кожа",
+        "quantity": 4
+      },
+      {
+        "name": "Нитки",
+        "quantity": 4
+      },
+      {
+        "name": "Кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Полотно",
+        "quantity": 4
+      },
+      {
+        "name": "Сталь",
+        "quantity": 1
+      }
+    ],
+    "page": 134
+  },
+  {
+    "type": "armor",
+    "category": "Одежда",
+    "tier": "Подмастерье",
+    "name": "Кожаные штаны из Лирии",
+    "dc": "18",
+    "time": "9 часов",
+    "ingredients": [
+      {
+        "name": "Лирийская кожа",
+        "quantity": 4
+      },
+      {
+        "name": "Нитки",
+        "quantity": 4
+      },
+      {
+        "name": "Кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Полотно",
+        "quantity": 4
+      },
+      {
+        "name": "Сталь",
+        "quantity": 1
+      }
+    ],
+    "page": 134
+  },
+  {
+    "type": "armor",
+    "category": "Щиты",
+    "tier": "Подмастерье",
+    "name": "Стальной каплевидный щит",
+    "dc": "17",
+    "time": "5 часов",
+    "ingredients": [
+      {
+        "name": "Сталь",
+        "quantity": 4
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Кожа",
+        "quantity": 1
+      }
+    ],
+    "page": 134
+  },
+  {
+    "type": "armor",
+    "category": "Шлемы",
+    "tier": "Подмастерье",
+    "name": "Темерский армет",
+    "dc": "18",
+    "time": "5 часов",
+    "ingredients": [
+      {
+        "name": "Сталь",
+        "quantity": 4
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 1
+      },
+      {
+        "name": "Кожа",
+        "quantity": 2
+      }
+    ],
+    "page": 134
+  },
+  {
+    "type": "armor",
+    "category": "Одежда",
+    "tier": "Подмастерье",
+    "name": "Реданские поножи",
+    "dc": "17",
+    "time": "9 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Терегорская сталь",
+        "quantity": 3
+      },
+      {
+        "name": "Нитки",
+        "quantity": 5
+      },
+      {
+        "name": "Дубильные травы",
+        "quantity": 3
+      },
+      {
+        "name": "Хлопок",
+        "quantity": 3
+      }
+    ],
+    "page": 135
+  },
+  {
+    "type": "armor",
+    "category": "Броня",
+    "tier": "Подмастерье",
+    "name": "Броня реданского алебардщика",
+    "dc": "17",
+    "time": "9 часов",
+    "ingredients": [
+      {
+        "name": "Нитки",
+        "quantity": 5
+      },
+      {
+        "name": "Кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Терегорская сталь",
+        "quantity": 2
+      }
+    ],
+    "page": 135
+  },
+  {
+    "type": "armor",
+    "category": "Щиты",
+    "tier": "Подмастерье",
+    "name": "Щит налётчика со Скеллиге",
+    "dc": "18",
+    "time": "5 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 5
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 1
+      },
+      {
+        "name": "Кости животных",
+        "quantity": 5
+      },
+      {
+        "name": "Кожа",
+        "quantity": 1
+      }
+    ],
+    "page": 135
+  },
+  {
+    "type": "armor",
+    "category": "Броня",
+    "tier": "Мастер",
+    "name": "Тонфелль",
+    "dc": "19",
+    "time": "5 часов",
+    "ingredients": [
+      {
+        "name": "Сталь",
+        "quantity": 5
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 3
+      },
+      {
+        "name": "Нитки",
+        "quantity": 6
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 2
+      },
+      {
+        "name": "Полотно",
+        "quantity": 1
+      }
+    ],
+    "page": 135
+  },
+  {
+    "type": "armor",
+    "category": "Броня",
+    "tier": "Мастер",
+    "name": "Хиндарфьяльский тяжёлый доспех",
+    "dc": "22",
+    "time": "11 часов",
+    "ingredients": [
+      {
+        "name": "Нитки",
+        "quantity": 6
+      },
+      {
+        "name": "Кости животных",
+        "quantity": 5
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Масло из дрейка",
+        "quantity": 3
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 4
+      }
+    ],
+    "page": 135
+  },
+  {
+    "type": "armor",
+    "category": "Одежда",
+    "tier": "Мастер",
+    "name": "Хиндарфьяльские тяжёлые штаны",
+    "dc": "22",
+    "time": "11 часов",
+    "ingredients": [
+      {
+        "name": "Нитки",
+        "quantity": 8
+      },
+      {
+        "name": "Кости животных",
+        "quantity": 5
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Масло из дрейка",
+        "quantity": 1
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 4
+      }
+    ],
+    "page": 135
+  },
+  {
+    "type": "armor",
+    "category": "Одежда",
+    "tier": "Мастер",
+    "name": "Нильфгаардские поножи",
+    "dc": "24",
+    "time": "12 часов",
+    "ingredients": [
+      {
+        "name": "Тёмная сталь",
+        "quantity": 5
+      },
+      {
+        "name": "Перья",
+        "quantity": 10
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Чёрное масло",
+        "quantity": 1
+      },
+      {
+        "name": "Масло из дрейка",
+        "quantity": 2
+      },
+      {
+        "name": "Полотно",
+        "quantity": 1
+      }
+    ],
+    "page": 135
+  },
+  {
+    "type": "armor",
+    "category": "Шлемы",
+    "tier": "Мастер",
+    "name": "Нильфгаардский шлем",
+    "dc": "24",
+    "time": "6 часов",
+    "ingredients": [
+      {
+        "name": "Тёмная сталь",
+        "quantity": 5
+      },
+      {
+        "name": "Масло",
+        "quantity": 5
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Чёрное масло",
+        "quantity": 1
+      },
+      {
+        "name": "Масло из дрейка",
+        "quantity": 1
+      },
+      {
+        "name": "Пепел",
+        "quantity": 10
+      }
+    ],
+    "page": 135
+  },
+  {
+    "type": "armor",
+    "category": "Броня",
+    "tier": "Мастер",
+    "name": "Нильфгаардская панцирь",
+    "dc": "22",
+    "time": "6 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 10
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 3
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 1
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 2
+      },
+      {
+        "name": "Чёрное масло",
+        "quantity": 1
+      },
+      {
+        "name": "Перья",
+        "quantity": 10
+      },
+      {
+        "name": "Травильная кислота",
+        "quantity": 2
+      }
+    ],
+    "page": 135
+  },
+  {
+    "type": "armor",
+    "category": "Броня",
+    "tier": "Мастер",
+    "name": "Нильфгаардский латный доспех",
+    "dc": "24",
+    "time": "12 часов",
+    "ingredients": [
+      {
+        "name": "Тёмная сталь",
+        "quantity": 5
+      },
+      {
+        "name": "Полотно",
+        "quantity": 3
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Чёрное масло",
+        "quantity": 1
+      },
+      {
+        "name": "Масло из дрейка",
+        "quantity": 2
+      },
+      {
+        "name": "Перья",
+        "quantity": 10
+      }
+    ],
+    "page": 135
+  },
+  {
+    "type": "armor",
+    "category": "Броня",
+    "tier": "Мастер",
+    "name": "Панцирь",
+    "dc": "19",
+    "time": "5 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 10
+      },
+      {
+        "name": "Сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 3
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 1
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 2
+      }
+    ],
+    "page": 135
+  },
+  {
+    "type": "armor",
+    "category": "Одежда",
+    "tier": "Мастер",
+    "name": "Латные поножи",
+    "dc": "19",
+    "time": "10 часов",
+    "ingredients": [
+      {
+        "name": "Сталь",
+        "quantity": 5
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 3
+      },
+      {
+        "name": "Нитки",
+        "quantity": 7
+      },
+      {
+        "name": "Травильная кислота",
+        "quantity": 4
+      },
+      {
+        "name": "Масло из дрейка",
+        "quantity": 1
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 1
+      }
+    ],
+    "page": 135
+  },
+  {
+    "type": "armor",
+    "category": "Броня",
+    "tier": "Мастер",
+    "name": "Латный доспех",
+    "dc": "19",
+    "time": "10 часов",
+    "ingredients": [
+      {
+        "name": "Сталь",
+        "quantity": 5
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 3
+      },
+      {
+        "name": "Нитки",
+        "quantity": 7
+      },
+      {
+        "name": "Травильная кислота",
+        "quantity": 4
+      },
+      {
+        "name": "Масло из дрейка",
+        "quantity": 1
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 1
+      }
+    ],
+    "page": 135
+  },
+  {
+    "type": "armor",
+    "category": "Шлемы",
+    "tier": "Мастер",
+    "name": "Скеллигский шлем",
+    "dc": "22",
+    "time": "6 часов",
+    "ingredients": [
+      {
+        "name": "Тёмная сталь",
+        "quantity": 4
+      },
+      {
+        "name": "Нитки",
+        "quantity": 6
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Кости животных",
+        "quantity": 5
+      },
+      {
+        "name": "Масло из дрейка",
+        "quantity": 1
+      }
+    ],
+    "page": 135
+  },
+  {
+    "type": "armor",
+    "category": "Одежда",
+    "tier": "Мастер",
+    "name": "Краснолюдский плащ",
+    "dc": "18",
+    "time": "9 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 12
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 10
+      },
+      {
+        "name": "Смола",
+        "quantity": 10
+      },
+      {
+        "name": "Масло из дрейка",
+        "quantity": 2
+      },
+      {
+        "name": "Кожа",
+        "quantity": 6
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 7
+      },
+      {
+        "name": "Нитки",
+        "quantity": 10
+      },
+      {
+        "name": "Коровья шкура",
+        "quantity": 2
+      }
+    ],
+    "page": 138
+  },
+  {
+    "type": "armor",
+    "category": "Щиты",
+    "tier": "Мастер",
+    "name": "Эльфский щит",
+    "dc": "20",
+    "time": "5 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 5
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 5
+      },
+      {
+        "name": "Тёмная сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 2
+      },
+      {
+        "name": "Травильная кислота",
+        "quantity": 4
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 2
+      }
+    ],
+    "page": 138
+  },
+  {
+    "type": "armor",
+    "category": "Щиты",
+    "tier": "Мастер",
+    "name": "Гномий баклер",
+    "dc": "22",
+    "time": "6 часов",
+    "ingredients": [
+      {
+        "name": "Тёмная сталь",
+        "quantity": 3
+      },
+      {
+        "name": "Кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 1
+      },
+      {
+        "name": "Травильная кислота",
+        "quantity": 4
+      },
+      {
+        "name": "Масло из дрейка",
+        "quantity": 1
+      }
+    ],
+    "page": 138
+  },
+  {
+    "type": "armor",
+    "category": "Одежда",
+    "tier": "Мастер",
+    "name": "Низушский защитный дублет",
+    "dc": "18",
+    "time": "9 часов",
+    "ingredients": [
+      {
+        "name": "Шёлк",
+        "quantity": 4
+      },
+      {
+        "name": "Нитки",
+        "quantity": 10
+      },
+      {
+        "name": "Хлопок",
+        "quantity": 7
+      },
+      {
+        "name": "Двойное полотно",
+        "quantity": 2
+      }
+    ],
+    "page": 138
+  },
+  {
+    "type": "armor",
+    "category": "Броня",
+    "tier": "Мастер",
+    "name": "Броня скоя'таэлей",
+    "dc": "20",
+    "time": "20 часов",
+    "ingredients": [
+      {
+        "name": "Тёмная сталь",
+        "quantity": 12
+      },
+      {
+        "name": "Волчья шкура",
+        "quantity": 3
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 10
+      },
+      {
+        "name": "Травильная кислота",
+        "quantity": 12
+      },
+      {
+        "name": "Перья",
+        "quantity": 11
+      },
+      {
+        "name": "Двойное полотно",
+        "quantity": 8
+      },
+      {
+        "name": "Чёрное масло",
+        "quantity": 4
+      },
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 13
+      },
+      {
+        "name": "Масло из дрейка",
+        "quantity": 2
+      },
+      {
+        "name": "Нитки",
+        "quantity": 9
+      }
+    ],
+    "page": 138
+  },
+  {
+    "type": "armor",
+    "category": "Броня",
+    "tier": "Великий мастер",
+    "name": "Кольчуга гномьей работы",
+    "dc": "24",
+    "time": "24 часа",
+    "ingredients": [
+      {
+        "name": "Тёмная сталь",
+        "quantity": 8
+      },
+      {
+        "name": "Кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Чёрное масло",
+        "quantity": 1
+      }
+    ],
+    "page": 138
+  },
+  {
+    "type": "armor",
+    "category": "Броня",
+    "tier": "Великий мастер",
+    "name": "Драконья броня гномьей работы",
+    "dc": "25",
+    "time": "25 часов",
+    "ingredients": [
+      {
+        "name": "Тёмная сталь",
+        "quantity": 12
+      },
+      {
+        "name": "Метеорит",
+        "quantity": 1
+      },
+      {
+        "name": "Махакемский диммерит",
+        "quantity": 2
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 10
+      },
+      {
+        "name": "Травильная кислота",
+        "quantity": 14
+      },
+      {
+        "name": "Двойное полотно",
+        "quantity": 5
+      },
+      {
+        "name": "Чёрное масло",
+        "quantity": 4
+      },
+      {
+        "name": "Масло из дрейка",
+        "quantity": 2
+      },
+      {
+        "name": "Нитки",
+        "quantity": 15
+      }
+    ],
+    "page": 138
+  },
+  {
+    "type": "armor",
+    "category": "Щиты",
+    "tier": "Великий мастер",
+    "name": "Махакемская павеза",
+    "dc": "26",
+    "time": "7 часов",
+    "ingredients": [
+      {
+        "name": "Укреплённое дерево",
+        "quantity": 10
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 5
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 11
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 2
+      },
+      {
+        "name": "Махакемская сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Травильная кислота",
+        "quantity": 3
+      },
+      {
+        "name": "Кожа",
+        "quantity": 4
+      }
+    ],
+    "page": 138
+  },
+  {
+    "type": "armor",
+    "category": "Броня",
+    "tier": "Великий мастер",
+    "name": "Махакемские латы",
+    "dc": "28",
+    "time": "28 часов",
+    "ingredients": [
+      {
+        "name": "Махакемская сталь",
+        "quantity": 12
+      },
+      {
+        "name": "Махакемский диммерит",
+        "quantity": 2
+      },
+      {
+        "name": "Эфирная смазка",
+        "quantity": 8
+      },
+      {
+        "name": "Травильная кислота",
+        "quantity": 12
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 6
+      },
+      {
+        "name": "Чёрное масло",
+        "quantity": 2
+      },
+      {
+        "name": "Масло из дрейка",
+        "quantity": 1
+      },
+      {
+        "name": "Метеорит",
+        "quantity": 2
+      },
+      {
+        "name": "Огров воск",
+        "quantity": 3
+      },
+      {
+        "name": "Нитки",
+        "quantity": 10
+      }
+    ],
+    "page": 138
+  },
+  {
+    "type": "armor",
+    "category": "Компоненты брони",
+    "tier": "Новичок",
+    "name": "Ткань",
+    "dc": "14",
+    "time": "3 часа",
+    "ingredients": [
+      {
+        "name": "Двойное полотно",
+        "quantity": 1
+      },
+      {
+        "name": "Нитки",
+        "quantity": 2
+      }
+    ],
+    "page": 139
+  },
+  {
+    "type": "armor",
+    "category": "Компоненты брони",
+    "tier": "Новичок",
+    "name": "Клёпаная кожа",
+    "dc": "14",
+    "time": "3 часа",
+    "ingredients": [
+      {
+        "name": "Кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Железо",
+        "quantity": 1
+      },
+      {
+        "name": "Нитки",
+        "quantity": 1
+      }
+    ],
+    "page": 139
+  },
+  {
+    "type": "armor",
+    "category": "Компоненты брони",
+    "tier": "Подмастерье",
+    "name": "Кольчужное",
+    "dc": "17",
+    "time": "5 часов",
+    "ingredients": [
+      {
+        "name": "Сталь",
+        "quantity": 2
+      }
+    ],
+    "page": 139
+  },
+  {
+    "type": "armor",
+    "category": "Компоненты брони",
+    "tier": "Подмастерье",
+    "name": "Укреплённая кожа",
+    "dc": "16",
+    "time": "4 часа",
+    "ingredients": [
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Кожа",
+        "quantity": 1
+      },
+      {
+        "name": "Нитки",
+        "quantity": 5
+      },
+      {
+        "name": "Воск",
+        "quantity": 3
+      }
+    ],
+    "page": 139
+  },
+  {
+    "type": "armor",
+    "category": "Компоненты брони",
+    "tier": "Подмастерье",
+    "name": "Стальное",
+    "dc": "18",
+    "time": "5 часов",
+    "ingredients": [
+      {
+        "name": "Сталь",
+        "quantity": 2
+      },
+      {
+        "name": "Нитки",
+        "quantity": 3
+      },
+      {
+        "name": "Травильная кислота",
+        "quantity": 2
+      }
+    ],
+    "page": 139
+  },
+  {
+    "type": "armor",
+    "category": "Компоненты брони",
+    "tier": "Мастер",
+    "name": "Эльфское",
+    "dc": "24",
+    "time": "6 часов",
+    "ingredients": [
+      {
+        "name": "Тёмная сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Нитки",
+        "quantity": 5
+      },
+      {
+        "name": "Укреплённая кожа",
+        "quantity": 2
+      },
+      {
+        "name": "Перья",
+        "quantity": 1
+      }
+    ],
+    "page": 139
+  },
+  {
+    "type": "armor",
+    "category": "Компоненты брони",
+    "tier": "Мастер",
+    "name": "Краснолюдское",
+    "dc": "24",
+    "time": "6 часов",
+    "ingredients": [
+      {
+        "name": "Махакемская сталь",
+        "quantity": 1
+      },
+      {
+        "name": "Нитки",
+        "quantity": 5
+      },
+      {
+        "name": "Волчья шкура",
+        "quantity": 1
+      },
+      {
+        "name": "Уголь",
+        "quantity": 1
+      }
+    ],
+    "page": 139
+  }
+]

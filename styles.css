@@ -74,6 +74,9 @@ kbd { padding: 1px 6px 2px; border: 1px solid #405247; border-radius: 4px; color
 .recipe-title { font: 500 16px/1.35 var(--serif); }
 .recipe-subtitle { color: var(--faint); font-size: 11px; margin-top: 3px; }
 .ingredient-preview { overflow: hidden; color: #b4c0b7; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
+.formula { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 3px; max-width: 100%; vertical-align: middle; }
+.alchemy-symbol { display: inline-block; width: 18px; height: 18px; flex: none; }
+.ingredient-preview .formula { flex-wrap: nowrap; overflow: hidden; }
 .meta-pill { color: var(--muted); font-size: 12px; white-space: nowrap; }
 .meta-pill strong { display: block; color: var(--gold); font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
 .card-arrow { color: var(--faint); justify-self: end; transition: transform .18s ease; }
