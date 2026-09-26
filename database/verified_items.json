@@ -8,8 +8,8 @@
       "page": 128,
       "weight_kg": 0.1,
       "cost_crowns": 1,
-      "rarity": "Повсеместный",
-      "habitat": "Костёр и старые предметы"
+      "where_found": "Костёр и старые предметы",
+      "availability": "Повсеместное"
     },
     {
       "item_id": "item_c12c6c04f3be5da62954",
@@ -18,8 +18,8 @@
       "page": 128,
       "weight_kg": 0.1,
       "cost_crowns": 1,
-      "rarity": "Обычный",
-      "habitat": "Костёр, горы и подземелья"
+      "where_found": "Костёр, горы и подземелья",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_cd1d56cdaded5b72d17c",
@@ -28,8 +28,8 @@
       "page": 128,
       "weight_kg": 0.1,
       "cost_crowns": 1,
-      "rarity": "Обычный",
-      "habitat": "Поля и плантации"
+      "where_found": "Поля и плантации",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_943f28742416c0cab69e",
@@ -39,7 +39,7 @@
       "weight_kg": 0.1,
       "cost_crowns": 22,
       "attributes": {
-        "availability": "Р"
+        "availability": "Редкое"
       },
       "description": "Получение: Покупается или изготавливается"
     },
@@ -51,7 +51,7 @@
       "weight_kg": 0.1,
       "cost_crowns": 16,
       "attributes": {
-        "availability": "Р"
+        "availability": "Редкое"
       },
       "description": "Получение: Покупается или изготавливается"
     },
@@ -63,7 +63,7 @@
       "weight_kg": 0.1,
       "cost_crowns": 9,
       "attributes": {
-        "availability": "О"
+        "availability": "Обычное"
       },
       "description": "Получение: Покупается или изготавливается"
     },
@@ -74,8 +74,8 @@
       "page": 128,
       "weight_kg": 0.1,
       "cost_crowns": 3,
-      "rarity": "Обычный",
-      "habitat": "Покупается или изготавливается"
+      "where_found": "Покупается или изготавливается",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_3b050052261f116f3d6b",
@@ -84,8 +84,8 @@
       "page": 128,
       "weight_kg": 0.1,
       "cost_crowns": 2,
-      "rarity": "Обычный",
-      "habitat": "Лес"
+      "where_found": "Лес",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_50ad2bc572fde0cd5f4a",
@@ -94,8 +94,8 @@
       "page": 128,
       "weight_kg": 0.1,
       "cost_crowns": 50,
-      "rarity": "Редкий",
-      "habitat": "Покупается"
+      "where_found": "Покупается",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_7b34ef808e8ceb056383",
@@ -105,7 +105,7 @@
       "weight_kg": 0.1,
       "cost_crowns": 3,
       "attributes": {
-        "availability": "О"
+        "availability": "Обычное"
       },
       "description": "Получение: Покупается или изготавливается"
     },
@@ -116,8 +116,8 @@
       "page": 128,
       "weight_kg": 1.0,
       "cost_crowns": 3,
-      "rarity": "Повсеместный",
-      "habitat": "Лес"
+      "where_found": "Лес",
+      "availability": "Повсеместное"
     },
     {
       "item_id": "item_1ebc5e3c852b8437ea5f",
@@ -126,8 +126,8 @@
       "page": 128,
       "weight_kg": 0.1,
       "cost_crowns": 2,
-      "rarity": "Обычный",
-      "habitat": "Лес и поля"
+      "where_found": "Лес и поля",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_a27ffa903164ed2b379f",
@@ -136,8 +136,8 @@
       "page": 128,
       "weight_kg": 4.0,
       "cost_crowns": 8,
-      "rarity": "Обычный",
-      "habitat": "Чудовища и животные"
+      "where_found": "Чудовища и животные",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_c737c6a2a556a51cb011",
@@ -146,8 +146,8 @@
       "page": 128,
       "weight_kg": 5.0,
       "cost_crowns": 10,
-      "rarity": "Обычный",
-      "habitat": "Покупается"
+      "where_found": "Покупается",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_4e9c7897668eb8f07d87",
@@ -156,8 +156,8 @@
       "page": 128,
       "weight_kg": 5.0,
       "cost_crowns": 58,
-      "rarity": "Уникальный",
-      "habitat": "Покупается или изготавливается"
+      "where_found": "Покупается или изготавливается",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_1781fa7129746a8ff9b7",
@@ -166,8 +166,8 @@
       "page": 128,
       "weight_kg": 5.0,
       "cost_crowns": 30,
-      "rarity": "Уникальный",
-      "habitat": "Виверны"
+      "where_found": "Виверны",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_313c800569d6d1e83503",
@@ -176,8 +176,8 @@
       "page": 128,
       "weight_kg": 0.1,
       "cost_crowns": 4,
-      "rarity": "Повсеместный",
-      "habitat": "Птицы"
+      "where_found": "Птицы",
+      "availability": "Повсеместное"
     },
     {
       "item_id": "item_168a2bcfd9fac25bc7b9",
@@ -187,7 +187,7 @@
       "weight_kg": 3.0,
       "cost_crowns": 48,
       "attributes": {
-        "availability": "Р"
+        "availability": "Редкое"
       },
       "description": "Получение: Покупается или изготавливается"
     },
@@ -199,7 +199,7 @@
       "weight_kg": 2.0,
       "cost_crowns": 28,
       "attributes": {
-        "availability": "О"
+        "availability": "Обычное"
       },
       "description": "Получение: Покупается или изготавливается"
     },
@@ -211,7 +211,7 @@
       "weight_kg": 2.0,
       "cost_crowns": 60,
       "attributes": {
-        "availability": "Р"
+        "availability": "Редкое"
       },
       "description": "Получение: Покупается или изготавливается"
     },
@@ -222,8 +222,8 @@
       "page": 128,
       "weight_kg": 3.0,
       "cost_crowns": 14,
-      "rarity": "Обычный",
-      "habitat": "Волки"
+      "where_found": "Волки",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_50b397130f0d5008561e",
@@ -232,8 +232,8 @@
       "page": 129,
       "weight_kg": 0.1,
       "cost_crowns": 24,
-      "rarity": "Редкий",
-      "habitat": "Лес"
+      "where_found": "Лес",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_bc0f3cc9e770c6a9c608",
@@ -242,8 +242,8 @@
       "page": 129,
       "weight_kg": 0.1,
       "cost_crowns": 45,
-      "rarity": "Редкий",
-      "habitat": "Реки и морское побережье"
+      "where_found": "Реки и морское побережье",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_803aeb9e60ba3d98cce6",
@@ -252,8 +252,8 @@
       "page": 129,
       "weight_kg": 0.1,
       "cost_crowns": 8,
-      "rarity": "Обычный",
-      "habitat": "Леса и поля"
+      "where_found": "Леса и поля",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_2bd4350dc3d6704f69ba",
@@ -262,8 +262,8 @@
       "page": 129,
       "weight_kg": 0.1,
       "cost_crowns": 2,
-      "rarity": "Обычный",
-      "habitat": "Пещеры и горы"
+      "where_found": "Пещеры и горы",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_4a02870e3faf31239541",
@@ -272,8 +272,8 @@
       "page": 129,
       "weight_kg": 0.1,
       "cost_crowns": 82,
-      "rarity": "Уникальный",
-      "habitat": "Места силы, маги и бесы"
+      "where_found": "Места силы, маги и бесы",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_d1e0bda6bf59017a2b70",
@@ -282,8 +282,8 @@
       "page": 129,
       "weight_kg": 0.1,
       "cost_crowns": 10,
-      "rarity": "Обычный",
-      "habitat": "Пещеры"
+      "where_found": "Пещеры",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_29a8990ffa9fb4714ae0",
@@ -292,8 +292,8 @@
       "page": 129,
       "weight_kg": 0.1,
       "cost_crowns": 32,
-      "rarity": "Редкий",
-      "habitat": "Горы и пещеры"
+      "where_found": "Горы и пещеры",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_5c0d3c551fbafefdf16c",
@@ -302,8 +302,8 @@
       "page": 129,
       "weight_kg": 0.1,
       "cost_crowns": 3,
-      "rarity": "Обычный",
-      "habitat": "Поля и леса"
+      "where_found": "Поля и леса",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_e849994381906e37fb45",
@@ -312,8 +312,8 @@
       "page": 129,
       "weight_kg": 1.5,
       "cost_crowns": 52,
-      "rarity": "Уникальный",
-      "habitat": "Горы и подземелья"
+      "where_found": "Горы и подземелья",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_79dd0bd6bd427d246d46",
@@ -323,7 +323,7 @@
       "weight_kg": 1.0,
       "cost_crowns": 82,
       "attributes": {
-        "availability": "У"
+        "availability": "Уникальное"
       },
       "description": "Получение: Покупается или изготавливается"
     },
@@ -335,7 +335,7 @@
       "weight_kg": 1.0,
       "cost_crowns": 240,
       "attributes": {
-        "availability": "У"
+        "availability": "Уникальное"
       },
       "description": "Получение: Покупается или изготавливается"
     },
@@ -346,8 +346,8 @@
       "page": 129,
       "weight_kg": 0.1,
       "cost_crowns": 100,
-      "rarity": "Уникальный",
-      "habitat": "Горы и подземелья"
+      "where_found": "Горы и подземелья",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_36cccc09d1a0a8178973",
@@ -356,8 +356,8 @@
       "page": 129,
       "weight_kg": 1.0,
       "cost_crowns": 80,
-      "rarity": "Уникальный",
-      "habitat": "Горы и подземелья"
+      "where_found": "Горы и подземелья",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_7d81cf69336ffbc78975",
@@ -366,8 +366,8 @@
       "page": 129,
       "weight_kg": 1.0,
       "cost_crowns": 85,
-      "rarity": "Уникальный",
-      "habitat": "Горы и подземелья"
+      "where_found": "Горы и подземелья",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_70c291fabb398e93eaa4",
@@ -376,8 +376,8 @@
       "page": 129,
       "weight_kg": 1.5,
       "cost_crowns": 30,
-      "rarity": "Редкий",
-      "habitat": "Горы и подземелья"
+      "where_found": "Горы и подземелья",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_8fc9d1da3476bea64e22",
@@ -387,7 +387,7 @@
       "weight_kg": 1.0,
       "cost_crowns": 300,
       "attributes": {
-        "availability": "У"
+        "availability": "Уникальное"
       },
       "description": "Получение: Покупается или изготавливается"
     },
@@ -399,7 +399,7 @@
       "weight_kg": 1.0,
       "cost_crowns": 114,
       "attributes": {
-        "availability": "Р"
+        "availability": "Редкое"
       },
       "description": "Получение: Покупается или изготавливается"
     },
@@ -410,8 +410,8 @@
       "page": 129,
       "weight_kg": 1.0,
       "cost_crowns": 98,
-      "rarity": "Уникальный",
-      "habitat": "Место падения на поверхности земли"
+      "where_found": "Место падения на поверхности земли",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_1e4b7676aaa84c2b1095",
@@ -420,8 +420,8 @@
       "page": 129,
       "weight_kg": 1.5,
       "cost_crowns": 5,
-      "rarity": "Редкий",
-      "habitat": "Реки или их берега"
+      "where_found": "Реки или их берега",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_b02e519f43dc0fdfb1f6",
@@ -431,7 +431,7 @@
       "weight_kg": 1.0,
       "cost_crowns": 48,
       "attributes": {
-        "availability": "Р"
+        "availability": "Редкое"
       },
       "description": "Получение: Покупается или изготавливается"
     },
@@ -443,7 +443,7 @@
       "weight_kg": 1.0,
       "cost_crowns": 64,
       "attributes": {
-        "availability": "Р"
+        "availability": "Редкое"
       },
       "description": "Получение: Покупается или изготавливается"
     },
@@ -527,9 +527,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 8,
-      "rarity": "Обычный",
-      "habitat": "Поля",
-      "alchemy_group": "Купорос"
+      "alchemy_group": "Купорос",
+      "where_found": "Поля",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_27a32e419e2b4304bd3ae25b13b373fc",
@@ -539,22 +539,21 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 9,
-      "rarity": "Обычный",
-      "habitat": "Поля",
-      "alchemy_group": "Купорос"
+      "alchemy_group": "Купорос",
+      "where_found": "Поля",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_047fda02ae7041f398379db95ef16133",
-      "name": "Лошадиная известь",
-      "original_name": "Calcium equum",
+      "name": "Calcium equum",
       "type": "ingredient",
       "page": 143,
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 12,
-      "rarity": "Обычный",
-      "habitat": "Горы и под землёй",
-      "alchemy_group": "Купорос"
+      "alchemy_group": "Купорос",
+      "where_found": "Горы и под землёй",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_14ea378f0fa048ce8912a44b7be43363",
@@ -564,9 +563,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 17,
-      "rarity": "Редкий",
-      "habitat": "Поля и леса",
-      "alchemy_group": "Купорос"
+      "alchemy_group": "Купорос",
+      "where_found": "Поля и леса",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_6d1ed957a691465f80a5ee5e43936fda",
@@ -576,9 +575,9 @@
       "new": true,
       "weight_kg": 1.0,
       "cost_crowns": 60,
-      "rarity": "Уникальный",
-      "habitat": "Гули",
-      "alchemy_group": "Купорос"
+      "alchemy_group": "Купорос",
+      "where_found": "Гули",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_afafd427b46b4197bd5bc9b37e542d9c",
@@ -588,9 +587,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 30,
-      "rarity": "Редкий",
-      "habitat": "Накеры",
-      "alchemy_group": "Купорос"
+      "alchemy_group": "Купорос",
+      "where_found": "Накеры",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_9dcbea61205c4ec193b70267cba81a00",
@@ -600,9 +599,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 17,
-      "rarity": "Редкий",
-      "habitat": "Пещеры",
-      "alchemy_group": "Купорос"
+      "alchemy_group": "Купорос",
+      "where_found": "Пещеры",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_53428a3284534a3db21ca0edb9fde3b3",
@@ -612,9 +611,9 @@
       "new": true,
       "weight_kg": 4.5,
       "cost_crowns": 147,
-      "rarity": "Уникальный",
-      "habitat": "Скальные тролли",
-      "alchemy_group": "Купорос"
+      "alchemy_group": "Купорос",
+      "where_found": "Скальные тролли",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_80da0ebb0c4f4c0eb6e156a6332162e1",
@@ -624,9 +623,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 8,
-      "rarity": "Обычный",
-      "habitat": "Поля",
-      "alchemy_group": "Купорос"
+      "alchemy_group": "Купорос",
+      "where_found": "Поля",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_f428d200c86340a08286703128acba70",
@@ -636,9 +635,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 8,
-      "rarity": "Обычный",
-      "habitat": "Поля и леса",
-      "alchemy_group": "Ребис"
+      "alchemy_group": "Ребис",
+      "where_found": "Поля и леса",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_063c15ac385448298badf88130aa1cca",
@@ -648,9 +647,9 @@
       "new": true,
       "weight_kg": 1.0,
       "cost_crowns": 80,
-      "rarity": "Редкий",
-      "habitat": "Утопцы",
-      "alchemy_group": "Ребис"
+      "alchemy_group": "Ребис",
+      "where_found": "Утопцы",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_0a962d3626264f84909c124776b3207d",
@@ -660,9 +659,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 17,
-      "rarity": "Редкий",
-      "habitat": "Поля",
-      "alchemy_group": "Ребис"
+      "alchemy_group": "Ребис",
+      "where_found": "Поля",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_4ac911238a6d46c5a8e82a3a59af697b",
@@ -672,9 +671,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 90,
-      "rarity": "Уникальный",
-      "habitat": "Кладбищенские бабы",
-      "alchemy_group": "Ребис"
+      "alchemy_group": "Ребис",
+      "where_found": "Кладбищенские бабы",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_f883c2f6f1d449bba67eab0822c7e019",
@@ -684,9 +683,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 91,
-      "rarity": "Уникальный",
-      "habitat": "Горы или под землёй",
-      "alchemy_group": "Ребис"
+      "alchemy_group": "Ребис",
+      "where_found": "Горы или под землёй",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_0fe4b37028634c329c2378074cac3070",
@@ -696,9 +695,9 @@
       "new": true,
       "weight_kg": 0.5,
       "cost_crowns": 30,
-      "rarity": "Редкий",
-      "habitat": "Накеры",
-      "alchemy_group": "Ребис"
+      "alchemy_group": "Ребис",
+      "where_found": "Накеры",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_b08a43de90044ecd958ee0b8c607fcfe",
@@ -708,9 +707,9 @@
       "new": true,
       "weight_kg": 0.5,
       "cost_crowns": 88,
-      "rarity": "Уникальный",
-      "habitat": "Винокурни",
-      "alchemy_group": "Ребис"
+      "alchemy_group": "Ребис",
+      "where_found": "Винокурни",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_92daab898cdb4518b223f3863fe22228",
@@ -720,9 +719,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 18,
-      "rarity": "Редкий",
-      "habitat": "Поля",
-      "alchemy_group": "Эфир"
+      "alchemy_group": "Эфир",
+      "where_found": "Поля",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_93fa614c521f4b91928ec8ce2b289534",
@@ -732,9 +731,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 9,
-      "rarity": "Обычный",
-      "habitat": "Горы и болота",
-      "alchemy_group": "Эфир"
+      "alchemy_group": "Эфир",
+      "where_found": "Горы и болота",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_c3c9296c6c1240e9b4a03f2e98dbbbdf",
@@ -744,9 +743,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 95,
-      "rarity": "Уникальный",
-      "habitat": "Призраки",
-      "alchemy_group": "Эфир"
+      "alchemy_group": "Эфир",
+      "where_found": "Призраки",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_84a6ed6993ff43af8a6fdcc51b58d18f",
@@ -756,9 +755,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 17,
-      "rarity": "Редкий",
-      "habitat": "Поля",
-      "alchemy_group": "Эфир"
+      "alchemy_group": "Эфир",
+      "where_found": "Поля",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_b7497a300a4545c2922cb72259ad53f7",
@@ -768,9 +767,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 19,
-      "rarity": "Редкий",
-      "habitat": "Леса",
-      "alchemy_group": "Эфир"
+      "alchemy_group": "Эфир",
+      "where_found": "Леса",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_4764e37eb98d451d83d27c65d0338d07",
@@ -780,9 +779,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 100,
-      "rarity": "Уникальный",
-      "habitat": "Дно океана и побережье",
-      "alchemy_group": "Эфир"
+      "alchemy_group": "Эфир",
+      "where_found": "Дно океана и побережье",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_78f5f494a7d84441accbeab119b10277",
@@ -792,9 +791,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 77,
-      "rarity": "Уникальный",
-      "habitat": "Горы или под землёй",
-      "alchemy_group": "Эфир"
+      "alchemy_group": "Эфир",
+      "where_found": "Горы или под землёй",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_b350baf23cff4cbd88ae1bd1369098b4",
@@ -804,9 +803,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 5,
-      "rarity": "Повсеместный",
-      "habitat": "Леса и пещеры",
-      "alchemy_group": "Эфир"
+      "alchemy_group": "Эфир",
+      "where_found": "Леса и пещеры",
+      "availability": "Повсеместное"
     },
     {
       "item_id": "item_128583c9dfeb4ff6b64d62e8ee624664",
@@ -816,9 +815,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 8,
-      "rarity": "Обычный",
-      "habitat": "Поля",
-      "alchemy_group": "Квебрит"
+      "alchemy_group": "Квебрит",
+      "where_found": "Поля",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_b508f4eae7ca4c718205c04052cd623f",
@@ -828,9 +827,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 20,
-      "rarity": "Обычный",
-      "habitat": "Горы и под землёй",
-      "alchemy_group": "Квебрит"
+      "alchemy_group": "Квебрит",
+      "where_found": "Горы и под землёй",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_5d54cf9db90744418ef0b2a8eaa00af8",
@@ -840,9 +839,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 2,
-      "rarity": "Повсеместный",
-      "habitat": "Поля",
-      "alchemy_group": "Квебрит"
+      "alchemy_group": "Квебрит",
+      "where_found": "Поля",
+      "availability": "Повсеместное"
     },
     {
       "item_id": "item_e84b7bfd4d414b62ad9f7dbbacae0431",
@@ -852,9 +851,9 @@
       "new": true,
       "weight_kg": 0.5,
       "cost_crowns": 80,
-      "rarity": "Уникальный",
-      "habitat": "Гули",
-      "alchemy_group": "Квебрит"
+      "alchemy_group": "Квебрит",
+      "where_found": "Гули",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_1070a6ea5e9c434bb194d738ab205cb3",
@@ -864,22 +863,21 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 21,
-      "rarity": "Обычный",
-      "habitat": "Поля",
-      "alchemy_group": "Квебрит"
+      "alchemy_group": "Квебрит",
+      "where_found": "Поля",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_524a9eabd5bf45d4ab85e3fbb88783ed",
-      "name": "Оптима матер",
-      "original_name": "Optima mater",
+      "name": "Optima mater",
       "type": "ingredient",
       "page": 144,
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 100,
-      "rarity": "Уникальный",
-      "habitat": "Горы и под землёй",
-      "alchemy_group": "Квебрит"
+      "alchemy_group": "Квебрит",
+      "where_found": "Горы и под землёй",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_596934530a04476b9a024b8ec2930e7b",
@@ -889,9 +887,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 14,
-      "rarity": "Обычный",
-      "habitat": "Горы и под землёй",
-      "alchemy_group": "Квебрит"
+      "alchemy_group": "Квебрит",
+      "where_found": "Горы и под землёй",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_cc5c1fc26688478cb0e98435c63ab104",
@@ -901,9 +899,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 18,
-      "rarity": "Редкий",
-      "habitat": "Лес",
-      "alchemy_group": "Гидраген"
+      "alchemy_group": "Гидраген",
+      "where_found": "Лес",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_3614a5d095fd4363b5db896a6773513a",
@@ -913,9 +911,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 46,
-      "rarity": "Уникальный",
-      "habitat": "Утопцы и сирены",
-      "alchemy_group": "Гидраген"
+      "alchemy_group": "Гидраген",
+      "where_found": "Утопцы и сирены",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_6d7d13ad514948a8956e080e56192b56",
@@ -925,9 +923,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 146,
-      "rarity": "Уникальный",
-      "habitat": "Призраки, полуденницы, грифоны и големы",
-      "alchemy_group": "Гидраген"
+      "alchemy_group": "Гидраген",
+      "where_found": "Призраки, полуденницы, грифоны и големы",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_d61b7507cc0a488c9c4bf39b94a53443",
@@ -937,9 +935,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 8,
-      "rarity": "Редкий",
-      "habitat": "Поля и леса",
-      "alchemy_group": "Гидраген"
+      "alchemy_group": "Гидраген",
+      "where_found": "Поля и леса",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_0228377dfcf44c3dbe4dc389daad2545",
@@ -949,9 +947,9 @@
       "new": true,
       "weight_kg": 0.5,
       "cost_crowns": 40,
-      "rarity": "Редкий",
-      "habitat": "Накеры",
-      "alchemy_group": "Гидраген"
+      "alchemy_group": "Гидраген",
+      "where_found": "Накеры",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_072f0d0b97974e94a1b8ff0e0e8f66c5",
@@ -961,9 +959,9 @@
       "new": true,
       "weight_kg": 1.0,
       "cost_crowns": 87,
-      "rarity": "Уникальный",
-      "habitat": "Скальные тролли",
-      "alchemy_group": "Гидраген"
+      "alchemy_group": "Гидраген",
+      "where_found": "Скальные тролли",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_f171d00e83a34a6a8054b042228eebc7",
@@ -973,9 +971,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 60,
-      "rarity": "Уникальный",
-      "habitat": "Волколаки",
-      "alchemy_group": "Гидраген"
+      "alchemy_group": "Гидраген",
+      "where_found": "Волколаки",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_41cb74080ece4cff9ff6f10f1df5ccd5",
@@ -985,9 +983,9 @@
       "new": true,
       "weight_kg": 5.0,
       "cost_crowns": 106,
-      "rarity": "Уникальный",
-      "habitat": "Главоглазы и эндриаги",
-      "alchemy_group": "Киноварь"
+      "alchemy_group": "Киноварь",
+      "where_found": "Главоглазы и эндриаги",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_66905460fec846298de055bd3deb2a44",
@@ -997,9 +995,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 38,
-      "rarity": "Редкий",
-      "habitat": "Эндриаги",
-      "alchemy_group": "Киноварь"
+      "alchemy_group": "Киноварь",
+      "where_found": "Эндриаги",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_e704898071174555b8331716b6214713",
@@ -1009,9 +1007,9 @@
       "new": true,
       "weight_kg": 1.0,
       "cost_crowns": 150,
-      "rarity": "Уникальный",
-      "habitat": "Грифоны и грифоньи гнёзда",
-      "alchemy_group": "Киноварь"
+      "alchemy_group": "Киноварь",
+      "where_found": "Грифоны и грифоньи гнёзда",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_a5fa68c1e60b40c78d33957de820777a",
@@ -1021,9 +1019,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 148,
-      "rarity": "Уникальный",
-      "habitat": "Грифоны",
-      "alchemy_group": "Киноварь"
+      "alchemy_group": "Киноварь",
+      "where_found": "Грифоны",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_7e149596c2764804aec2baa1ae77635d",
@@ -1033,9 +1031,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 65,
-      "rarity": "Уникальный",
-      "habitat": "Поля и леса",
-      "alchemy_group": "Киноварь"
+      "alchemy_group": "Киноварь",
+      "where_found": "Поля и леса",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_205f7478a37d4e4a8983b1e9ea51d2b0",
@@ -1045,9 +1043,9 @@
       "new": true,
       "weight_kg": 0.5,
       "cost_crowns": 20,
-      "rarity": "Редкий",
-      "habitat": "Горы и под землёй",
-      "alchemy_group": "Киноварь"
+      "alchemy_group": "Киноварь",
+      "where_found": "Горы и под землёй",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_c8a3a16dbf624ac3ac873b163b6b9074",
@@ -1057,9 +1055,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 9,
-      "rarity": "Редкий",
-      "habitat": "Поля, леса и горы",
-      "alchemy_group": "Киноварь"
+      "alchemy_group": "Киноварь",
+      "where_found": "Поля, леса и горы",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_90140c66830d4af393f846d2476d9a1a",
@@ -1069,9 +1067,9 @@
       "new": true,
       "weight_kg": 0.5,
       "cost_crowns": 149,
-      "rarity": "Уникальный",
-      "habitat": "Бесы",
-      "alchemy_group": "Солнце"
+      "alchemy_group": "Солнце",
+      "where_found": "Бесы",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_229c29faf1a34d2ebac859e8debd5435",
@@ -1081,9 +1079,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 43,
-      "rarity": "Редкий",
-      "habitat": "Полуденницы",
-      "alchemy_group": "Солнце"
+      "alchemy_group": "Солнце",
+      "where_found": "Полуденницы",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_2b5fa08d56554cbca956297f00b1adc6",
@@ -1093,9 +1091,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 65,
-      "rarity": "Уникальный",
-      "habitat": "Сирены",
-      "alchemy_group": "Солнце"
+      "alchemy_group": "Солнце",
+      "where_found": "Сирены",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_1a9bde9bb09042e6b5619161919d8313",
@@ -1105,9 +1103,9 @@
       "new": true,
       "weight_kg": 0.5,
       "cost_crowns": 155,
-      "rarity": "Уникальный",
-      "habitat": "Катаканы",
-      "alchemy_group": "Солнце"
+      "alchemy_group": "Солнце",
+      "where_found": "Катаканы",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_92cccf3e846640868a19411d0bcce4a6",
@@ -1117,9 +1115,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 18,
-      "rarity": "Редкий",
-      "habitat": "Поля",
-      "alchemy_group": "Солнце"
+      "alchemy_group": "Солнце",
+      "where_found": "Поля",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_bd589e6864ab4e7f8d8f71fd5a9e0790",
@@ -1129,9 +1127,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 39,
-      "rarity": "Редкий",
-      "habitat": "Синие горы",
-      "alchemy_group": "Солнце"
+      "alchemy_group": "Солнце",
+      "where_found": "Синие горы",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_aaf948439d8940ab90f685053a8c9bd5",
@@ -1141,9 +1139,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 75,
-      "rarity": "Уникальный",
-      "habitat": "Виверны",
-      "alchemy_group": "Солнце"
+      "alchemy_group": "Солнце",
+      "where_found": "Виверны",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_ce1dd77aaaeb4c749c7bd7774b4565c7",
@@ -1153,9 +1151,9 @@
       "new": true,
       "weight_kg": 0.5,
       "cost_crowns": 76,
-      "rarity": "Уникальный",
-      "habitat": "Главоглазы",
-      "alchemy_group": "Аер"
+      "alchemy_group": "Аер",
+      "where_found": "Главоглазы",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_31dc85756ad74b87b26a10f45a8ba827",
@@ -1165,9 +1163,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 8,
-      "rarity": "Обычный",
-      "habitat": "Горы и города",
-      "alchemy_group": "Аер"
+      "alchemy_group": "Аер",
+      "where_found": "Горы и города",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_4b32deb6558b47049e0a619287f196c8",
@@ -1177,9 +1175,9 @@
       "new": true,
       "weight_kg": 0.5,
       "cost_crowns": 86,
-      "rarity": "Уникальный",
-      "habitat": "Утопцы",
-      "alchemy_group": "Аер"
+      "alchemy_group": "Аер",
+      "where_found": "Утопцы",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_3ec5da0a51b044d1b940a441748a5fbd",
@@ -1189,9 +1187,9 @@
       "new": true,
       "weight_kg": 1.0,
       "cost_crowns": 106,
-      "rarity": "Уникальный",
-      "habitat": "Территория бесов или бесы",
-      "alchemy_group": "Аер"
+      "alchemy_group": "Аер",
+      "where_found": "Территория бесов или бесы",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_528fa8ac01c94c7b859e583983393dea",
@@ -1201,9 +1199,9 @@
       "new": true,
       "weight_kg": 0.5,
       "cost_crowns": 80,
-      "rarity": "Уникальный",
-      "habitat": "Кладбищенские бабы",
-      "alchemy_group": "Аер"
+      "alchemy_group": "Аер",
+      "where_found": "Кладбищенские бабы",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_03ec7e73ce9b409ab259e75005d803e2",
@@ -1213,9 +1211,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 8,
-      "rarity": "Обычный",
-      "habitat": "Пещеры",
-      "alchemy_group": "Аер"
+      "alchemy_group": "Аер",
+      "where_found": "Пещеры",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_d712fd54e3af4f15ab549f8bb9e1d5c8",
@@ -1225,9 +1223,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 150,
-      "rarity": "Уникальный",
-      "habitat": "Катаканы",
-      "alchemy_group": "Аер"
+      "alchemy_group": "Аер",
+      "where_found": "Катаканы",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_eec078bddfca4202bbe61d461152ea27",
@@ -1237,9 +1235,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 38,
-      "rarity": "Редкий",
-      "habitat": "Гули, кладбищенские бабы, эндриаги, главоглазы, виверны",
-      "alchemy_group": "Аер"
+      "alchemy_group": "Аер",
+      "where_found": "Гули, кладбищенские бабы, эндриаги, главоглазы, виверны",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_4063131b89fa48bba52e4aea2376c607",
@@ -1249,9 +1247,9 @@
       "new": true,
       "weight_kg": 0.5,
       "cost_crowns": 95,
-      "rarity": "Уникальный",
-      "habitat": "Главоглазы и эндриаги",
-      "alchemy_group": "Фульгор"
+      "alchemy_group": "Фульгор",
+      "where_found": "Главоглазы и эндриаги",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_06f2733011b643d8a171864b1bc1a2cd",
@@ -1261,9 +1259,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 10,
-      "rarity": "Обычный",
-      "habitat": "Собаки и волки",
-      "alchemy_group": "Фульгор"
+      "alchemy_group": "Фульгор",
+      "where_found": "Собаки и волки",
+      "availability": "Обычное"
     },
     {
       "item_id": "item_018fff991d3b44c9a425c62ca71ef0a3",
@@ -1273,9 +1271,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 75,
-      "rarity": "Уникальный",
-      "habitat": "Под землёй",
-      "alchemy_group": "Фульгор"
+      "alchemy_group": "Фульгор",
+      "where_found": "Под землёй",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_350887c119d74390977270584c916b78",
@@ -1285,9 +1283,9 @@
       "new": true,
       "weight_kg": 1.5,
       "cost_crowns": 55,
-      "rarity": "Уникальный",
-      "habitat": "Гнёзда эндриаг",
-      "alchemy_group": "Фульгор"
+      "alchemy_group": "Фульгор",
+      "where_found": "Гнёзда эндриаг",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_d75be594d82b41619aca94057ace3fa1",
@@ -1297,9 +1295,9 @@
       "new": true,
       "weight_kg": 1.0,
       "cost_crowns": 167,
-      "rarity": "Уникальный",
-      "habitat": "Големы",
-      "alchemy_group": "Фульгор"
+      "alchemy_group": "Фульгор",
+      "where_found": "Големы",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_d0f35adbe5104ec0a9d2691ac3442349",
@@ -1309,9 +1307,9 @@
       "new": true,
       "weight_kg": 0.1,
       "cost_crowns": 134,
-      "rarity": "Уникальный",
-      "habitat": "Кладбищенские бабы",
-      "alchemy_group": "Фульгор"
+      "alchemy_group": "Фульгор",
+      "where_found": "Кладбищенские бабы",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_04f5854aa0cd47109d5d8040acb38211",
@@ -1319,11 +1317,10 @@
       "type": "ingredient",
       "page": 145,
       "new": true,
-      "weight_kg": 0.1,
       "cost_crowns": 30,
-      "rarity": "Редкий",
-      "habitat": "Призраки",
-      "alchemy_group": "Фульгор"
+      "alchemy_group": "Фульгор",
+      "where_found": "Призраки",
+      "availability": "Редкое"
     },
     {
       "item_id": "item_5b72f5549c2741229ca333d65517a177",
@@ -1333,9 +1330,9 @@
       "new": true,
       "weight_kg": 2.0,
       "cost_crowns": 150,
-      "rarity": "Уникальный",
-      "habitat": "Виверны",
-      "alchemy_group": "Фульгор"
+      "alchemy_group": "Фульгор",
+      "where_found": "Виверны",
+      "availability": "Уникальное"
     },
     {
       "item_id": "item_66227b1dbd606bdb24ac",
@@ -1345,12 +1342,14 @@
       "weight_kg": 1.5,
       "cost_crowns": 160,
       "attributes": {
-        "availability": "П",
+        "availability": "Повсеместное",
         "damage": "2d6+2",
         "accuracy": "+0",
         "reliability": 10,
         "hands": 2,
-        "enhancement_slots": 0
+        "enhancement_slots": 0,
+        "damage_type": "рубящий, колющий",
+        "concealment": "Крупное (под плащом)"
       }
     },
     {
@@ -1361,12 +1360,14 @@
       "weight_kg": 2.5,
       "cost_crowns": 270,
       "attributes": {
-        "availability": "О",
+        "availability": "Обычное",
         "damage": "2d6+4",
         "accuracy": "+0",
         "reliability": 15,
         "hands": 1,
-        "enhancement_slots": 0
+        "enhancement_slots": 0,
+        "damage_type": "рубящий, колющий",
+        "concealment": "Крупное (под плащом)"
       }
     },
     {
@@ -1377,12 +1378,14 @@
       "weight_kg": 3.0,
       "cost_crowns": 285,
       "attributes": {
-        "availability": "О",
+        "availability": "Обычное",
         "damage": "3d6+2",
         "accuracy": "+0",
         "reliability": 5,
         "hands": 2,
-        "enhancement_slots": 0
+        "enhancement_slots": 0,
+        "damage_type": "рубящий, колющий",
+        "concealment": "Крупное (под плащом)"
       }
     },
     {
@@ -1393,12 +1396,14 @@
       "weight_kg": 2.0,
       "cost_crowns": 325,
       "attributes": {
-        "availability": "О",
+        "availability": "Обычное",
         "damage": "3d6",
         "accuracy": "+0",
         "reliability": 15,
         "hands": 1,
-        "enhancement_slots": 0
+        "enhancement_slots": 0,
+        "damage_type": "рубящий, колющий",
+        "concealment": "Крупное (под плащом)"
       }
     },
     {
@@ -1409,12 +1414,14 @@
       "weight_kg": 2.0,
       "cost_crowns": 570,
       "attributes": {
-        "availability": "О",
+        "availability": "Обычное",
         "damage": "4d6+4",
         "accuracy": "+2",
         "reliability": 10,
         "hands": 1,
-        "enhancement_slots": 0
+        "enhancement_slots": 0,
+        "damage_type": "рубящий, колющий",
+        "concealment": "Крупное (под плащом)"
       }
     },
     {
@@ -1425,12 +1432,14 @@
       "weight_kg": 1.5,
       "cost_crowns": 650,
       "attributes": {
-        "availability": "Р",
+        "availability": "Редкое",
         "damage": "5d6",
         "accuracy": "+1",
         "reliability": 10,
         "hands": 1,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "рубящий, колющий",
+        "concealment": "Не спрятать под одеждой"
       }
     },
     {
@@ -1441,12 +1450,14 @@
       "weight_kg": 1.5,
       "cost_crowns": 725,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "5d6",
         "accuracy": "+0",
         "reliability": 15,
         "hands": 1,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "рубящий, колющий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Кровопускающее (25 %)"
@@ -1460,12 +1471,14 @@
       "weight_kg": 2.0,
       "cost_crowns": 955,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "6d6+4",
         "accuracy": "+0",
         "reliability": 15,
         "hands": 2,
-        "enhancement_slots": 2
+        "enhancement_slots": 2,
+        "damage_type": "рубящий, колющий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Сбалансированное"
@@ -1479,12 +1492,14 @@
       "weight_kg": 2.0,
       "cost_crowns": 1075,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "6d6",
         "accuracy": "+0",
         "reliability": 15,
         "hands": 2,
-        "enhancement_slots": 2
+        "enhancement_slots": 2,
+        "damage_type": "рубящий, колющий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Кровопускающее (50 %)"
@@ -1498,12 +1513,14 @@
       "weight_kg": 0.5,
       "cost_crowns": 50,
       "attributes": {
-        "availability": "П",
+        "availability": "Повсеместное",
         "damage": "1d6+2",
         "accuracy": "+0",
         "reliability": 10,
         "hands": 1,
-        "enhancement_slots": 0
+        "enhancement_slots": 0,
+        "damage_type": "рубящий, колющий",
+        "concealment": "Небольшое (под курткой)"
       }
     },
     {
@@ -1514,12 +1531,14 @@
       "weight_kg": 0.5,
       "cost_crowns": 275,
       "attributes": {
-        "availability": "О",
+        "availability": "Обычное",
         "damage": "1d6",
         "accuracy": "+2",
         "reliability": 5,
         "hands": 1,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "рубящий, колющий",
+        "concealment": "Маленькое (в кармане)"
       },
       "effects": [
         "Незаметное"
@@ -1533,12 +1552,14 @@
       "weight_kg": 1.0,
       "cost_crowns": 350,
       "attributes": {
-        "availability": "Р",
+        "availability": "Редкое",
         "damage": "2d6+2",
         "accuracy": "+1",
         "reliability": 10,
         "hands": 1,
-        "enhancement_slots": 0
+        "enhancement_slots": 0,
+        "damage_type": "рубящий, колющий",
+        "concealment": "Небольшое (под курткой)"
       },
       "effects": [
         "Кровопускающее (25 %)"
@@ -1552,12 +1573,14 @@
       "weight_kg": 0.5,
       "cost_crowns": 440,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "2d6",
         "accuracy": "+2",
         "reliability": 10,
         "hands": 1,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "рубящий, колющий",
+        "concealment": "Небольшое (под курткой)"
       },
       "effects": [
         "Кровопускающее (25 %), пробивающее броню"
@@ -1571,12 +1594,14 @@
       "weight_kg": 1.0,
       "cost_crowns": 205,
       "attributes": {
-        "availability": "П",
+        "availability": "Повсеместное",
         "damage": "2d6+1",
         "accuracy": "+0",
         "reliability": 10,
         "hands": 1,
-        "enhancement_slots": 0
+        "enhancement_slots": 0,
+        "damage_type": "рубящий",
+        "concealment": "Небольшое (под курткой)"
       }
     },
     {
@@ -1587,12 +1612,14 @@
       "weight_kg": 2.0,
       "cost_crowns": 525,
       "attributes": {
-        "availability": "О",
+        "availability": "Обычное",
         "damage": "5d6",
         "accuracy": "+0",
         "reliability": 15,
         "hands": 1,
-        "enhancement_slots": 0
+        "enhancement_slots": 0,
+        "damage_type": "рубящий",
+        "concealment": "Крупное (под плащом)"
       }
     },
     {
@@ -1603,12 +1630,14 @@
       "weight_kg": 3.0,
       "cost_crowns": 960,
       "attributes": {
-        "availability": "Р",
+        "availability": "Редкое",
         "damage": "6d6",
         "accuracy": "+0",
         "reliability": 15,
         "hands": 2,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "рубящий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Разрушающее, кровопускающее (25 %)"
@@ -1622,12 +1651,14 @@
       "weight_kg": 0.5,
       "cost_crowns": 50,
       "attributes": {
-        "availability": "П",
+        "availability": "Повсеместное",
         "damage": "1d6",
         "accuracy": "+1",
         "reliability": 15,
         "hands": 1,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "дробящий",
+        "concealment": "Маленькое (в кармане)"
       },
       "effects": [
         "Рукопашное"
@@ -1641,12 +1672,14 @@
       "weight_kg": 2.0,
       "cost_crowns": 525,
       "attributes": {
-        "availability": "О",
+        "availability": "Обычное",
         "damage": "5d6",
         "accuracy": "+0",
         "reliability": 15,
         "hands": 1,
-        "enhancement_slots": 0
+        "enhancement_slots": 0,
+        "damage_type": "дробящий",
+        "concealment": "Крупное (под плащом)"
       }
     },
     {
@@ -1657,12 +1690,14 @@
       "weight_kg": 3.0,
       "cost_crowns": 1100,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "6d6+2",
         "accuracy": "+0",
         "reliability": 20,
         "hands": 2,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "дробящий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Дезориентирующее (-2), метеоритное"
@@ -1676,12 +1711,14 @@
       "weight_kg": 3.5,
       "cost_crowns": 375,
       "attributes": {
-        "availability": "П",
+        "availability": "Повсеместное",
         "damage": "3d6",
         "accuracy": "+0",
         "reliability": 10,
         "hands": 2,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "колющий, дробящий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Длинное"
@@ -1695,12 +1732,14 @@
       "weight_kg": 3.0,
       "cost_crowns": 460,
       "attributes": {
-        "availability": "Р",
+        "availability": "Редкое",
         "damage": "4d6+2",
         "accuracy": "+0",
         "reliability": 10,
         "hands": 2,
-        "enhancement_slots": 0
+        "enhancement_slots": 0,
+        "damage_type": "рубящий, колющий, дробящий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Длинное"
@@ -1714,12 +1753,14 @@
       "weight_kg": 4.0,
       "cost_crowns": 865,
       "attributes": {
-        "availability": "Р",
+        "availability": "Редкое",
         "damage": "6d6+3",
         "accuracy": "+0",
         "reliability": 10,
         "hands": 2,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "рубящий, колющий, дробящий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Длинное"
@@ -1733,12 +1774,14 @@
       "weight_kg": 3.0,
       "cost_crowns": 335,
       "attributes": {
-        "availability": "О",
+        "availability": "Обычное",
         "damage": "1d6+2",
         "accuracy": "+0",
         "reliability": 10,
         "hands": 2,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "дробящий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Длинное, фокусирующее (1)"
@@ -1752,12 +1795,14 @@
       "weight_kg": 3.5,
       "cost_crowns": 550,
       "attributes": {
-        "availability": "Р",
+        "availability": "Редкое",
         "damage": "2d6",
         "accuracy": "+0",
         "reliability": 10,
         "hands": 2,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "колющий, дробящий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Длинное, фокусирующее (1), захватное"
@@ -1771,12 +1816,14 @@
       "weight_kg": 4.0,
       "cost_crowns": 675,
       "attributes": {
-        "availability": "Р",
+        "availability": "Редкое",
         "damage": "3d6",
         "accuracy": "+0",
         "reliability": 15,
         "hands": 2,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "дробящий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Длинное, фокусирующее (2)"
@@ -1790,12 +1837,14 @@
       "weight_kg": 2.5,
       "cost_crowns": 835,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "2d6+2",
         "accuracy": "+0",
         "reliability": 5,
         "hands": 2,
-        "enhancement_slots": 2
+        "enhancement_slots": 2,
+        "damage_type": "дробящий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Длинное, фокусирующее (3), улучшенное фокусирующее"
@@ -1809,13 +1858,15 @@
       "weight_kg": 0.5,
       "cost_crowns": 50,
       "attributes": {
-        "availability": "П",
+        "availability": "Повсеместное",
         "damage": "1d6",
         "accuracy": "+0",
         "range": "Тел × 4 м",
         "reliability": 5,
         "hands": 1,
-        "enhancement_slots": 0
+        "enhancement_slots": 0,
+        "damage_type": "колющий",
+        "concealment": "Маленькое (в кармане)"
       }
     },
     {
@@ -1826,13 +1877,15 @@
       "weight_kg": 1.0,
       "cost_crowns": 75,
       "attributes": {
-        "availability": "П",
+        "availability": "Повсеместное",
         "damage": "2d6",
         "accuracy": "+0",
         "range": "Тел × 2 м",
         "reliability": 10,
         "hands": 1,
-        "enhancement_slots": 0
+        "enhancement_slots": 0,
+        "damage_type": "рубящий",
+        "concealment": "Небольшое (под курткой)"
       }
     },
     {
@@ -1843,13 +1896,15 @@
       "weight_kg": 0.1,
       "cost_crowns": 100,
       "attributes": {
-        "availability": "Р",
+        "availability": "Редкое",
         "damage": "1d6",
         "accuracy": "+1",
         "range": "Тел × 4 м",
         "reliability": 5,
         "hands": 1,
-        "enhancement_slots": 0
+        "enhancement_slots": 0,
+        "damage_type": "рубящий",
+        "concealment": "Маленькое (в кармане)"
       }
     },
     {
@@ -1860,13 +1915,15 @@
       "weight_kg": 1.0,
       "cost_crowns": 290,
       "attributes": {
-        "availability": "П",
+        "availability": "Повсеместное",
         "damage": "3d6+3",
         "accuracy": "+0",
         "range": "100 м",
         "reliability": 10,
         "hands": 2,
-        "enhancement_slots": 0
+        "enhancement_slots": 0,
+        "damage_type": "колющий",
+        "concealment": "Крупное (под плащом)"
       }
     },
     {
@@ -1877,13 +1934,15 @@
       "weight_kg": 2.0,
       "cost_crowns": 475,
       "attributes": {
-        "availability": "П",
+        "availability": "Повсеместное",
         "damage": "4d6",
         "accuracy": "+0",
         "range": "200 м",
         "reliability": 10,
         "hands": 2,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "колющий",
+        "concealment": "Не спрятать под одеждой"
       }
     },
     {
@@ -1894,13 +1953,15 @@
       "weight_kg": 3.0,
       "cost_crowns": 835,
       "attributes": {
-        "availability": "О",
+        "availability": "Обычное",
         "damage": "6d6",
         "accuracy": "+0",
         "range": "300 м",
         "reliability": 15,
         "hands": 2,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "колющий",
+        "concealment": "Не спрятать под одеждой"
       }
     },
     {
@@ -1911,13 +1972,15 @@
       "weight_kg": 0.5,
       "cost_crowns": 285,
       "attributes": {
-        "availability": "П",
+        "availability": "Повсеместное",
         "damage": "2d6+2",
         "accuracy": "+1",
         "range": "50 м",
         "reliability": 5,
         "hands": 1,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "колющий",
+        "concealment": "Крупное (под плащом)"
       },
       "effects": [
         "Медленно перезаряжающееся"
@@ -1931,13 +1994,15 @@
       "weight_kg": 3.0,
       "cost_crowns": 455,
       "attributes": {
-        "availability": "П",
+        "availability": "Повсеместное",
         "damage": "4d6+2",
         "accuracy": "+1",
         "range": "100 м",
         "reliability": 5,
         "hands": 2,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "колющий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Медленно перезаряжающееся"
@@ -1951,13 +2016,15 @@
       "weight_kg": 4.0,
       "cost_crowns": 1125,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "6d6",
         "accuracy": "+1",
         "range": "200 м",
         "reliability": 15,
         "hands": 2,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "колющий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Медленно перезаряжающееся, пробивающее броню"
@@ -1971,7 +2038,9 @@
       "weight_kg": 0.5,
       "cost_crowns": 10,
       "attributes": {
-        "availability": "П"
+        "availability": "Повсеместное",
+        "damage_type": "колющий",
+        "concealment": "Крупное (под плащом)"
       }
     },
     {
@@ -1982,7 +2051,9 @@
       "weight_kg": 0.1,
       "cost_crowns": 5,
       "attributes": {
-        "availability": "О"
+        "availability": "Обычное",
+        "damage_type": "дробящий",
+        "concealment": "Крупное (под плащом)"
       },
       "effects": [
         "Несмертельное"
@@ -1996,7 +2067,9 @@
       "weight_kg": 0.1,
       "cost_crowns": 10,
       "attributes": {
-        "availability": "О"
+        "availability": "Обычное",
+        "damage_type": "колющий",
+        "concealment": "Крупное (под плащом)"
       },
       "effects": [
         "Кровопускающее (100 %)"
@@ -2010,7 +2083,9 @@
       "weight_kg": 0.1,
       "cost_crowns": 15,
       "attributes": {
-        "availability": "О"
+        "availability": "Обычное",
+        "damage_type": "колющий",
+        "concealment": "Крупное (под плащом)"
       },
       "effects": [
         "Пробивающее броню"
@@ -2024,12 +2099,14 @@
       "weight_kg": 2.0,
       "cost_crowns": 595,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "3d6+4",
         "accuracy": "+2",
         "reliability": 15,
         "hands": 1,
-        "enhancement_slots": 2
+        "enhancement_slots": 2,
+        "damage_type": "колющий, рубящий",
+        "concealment": "Крупное (под плащом)"
       }
     },
     {
@@ -2040,12 +2117,14 @@
       "weight_kg": 2.5,
       "cost_crowns": 745,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "4d6+4",
         "accuracy": "+3",
         "reliability": 15,
         "hands": 1,
-        "enhancement_slots": 0
+        "enhancement_slots": 0,
+        "damage_type": "колющий, рубящий",
+        "concealment": "Крупное (под плащом)"
       },
       "effects": [
         "Кровопускающее (25 %)"
@@ -2059,12 +2138,14 @@
       "weight_kg": 3.0,
       "cost_crowns": 875,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "5d6",
         "accuracy": "+1",
         "reliability": 20,
         "hands": 2,
-        "enhancement_slots": 2
+        "enhancement_slots": 2,
+        "damage_type": "колющий, рубящий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Сбалансированное, метеоритное"
@@ -2078,12 +2159,14 @@
       "weight_kg": 2.5,
       "cost_crowns": 1090,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "5d6+3",
         "accuracy": "+3",
         "reliability": 15,
         "hands": 2,
-        "enhancement_slots": 2
+        "enhancement_slots": 2,
+        "damage_type": "колющий, рубящий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Кровопускающее (50 %)"
@@ -2097,12 +2180,14 @@
       "weight_kg": 3.0,
       "cost_crowns": 1175,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "6d6",
         "accuracy": "+3",
         "reliability": 15,
         "hands": 2,
-        "enhancement_slots": 2
+        "enhancement_slots": 2,
+        "damage_type": "колющий, рубящий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Кровопускающее (25 %)"
@@ -2116,12 +2201,14 @@
       "weight_kg": 1.0,
       "cost_crowns": 485,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "2d6+2",
         "accuracy": "+2",
         "reliability": 10,
         "hands": 1,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "колющий, рубящий",
+        "concealment": "Небольшое (под курткой)"
       },
       "effects": [
         "Пробивающее броню"
@@ -2135,12 +2222,14 @@
       "weight_kg": 1.5,
       "cost_crowns": 500,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "3d6",
         "accuracy": "+2",
         "reliability": 15,
         "hands": 1,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "рубящий, дробящий",
+        "concealment": "Небольшое (под курткой)"
       }
     },
     {
@@ -2151,12 +2240,14 @@
       "weight_kg": 4.0,
       "cost_crowns": 740,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "5d6+3",
         "accuracy": "+3",
         "reliability": 15,
         "hands": 1,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "рубящий",
+        "concealment": "Крупное (под плащом)"
       }
     },
     {
@@ -2167,12 +2258,14 @@
       "weight_kg": 2.5,
       "cost_crowns": 910,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "6d6+2",
         "accuracy": "+2",
         "reliability": 15,
         "hands": 2,
-        "enhancement_slots": 2
+        "enhancement_slots": 2,
+        "damage_type": "рубящий",
+        "concealment": "Не спрятать под одеждой"
       }
     },
     {
@@ -2183,12 +2276,14 @@
       "weight_kg": 3.5,
       "cost_crowns": 750,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "5d6",
         "accuracy": "+0",
         "reliability": 15,
         "hands": 2,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "дробящий",
+        "concealment": "Крупное (под плащом)"
       },
       "effects": [
         "Пробивающее броню"
@@ -2202,12 +2297,14 @@
       "weight_kg": 4.0,
       "cost_crowns": 900,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "6d6",
         "accuracy": "+2",
         "reliability": 20,
         "hands": 1,
-        "enhancement_slots": 2
+        "enhancement_slots": 2,
+        "damage_type": "дробящий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Захватное, метеоритное"
@@ -2221,12 +2318,14 @@
       "weight_kg": 4.0,
       "cost_crowns": 835,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "5d6+2",
         "accuracy": "+0",
         "reliability": 15,
         "hands": 2,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "колющий, дробящий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Длинное, дезориентирующее (-2)"
@@ -2240,12 +2339,14 @@
       "weight_kg": 3.0,
       "cost_crowns": 925,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "4d6+3",
         "accuracy": "+2",
         "reliability": 10,
         "hands": 2,
-        "enhancement_slots": 2
+        "enhancement_slots": 2,
+        "damage_type": "рубящий, колющий, дробящий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Длинное, кровопускающее (25 %)"
@@ -2259,12 +2360,14 @@
       "weight_kg": 2.5,
       "cost_crowns": 910,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "3d6+2",
         "accuracy": "+1",
         "reliability": 15,
         "hands": 2,
-        "enhancement_slots": 2
+        "enhancement_slots": 2,
+        "damage_type": "дробящий",
+        "concealment": "Крупное (под плащом)"
       },
       "effects": [
         "Длинное, фокусирующее (3)"
@@ -2278,12 +2381,14 @@
       "weight_kg": 1.5,
       "cost_crowns": 975,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "3d6",
         "accuracy": "+1",
         "reliability": 10,
         "hands": 2,
-        "enhancement_slots": 2
+        "enhancement_slots": 2,
+        "damage_type": "дробящий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Длинное, фокусирующее (3), улучшенное фокусирующее"
@@ -2297,13 +2402,15 @@
       "weight_kg": 1.0,
       "cost_crowns": 575,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "4d6",
         "accuracy": "+1",
         "range": "200 м",
         "reliability": 10,
         "hands": 2,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "колющий",
+        "concealment": "Крупное (под плащом)"
       }
     },
     {
@@ -2314,13 +2421,15 @@
       "weight_kg": 2.5,
       "cost_crowns": 1100,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "6d6",
         "accuracy": "+2",
         "range": "350 м",
         "reliability": 10,
         "hands": 2,
-        "enhancement_slots": 2
+        "enhancement_slots": 2,
+        "damage_type": "колющий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Улучшенное пробивающее броню"
@@ -2334,13 +2443,15 @@
       "weight_kg": 1.0,
       "cost_crowns": 425,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "2d6",
         "accuracy": "+3",
         "range": "100 м",
         "reliability": 10,
         "hands": 1,
-        "enhancement_slots": 1
+        "enhancement_slots": 1,
+        "damage_type": "колющий",
+        "concealment": "Небольшое (под курткой)"
       },
       "effects": [
         "Медленно перезаряжающееся"
@@ -2354,13 +2465,15 @@
       "weight_kg": 3.5,
       "cost_crowns": 850,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "damage": "5d6",
         "accuracy": "+3",
         "range": "300 м",
         "reliability": 15,
         "hands": 2,
-        "enhancement_slots": 2
+        "enhancement_slots": 2,
+        "damage_type": "колющий",
+        "concealment": "Не спрятать под одеждой"
       },
       "effects": [
         "Медленно перезаряжающееся"
@@ -2374,10 +2487,12 @@
       "weight_kg": 0.1,
       "cost_crowns": 50,
       "attributes": {
-        "availability": "У"
+        "availability": "Уникальное",
+        "damage_type": "колющий",
+        "concealment": "Крупное (под плащом)"
       },
       "effects": [
-        "Кровопускающее (100 %)"
+        "Кровопускающее (100 %). Чтобы извлечь наконечник из раны и остановить кровотечение, нужна проверка Первой помощи со СЛ 16."
       ]
     },
     {
@@ -2388,7 +2503,9 @@
       "weight_kg": 0.1,
       "cost_crowns": 50,
       "attributes": {
-        "availability": "У"
+        "availability": "Уникальное",
+        "damage_type": "дробящий",
+        "concealment": "Крупное (под плащом)"
       },
       "effects": [
         "Разрушающее"
@@ -2402,7 +2519,7 @@
       "weight_kg": 0.5,
       "cost_crowns": 100,
       "attributes": {
-        "availability": "О",
+        "availability": "Обычное",
         "armor_region": "Голова",
         "armor_slots": 1,
         "encumbrance": 0,
@@ -2417,7 +2534,7 @@
       "weight_kg": 1.0,
       "cost_crowns": 175,
       "attributes": {
-        "availability": "Р",
+        "availability": "Редкое",
         "armor_region": "Голова",
         "armor_slots": 1,
         "encumbrance": 0,
@@ -2432,7 +2549,7 @@
       "weight_kg": 1.0,
       "cost_crowns": 200,
       "attributes": {
-        "availability": "О",
+        "availability": "Обычное",
         "armor_region": "Голова",
         "armor_slots": 0,
         "encumbrance": 0,
@@ -2447,7 +2564,7 @@
       "weight_kg": 1.5,
       "cost_crowns": 250,
       "attributes": {
-        "availability": "П",
+        "availability": "Повсеместное",
         "armor_region": "Голова",
         "armor_slots": 0,
         "encumbrance": 0,
@@ -2462,7 +2579,7 @@
       "weight_kg": 2.0,
       "cost_crowns": 250,
       "attributes": {
-        "availability": "О",
+        "availability": "Обычное",
         "armor_region": "Голова",
         "armor_slots": 0,
         "encumbrance": 0,
@@ -2477,14 +2594,14 @@
       "weight_kg": 1.5,
       "cost_crowns": 475,
       "attributes": {
-        "availability": "Р",
+        "availability": "Редкое",
         "armor_region": "Голова",
         "armor_slots": 1,
         "encumbrance": 0,
         "armor_rating": 16
       },
       "effects": [
-        "Ограничение зрения"
+        "Ограничение зрения: обзор сужается до конуса перед персонажем; отменяет ведьмачьи обострённые чувства — бонусы к Вниманию и выслеживанию по запаху."
       ]
     },
     {
@@ -2495,14 +2612,14 @@
       "weight_kg": 3.5,
       "cost_crowns": 575,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "armor_region": "Голова",
         "armor_slots": 1,
         "encumbrance": 0,
         "armor_rating": 20
       },
       "effects": [
-        "Ограничение зрения"
+        "Ограничение зрения: обзор сужается до конуса перед персонажем; отменяет ведьмачьи обострённые чувства — бонусы к Вниманию и выслеживанию по запаху."
       ]
     },
     {
@@ -2513,14 +2630,14 @@
       "weight_kg": 3.5,
       "cost_crowns": 700,
       "attributes": {
-        "availability": "Р",
+        "availability": "Редкое",
         "armor_region": "Голова",
         "armor_slots": 1,
         "encumbrance": 0,
         "armor_rating": 25
       },
       "effects": [
-        "Ограничение зрения"
+        "Ограничение зрения: обзор сужается до конуса перед персонажем; отменяет ведьмачьи обострённые чувства — бонусы к Вниманию и выслеживанию по запаху."
       ]
     },
     {
@@ -2531,14 +2648,14 @@
       "weight_kg": 3.0,
       "cost_crowns": 800,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "armor_region": "Голова",
         "armor_slots": 2,
         "encumbrance": 0,
         "armor_rating": 30
       },
       "effects": [
-        "Ограничение зрения"
+        "Ограничение зрения: обзор сужается до конуса перед персонажем; отменяет ведьмачьи обострённые чувства — бонусы к Вниманию и выслеживанию по запаху."
       ]
     },
     {
@@ -2549,7 +2666,7 @@
       "weight_kg": 1.0,
       "cost_crowns": 100,
       "attributes": {
-        "availability": "П",
+        "availability": "Повсеместное",
         "armor_region": "Туловище и руки",
         "armor_slots": 0,
         "encumbrance": 0,
@@ -2564,7 +2681,7 @@
       "weight_kg": 1.5,
       "cost_crowns": 175,
       "attributes": {
-        "availability": "Р",
+        "availability": "Редкое",
         "armor_region": "Туловище и руки",
         "armor_slots": 1,
         "encumbrance": 0,
@@ -2579,7 +2696,7 @@
       "weight_kg": 2.5,
       "cost_crowns": 250,
       "attributes": {
-        "availability": "Р",
+        "availability": "Редкое",
         "armor_region": "Туловище и руки",
         "armor_slots": 1,
         "encumbrance": 0,
@@ -2594,7 +2711,7 @@
       "weight_kg": 7.0,
       "cost_crowns": 300,
       "attributes": {
-        "availability": "О",
+        "availability": "Обычное",
         "armor_region": "Туловище и руки",
         "armor_slots": 0,
         "encumbrance": 1,
@@ -2609,7 +2726,7 @@
       "weight_kg": 8.5,
       "cost_crowns": 400,
       "attributes": {
-        "availability": "Р",
+        "availability": "Редкое",
         "armor_region": "Туловище и руки",
         "armor_slots": 1,
         "encumbrance": 1,
@@ -2624,7 +2741,7 @@
       "weight_kg": 6.5,
       "cost_crowns": 525,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "armor_region": "Туловище и руки",
         "armor_slots": 1,
         "encumbrance": 1,
@@ -2639,7 +2756,7 @@
       "weight_kg": 14.0,
       "cost_crowns": 625,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "armor_region": "Туловище и руки",
         "armor_slots": 1,
         "encumbrance": 2,
@@ -2654,7 +2771,7 @@
       "weight_kg": 15.0,
       "cost_crowns": 750,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "armor_region": "Туловище и руки",
         "armor_slots": 3,
         "encumbrance": 2,
@@ -2669,7 +2786,7 @@
       "weight_kg": 12.0,
       "cost_crowns": 850,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "armor_region": "Туловище и руки",
         "armor_slots": 2,
         "encumbrance": 2,
@@ -2684,7 +2801,7 @@
       "weight_kg": 0.5,
       "cost_crowns": 75,
       "attributes": {
-        "availability": "О",
+        "availability": "Обычное",
         "armor_region": "Ноги",
         "armor_slots": 0,
         "encumbrance": 0,
@@ -2699,7 +2816,7 @@
       "weight_kg": 1.0,
       "cost_crowns": 125,
       "attributes": {
-        "availability": "О",
+        "availability": "Обычное",
         "armor_region": "Ноги",
         "armor_slots": 1,
         "encumbrance": 0,
@@ -2714,7 +2831,7 @@
       "weight_kg": 1.5,
       "cost_crowns": 225,
       "attributes": {
-        "availability": "Р",
+        "availability": "Редкое",
         "armor_region": "Ноги",
         "armor_slots": 0,
         "encumbrance": 0,
@@ -2729,7 +2846,7 @@
       "weight_kg": 3.5,
       "cost_crowns": 250,
       "attributes": {
-        "availability": "П",
+        "availability": "Повсеместное",
         "armor_region": "Ноги",
         "armor_slots": 0,
         "encumbrance": 0,
@@ -2744,7 +2861,7 @@
       "weight_kg": 4.0,
       "cost_crowns": 400,
       "attributes": {
-        "availability": "Р",
+        "availability": "Редкое",
         "armor_region": "Ноги",
         "armor_slots": 1,
         "encumbrance": 0,
@@ -2759,7 +2876,7 @@
       "weight_kg": 3.5,
       "cost_crowns": 525,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "armor_region": "Ноги",
         "armor_slots": 1,
         "encumbrance": 0,
@@ -2774,7 +2891,7 @@
       "weight_kg": 7.5,
       "cost_crowns": 625,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "armor_region": "Ноги",
         "armor_slots": 1,
         "encumbrance": 1,
@@ -2789,7 +2906,7 @@
       "weight_kg": 5.0,
       "cost_crowns": 650,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "armor_region": "Ноги",
         "armor_slots": 3,
         "encumbrance": 1,
@@ -2804,7 +2921,7 @@
       "weight_kg": 6.0,
       "cost_crowns": 850,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "armor_region": "Ноги",
         "armor_slots": 2,
         "encumbrance": 1,
@@ -2819,7 +2936,7 @@
       "weight_kg": 0.5,
       "cost_crowns": 50,
       "attributes": {
-        "availability": "П",
+        "availability": "Повсеместное",
         "armor_region": "Щит",
         "armor_slots": 0,
         "encumbrance": 0,
@@ -2834,7 +2951,7 @@
       "weight_kg": 1.0,
       "cost_crowns": 150,
       "attributes": {
-        "availability": "О",
+        "availability": "Обычное",
         "armor_region": "Щит",
         "armor_slots": 0,
         "encumbrance": 0,
@@ -2849,7 +2966,7 @@
       "weight_kg": 1.5,
       "cost_crowns": 225,
       "attributes": {
-        "availability": "О",
+        "availability": "Обычное",
         "armor_region": "Щит",
         "armor_slots": 1,
         "encumbrance": 0,
@@ -2864,7 +2981,7 @@
       "weight_kg": 2.0,
       "cost_crowns": 325,
       "attributes": {
-        "availability": "Р",
+        "availability": "Редкое",
         "armor_region": "Щит",
         "armor_slots": 1,
         "encumbrance": 0,
@@ -2879,7 +2996,7 @@
       "weight_kg": 2.5,
       "cost_crowns": 400,
       "attributes": {
-        "availability": "Р",
+        "availability": "Редкое",
         "armor_region": "Щит",
         "armor_slots": 1,
         "encumbrance": 0,
@@ -2894,7 +3011,7 @@
       "weight_kg": 3.0,
       "cost_crowns": 400,
       "attributes": {
-        "availability": "О",
+        "availability": "Обычное",
         "armor_region": "Щит",
         "armor_slots": 0,
         "encumbrance": 0,
@@ -2909,14 +3026,14 @@
       "weight_kg": 4.0,
       "cost_crowns": 500,
       "attributes": {
-        "availability": "Р",
+        "availability": "Редкое",
         "armor_region": "Щит",
         "armor_slots": 0,
         "encumbrance": 1,
         "reliability": 20
       },
       "effects": [
-        "Полное укрытие"
+        "Полное укрытие. Если персонаж присел за павезой, атака должна нанести урон выше её надёжности, чтобы задеть персонажа. Каждый раз, когда павеза получает урон, её надёжность снижается на 1."
       ]
     },
     {
@@ -2927,14 +3044,14 @@
       "weight_kg": 5.0,
       "cost_crowns": 600,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "armor_region": "Щит",
         "armor_slots": 1,
         "encumbrance": 1,
         "reliability": 25
       },
       "effects": [
-        "Полное укрытие"
+        "Полное укрытие. Павезу можно установить без опоры действием. Если стоящая павеза получает урон больше половины надёжности, она падает. Пока её не держат, она служит укрытием, но не блокирует урон; каждый полученный ею урон снижает надёжность на 1."
       ]
     },
     {
@@ -2945,14 +3062,14 @@
       "weight_kg": 1.0,
       "cost_crowns": 375,
       "attributes": {
-        "availability": "У",
-        "armor_region": "Особая броня",
+        "availability": "Уникальное",
+        "armor_region": "Туловище и руки",
         "armor_slots": 1,
         "encumbrance": 0,
         "armor_rating": 8
       },
       "effects": [
-        "Примечание на полях"
+        "Выглядит как обычный дублет. Чтобы распознать его как броню, нужна проверка Внимания со СЛ 20."
       ]
     },
     {
@@ -2963,8 +3080,8 @@
       "weight_kg": 5.0,
       "cost_crowns": 975,
       "attributes": {
-        "availability": "У",
-        "armor_region": "Особая броня",
+        "availability": "Уникальное",
+        "armor_region": "Голова, туловище, руки и ноги",
         "armor_slots": 1,
         "encumbrance": 0,
         "armor_rating": 10
@@ -2981,8 +3098,8 @@
       "weight_kg": 5.0,
       "cost_crowns": 1400,
       "attributes": {
-        "availability": "У",
-        "armor_region": "Особая броня",
+        "availability": "Уникальное",
+        "armor_region": "Голова, туловище, руки и ноги",
         "armor_slots": 1,
         "encumbrance": 0,
         "armor_rating": 16
@@ -2996,14 +3113,14 @@
       "weight_kg": 12.0,
       "cost_crowns": 2325,
       "attributes": {
-        "availability": "У",
-        "armor_region": "Особая броня",
+        "availability": "Уникальное",
+        "armor_region": "Голова, туловище, руки и ноги",
         "armor_slots": 2,
         "encumbrance": 1,
         "armor_rating": 20
       },
       "effects": [
-        "Примечание на полях"
+        "В дикой местности носитель получает +2 к проверкам Скрытности."
       ]
     },
     {
@@ -3014,14 +3131,15 @@
       "weight_kg": 20.0,
       "cost_crowns": 2850,
       "attributes": {
-        "availability": "У",
-        "armor_region": "Особая броня",
+        "availability": "Уникальное",
+        "armor_region": "Голова, туловище, руки и ноги",
         "armor_slots": 2,
         "encumbrance": 2,
         "armor_rating": 25
       },
       "effects": [
-        "Сопротивление режущему и колющему урону"
+        "Сопротивление режущему и колющему урону.",
+        "Пока персонаж верхом, он получает +2 к проверкам Верховой езды."
       ]
     },
     {
@@ -3032,8 +3150,8 @@
       "weight_kg": 30.0,
       "cost_crowns": 3525,
       "attributes": {
-        "availability": "У",
-        "armor_region": "Особая броня",
+        "availability": "Уникальное",
+        "armor_region": "Голова, туловище, руки и ноги",
         "armor_slots": 3,
         "encumbrance": 2,
         "armor_rating": 30
@@ -3050,7 +3168,7 @@
       "weight_kg": 1.0,
       "cost_crowns": 450,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "armor_region": "Щит",
         "armor_slots": 2,
         "encumbrance": 0,
@@ -3065,7 +3183,7 @@
       "weight_kg": 3.0,
       "cost_crowns": 700,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "armor_region": "Щит",
         "armor_slots": 2,
         "encumbrance": 0,
@@ -3080,14 +3198,14 @@
       "weight_kg": 5.5,
       "cost_crowns": 1050,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "armor_region": "Щит",
         "armor_slots": 2,
         "encumbrance": 1,
         "reliability": 35
       },
       "effects": [
-        "Примечание на полях"
+        "Можно поставить в землю перед собой, как нильфгаардскую павезу."
       ]
     },
     {
@@ -3098,10 +3216,13 @@
       "weight_kg": 3.0,
       "cost_crowns": 125,
       "attributes": {
-        "availability": "Р",
+        "availability": "Редкое",
         "protection_bonus": 3,
         "armor_region": "Усиление брони"
-      }
+      },
+      "effects": [
+        "Сопротивление дробящему и режущему урону."
+      ]
     },
     {
       "item_id": "item_4f0c9cda422e86759a0f",
@@ -3111,10 +3232,13 @@
       "weight_kg": 3.5,
       "cost_crowns": 195,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "protection_bonus": 5,
         "armor_region": "Усиление брони"
-      }
+      },
+      "effects": [
+        "Сопротивление режущему и колющему урону."
+      ]
     },
     {
       "item_id": "item_e99333571e8c3f52a30e",
@@ -3124,12 +3248,13 @@
       "weight_kg": 0.5,
       "cost_crowns": 200,
       "attributes": {
-        "availability": "У",
+        "availability": "Уникальное",
         "protection_bonus": 3,
         "armor_region": "Усиление брони"
       },
       "effects": [
-        "+1 к скрытности"
+        "Сопротивление дробящему и колющему урону.",
+        "+1 к проверкам Скрытности."
       ]
     },
     {
@@ -3140,7 +3265,7 @@
       "weight_kg": 0.5,
       "cost_crowns": 40,
       "attributes": {
-        "availability": "П",
+        "availability": "Повсеместное",
         "protection_bonus": 1,
         "armor_region": "Усиление брони"
       },
@@ -3156,12 +3281,13 @@
       "weight_kg": 1.5,
       "cost_crowns": 130,
       "attributes": {
-        "availability": "О",
+        "availability": "Обычное",
         "protection_bonus": 2,
         "armor_region": "Усиление брони"
       },
       "effects": [
-        "Сопротивление огню"
+        "Сопротивление дробящему и режущему урону.",
+        "Сопротивление огню."
       ]
     },
     {
@@ -3172,10 +3298,13 @@
       "weight_kg": 3.5,
       "cost_crowns": 145,
       "attributes": {
-        "availability": "Р",
+        "availability": "Редкое",
         "protection_bonus": 4,
         "armor_region": "Усиление брони"
-      }
+      },
+      "effects": [
+        "Сопротивление режущему и колющему урону."
+      ]
     },
     {
       "item_id": "item_6dbc35f530b338582076",
@@ -3185,10 +3314,13 @@
       "weight_kg": 1.0,
       "cost_crowns": 80,
       "attributes": {
-        "availability": "О",
+        "availability": "Обычное",
         "protection_bonus": 2,
         "armor_region": "Усиление брони"
-      }
+      },
+      "effects": [
+        "Сопротивление режущему урону."
+      ]
     },
     {
       "item_id": "item_db93c4d074cff8c05214",
@@ -3198,7 +3330,7 @@
       "weight_kg": 0.5,
       "cost_crowns": 56,
       "attributes": {
-        "availability": "Р"
+        "availability": "Редкое"
       },
       "effect": "2d6 урона живому существу; 1d6/2 разрушающего урона оружию и броне. Бросок: дистанция Тел × 2 м, площадь 2-метровый конус.",
       "effects": [
@@ -3214,7 +3346,7 @@
       "weight_kg": 0.1,
       "cost_crowns": 18,
       "attributes": {
-        "availability": "О"
+        "availability": "Обычное"
       },
       "effect": "Консервирует продукты и трупы на 1d10 дней; для тела размером с человека нужны две порции.",
       "effects": [
@@ -3231,7 +3363,7 @@
       "weight_kg": 0.1,
       "cost_crowns": 28,
       "attributes": {
-        "availability": "О"
+        "availability": "Обычное"
       },
       "effect": "Склеивает предметы или персонажей спустя 2 раунда; разъединение требует проверки Силы СЛ 16.",
       "effects": [
@@ -3248,7 +3380,7 @@
       "weight_kg": 0.1,
       "cost_crowns": 18,
       "attributes": {
-        "availability": "О"
+        "availability": "Обычное"
       },
       "effect": "Нейтрализует одну порцию кислотного раствора и его воздействие на рану.",
       "effects": [
@@ -3264,7 +3396,7 @@
       "weight_kg": 0.1,
       "cost_crowns": 45,
       "attributes": {
-        "availability": "О"
+        "availability": "Обычное"
       },
       "effect": "Отравляет при попадании в кровь или после проглатывания; сопротивление: Стойкость СЛ 16.",
       "effects": [
@@ -3280,7 +3412,7 @@
       "weight_kg": 0.5,
       "cost_crowns": 95,
       "attributes": {
-        "availability": "У"
+        "availability": "Уникальное"
       },
       "effect": "Взрывается на воздухе и наносит 2d6 урона в радиусе 2 м; бросок на дистанцию Тел × 2 м.",
       "effects": [
@@ -3296,7 +3428,7 @@
       "weight_kg": 0.1,
       "cost_crowns": 36,
       "attributes": {
-        "availability": "О"
+        "availability": "Обычное"
       },
       "effect": "Цель делает проверку Устойчивости со штрафом −2 или теряет сознание; флакон содержит 25 порций.",
       "effects": [
@@ -3312,7 +3444,7 @@
       "weight_kg": 0.1,
       "cost_crowns": 20,
       "attributes": {
-        "availability": "О"
+        "availability": "Обычное"
       },
       "effect": "Останавливает кровотечение на 2d10 раундов; при возобновлении можно применить ещё порцию.",
       "effects": [
@@ -3329,7 +3461,7 @@
       "weight_kg": 0.1,
       "cost_crowns": 80,
       "attributes": {
-        "availability": "Р"
+        "availability": "Редкое"
       },
       "effect": "Наркотик; после каждого применения проверка Стойкости СЛ 18 на привыкание.",
       "effects": [
@@ -3345,7 +3477,7 @@
       "weight_kg": 0.1,
       "cost_crowns": 25,
       "attributes": {
-        "availability": "О"
+        "availability": "Обычное"
       },
       "effect": "Цель делает проверку Стойкости СЛ 15 или испытывает галлюцинации 1d10 раундов.",
       "effects": [
@@ -3362,7 +3494,7 @@
       "weight_kg": 0.1,
       "cost_crowns": 15,
       "attributes": {
-        "availability": "О"
+        "availability": "Обычное"
       },
       "effect": "Написанный текст становится различим после нагревания.",
       "effects": [
@@ -3373,13 +3505,13 @@
     },
     {
       "item_id": "item_8784ebdce5d9f494be56",
-      "name": "Обеззараживающие травы",
+      "name": "Обезболивающие травы",
       "type": "alchemical",
       "page": 88,
       "weight_kg": 0.1,
       "cost_crowns": 12,
       "attributes": {
-        "availability": "П"
+        "availability": "Повсеместное"
       },
       "effect": "Снижают штраф от критических ран на 2 и штраф к состоянию при смерти на 2; действуют 2d10 раундов.",
       "effects": [
@@ -3396,7 +3528,7 @@
       "weight_kg": 0.5,
       "cost_crowns": 67,
       "attributes": {
-        "availability": "Р"
+        "availability": "Редкое"
       },
       "effect": "Вызывает состояние безумного счастья и повышенную восприимчивость к убеждению.",
       "effects": [
@@ -3413,7 +3545,7 @@
       "weight_kg": 0.5,
       "cost_crowns": 76,
       "attributes": {
-        "availability": "Р"
+        "availability": "Редкое"
       },
       "effect": "При провале проверки Стойкости СЛ 16 вызывает опьянение; снять его могут магия или Слёзы жён.",
       "effects": [
@@ -3430,7 +3562,7 @@
       "weight_kg": 0.1,
       "cost_crowns": 16,
       "attributes": {
-        "availability": "О"
+        "availability": "Обычное"
       },
       "effect": "Увеличивает СЛ обнаружения яда до 20.",
       "effects": [
@@ -3446,7 +3578,7 @@
       "weight_kg": 0.1,
       "cost_crowns": 45,
       "attributes": {
-        "availability": "Р"
+        "availability": "Редкое"
       },
       "effect": "Высыхает на поверхности и даёт 50%-й шанс возгорания при контакте с огнём или искрой.",
       "effects": [
@@ -3462,7 +3594,7 @@
       "weight_kg": 0.1,
       "cost_crowns": 25,
       "attributes": {
-        "availability": "О"
+        "availability": "Обычное"
       },
       "effect": "Приводит в себя потерявшего сознание или дезориентированного; допускает до 25 применений.",
       "effects": [
@@ -3478,7 +3610,7 @@
       "weight_kg": 0.1,
       "cost_crowns": 22,
       "attributes": {
-        "availability": "О"
+        "availability": "Обычное"
       },
       "effect": "Повышает естественную скорость заживления на 2 и сокращает срок лечения критической раны на 2 дня.",
       "effects": [
@@ -3494,7 +3626,7 @@
       "weight_kg": 0.1,
       "cost_crowns": 20,
       "attributes": {
-        "availability": "О"
+        "availability": "Обычное"
       },
       "effect": "Даёт +2 к Соблазнению при нанесении на кожу; при добавлении в питьё налагает −5 к сопротивлению соблазнению.",
       "effects": [
@@ -3510,7 +3642,7 @@
       "weight_kg": 0.1,
       "cost_crowns": 79,
       "attributes": {
-        "availability": "Р"
+        "availability": "Редкое"
       },
       "effect": "Мгновенно замораживают поверхность; покрытые жидкостью вещи получают двойной разрушающий урон. Бросок: Тел × 2 м, площадь 2-метровый конус.",
       "effects": [
@@ -3526,7 +3658,7 @@
       "weight_kg": 0.1,
       "cost_crowns": 56,
       "attributes": {
-        "availability": "Р"
+        "availability": "Редкое"
       },
       "effect": "Немедленно снимают опьянение.",
       "effects": [
@@ -3542,13 +3674,57 @@
       "weight_kg": 0.5,
       "cost_crowns": 65,
       "attributes": {
-        "availability": "Р"
+        "availability": "Редкое"
       },
       "effect": "Мгновенно поджигает цель и всё в пределах 2-метрового конуса; бросок на дистанцию Тел × 2 м.",
       "effects": [
         "Мгновенно поджигает цель и всё в пределах 2-метрового конуса; бросок на дистанцию Тел × 2 м."
       ],
       "application": "Бросить склянку"
+    },
+    {
+      "item_id": "item_c5e6870520e8d266b84f3862c7620a82",
+      "name": "Стекло",
+      "type": "ingredient",
+      "page": 128,
+      "new": true,
+      "weight_kg": 0.5,
+      "cost_crowns": 5,
+      "where_found": "Покупается",
+      "availability": "Редкое"
+    },
+    {
+      "item_id": "item_29e4f6ade05b98792eff4a68cf71e866",
+      "name": "Серебро",
+      "type": "ingredient",
+      "page": 129,
+      "new": true,
+      "weight_kg": 1,
+      "cost_crowns": 72,
+      "where_found": "Горы и под землёй",
+      "availability": "Уникальное"
+    },
+    {
+      "item_id": "item_fa0bf758081fa296bdf66349523632d7",
+      "name": "Камень",
+      "type": "ingredient",
+      "page": 129,
+      "new": true,
+      "weight_kg": 2,
+      "cost_crowns": 4,
+      "where_found": "Повсеместно",
+      "availability": "Повсеместное"
+    },
+    {
+      "item_id": "item_43eae099757151447448c4b01ae78ba4",
+      "name": "Зерриканская смесь",
+      "type": "ingredient",
+      "page": 129,
+      "new": true,
+      "weight_kg": 0.1,
+      "cost_crowns": 30,
+      "where_found": "Горы или под землёй",
+      "availability": "Редкое"
     }
   ]
 }

@@ -40,6 +40,8 @@
         <div><span class="detail-label">Уровень</span><span class="detail-value">${escapeHtml(recipe.tier || "—")}</span></div>
         ${recipe.dc ? `<div><span class="detail-label">Сложность изготовления</span><span class="detail-value">${escapeHtml(recipe.dc)}</span></div>` : ""}
         ${recipe.time ? `<div><span class="detail-label">Время</span><span class="detail-value">${escapeHtml(recipe.time)}</span></div>` : ""}
+        ${recipe.priceCrowns !== null && recipe.priceCrowns !== undefined ? `<div><span class="detail-label">Цена</span><span class="detail-value">${numberText(recipe.priceCrowns)} кр.</span></div>` : ""}
+        ${recipe.surchargeCrowns !== null && recipe.surchargeCrowns !== undefined ? `<div><span class="detail-label">Доплата за изготовление</span><span class="detail-value">${numberText(recipe.surchargeCrowns)} кр.</span></div>` : ""}
         ${(recipe.outputs || []).length ? `<div class="full-width"><span class="detail-label">Результат</span><span class="detail-value">${outputs}</span></div>` : ""}
         ${recipe.type === "alchemy" ? `<div class="full-width"><span class="detail-label">Формула · символы ингредиентов</span>${formula(ingredients)}</div>` : ""}
         <div class="full-width"><span class="detail-label">Компоненты</span><span class="ingredient-list">${ingredients.map(ingredient => `<span class="ingredient-tag">${escapeHtml(ingredient.name)}${ingredient.quantity ? ` ×${escapeHtml(ingredient.quantity)}` : ""}</span>`).join("") || `<span class="detail-value">Не указаны</span>`}</span></div>
@@ -92,7 +94,7 @@
     if (item.costCrowns !== null) quick.push(`<span><strong>Цена</strong> ${numberText(item.costCrowns)} кр.</span>`);
     const details = item.details || {};
     const narrative = Object.entries(details).filter(([, value]) => value !== null && value !== "").map(([key, value]) => {
-      const labels = { habitat: "Место обитания", rarity: "Редкость", acquisition_method: "Где найти", alchemy_group: "Группа", effect: "Эффект", duration: "Длительность", toxicity: "Токсичность", application: "Применение", notes: "Примечание" };
+      const labels = { where_found: "Где найти", availability: "Доступность", acquisition_method: "Где найти", alchemy_group: "Группа", effect: "Эффект", duration: "Длительность", toxicity: "Токсичность", application: "Применение", notes: "Примечание" };
       return `<div class="detail-block"><span class="detail-label">${labels[key] || escapeHtml(key)}</span><p>${escapeHtml(value)}</p></div>`;
     }).join("");
     const attributes = item.attributes?.length ? `<div class="detail-block"><span class="detail-label">Характеристики</span><div class="attribute-list">${item.attributes.map(attribute => `<div class="attribute-row"><span>${escapeHtml(attribute.label)}</span><strong>${fieldValue(attribute.value, attribute.unit)}</strong></div>`).join("")}</div></div>` : "";
@@ -111,24 +113,24 @@
   function updateItemFilters() {
     const isIngredient = $("#item-type-filter").value === "ingredient";
     const ingredients = items.filter(item => item.type === "ingredient");
-    const rarities = [...new Set(ingredients.map(item => item.details?.rarity).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ru"));
+    const availabilities = [...new Set(ingredients.map(item => item.details?.availability).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ru"));
     const groups = [...new Set(ingredients.map(item => item.details?.alchemy_group).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ru"));
-    setItemFilterOptions($("#item-rarity-filter"), "Любая редкость", rarities);
+    setItemFilterOptions($("#item-availability-filter"), "Любая доступность", availabilities);
     setItemFilterOptions($("#item-group-filter"), "Любая группа", groups);
-    $("#item-rarity-wrap").hidden = !isIngredient || rarities.length < 2;
+    $("#item-availability-wrap").hidden = !isIngredient || availabilities.length < 2;
     $("#item-group-wrap").hidden = !isIngredient || groups.length < 2;
   }
 
   function renderItems() {
     const terms = normalize($("#item-search").value.trim()).split(/\s+/).filter(Boolean);
     const type = $("#item-type-filter").value;
-    const rarity = $("#item-rarity-filter").value;
+    const availability = $("#item-availability-filter").value;
     const group = $("#item-group-filter").value;
     const visible = items.filter(item => {
       if (type && item.type !== type) return false;
-      if (rarity && item.details?.rarity !== rarity) return false;
+      if (availability && item.details?.availability !== availability) return false;
       if (group && item.details?.alchemy_group !== group) return false;
-      const detailLabels = { habitat: "место обитания", rarity: "редкость", acquisition_method: "где найти", alchemy_group: "алхимическая группа", effect: "эффект", duration: "длительность", toxicity: "токсичность", application: "применение", notes: "примечание" };
+      const detailLabels = { where_found: "где найти", availability: "доступность", acquisition_method: "где найти", alchemy_group: "алхимическая группа", effect: "эффект", duration: "длительность", toxicity: "токсичность", application: "применение", notes: "примечание" };
       const searchable = normalize([
         item.name, item.typeLabel, item.description,
         ...Object.entries(item.details || {}).flatMap(([key, value]) => [detailLabels[key] || key, value]),
@@ -139,7 +141,7 @@
     });
     $("#item-list").innerHTML = visible.map(itemCard).join("");
     $("#item-empty").hidden = visible.length > 0;
-    $("#clear-item-filters").disabled = !$("#item-search").value && !type && !rarity && !group;
+    $("#clear-item-filters").disabled = !$("#item-search").value && !type && !availability && !group;
   }
 
   function resolveItemId(itemId) {
@@ -271,7 +273,7 @@
   });
   $("#item-search").addEventListener("input", renderItems);
   $("#item-type-filter").addEventListener("change", () => { updateItemFilters(); renderItems(); });
-  $("#item-rarity-filter").addEventListener("change", renderItems);
+  $("#item-availability-filter").addEventListener("change", renderItems);
   $("#item-group-filter").addEventListener("change", renderItems);
   $("#clear-item-filters").addEventListener("click", () => {
     $("#item-search").value = "";

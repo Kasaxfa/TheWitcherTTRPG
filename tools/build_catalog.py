@@ -89,9 +89,17 @@ def validate_catalog(connection: sqlite3.Connection) -> None:
     """).fetchall()
     if missing:
         raise sqlite3.DatabaseError(f"Recipes without outputs or source pages: {missing[:5]}")
+    invalid_prices = connection.execute("""
+        SELECT recipe_id FROM recipes
+        WHERE price_crowns IS NULL
+           OR (recipe_type = 'alchemy' AND surcharge_crowns IS NOT NULL)
+           OR (recipe_type != 'alchemy' AND surcharge_crowns IS NULL)
+    """).fetchall()
+    if invalid_prices:
+        raise sqlite3.DatabaseError(f"Recipes with missing or inconsistent prices: {invalid_prices[:5]}")
     for table, fields in {
         "items": ("weight_kg", "cost_crowns", "description"),
-        "ingredient_details": ("habitat", "rarity", "acquisition_method", "alchemy_group", "notes"),
+        "ingredient_details": ("where_found", "availability", "acquisition_method", "alchemy_group", "notes"),
         "alchemical_details": ("effect", "duration", "toxicity", "application", "notes"),
     }.items():
         for field in fields:
@@ -123,7 +131,7 @@ def build_site_data(connection: sqlite3.Connection) -> dict[str, Any]:
     query = """
         SELECT r.recipe_id, r.title, r.recipe_type, r.category_id,
                c.label AS category, t.tier_code, t.label AS tier,
-               r.craft_dc, r.crafting_time
+               r.craft_dc, r.crafting_time, r.price_crowns, r.surcharge_crowns
         FROM recipes r
         JOIN recipe_categories c ON c.category_id = r.category_id
         LEFT JOIN skill_tiers t ON t.tier_code = r.tier_code
@@ -162,6 +170,8 @@ def build_site_data(connection: sqlite3.Connection) -> dict[str, Any]:
                 "name": recipe["title"],
                 "dc": str(recipe["craft_dc"]) if recipe["craft_dc"] is not None else "",
                 "time": recipe["crafting_time"] or "",
+                "priceCrowns": recipe["price_crowns"],
+                "surchargeCrowns": recipe["surcharge_crowns"],
                 "ingredients": ingredients,
                 "outputs": outputs,
             }
@@ -185,7 +195,7 @@ def build_site_data(connection: sqlite3.Connection) -> dict[str, Any]:
     for item in connection.execute(item_query):
         details: dict[str, Any] = {}
         table_by_type = {
-            "ingredient": ("ingredient_details", ("habitat", "rarity", "acquisition_method", "alchemy_group", "notes")),
+            "ingredient": ("ingredient_details", ("where_found", "availability", "acquisition_method", "alchemy_group", "notes")),
             "alchemical": ("alchemical_details", ("effect", "duration", "toxicity", "application", "notes")),
         }
         if item["item_type"] in table_by_type:
@@ -248,9 +258,122 @@ def validate_site_data(connection: sqlite3.Connection, data: dict[str, Any]) -> 
         for link in recipe["ingredients"] + recipe["outputs"]:
             if link["itemId"] not in item_ids:
                 raise sqlite3.DatabaseError(f"Recipe {recipe['id']} has an exported link to a missing item")
+    database_recipes = {
+        row["recipe_id"]: row for row in connection.execute("""
+            SELECT r.recipe_id, r.title, r.recipe_type, r.category_id, c.label AS category,
+                   r.tier_code, t.label AS tier, r.craft_dc, r.crafting_time,
+                   r.price_crowns, r.surcharge_crowns
+            FROM recipes r JOIN recipe_categories c USING(category_id)
+            LEFT JOIN skill_tiers t USING(tier_code)
+        """)
+    }
+    exported_recipes = {recipe["id"]: recipe for recipe in data["recipes"]}
+    if set(exported_recipes) != set(database_recipes):
+        raise sqlite3.DatabaseError("Exported recipe IDs do not match the database")
+    for recipe_id, row in database_recipes.items():
+        recipe = exported_recipes[recipe_id]
+        expected = {
+            "name": row["title"], "type": row["recipe_type"],
+            "categoryId": row["category_id"], "category": row["category"],
+            "tierCode": row["tier_code"], "tier": row["tier"],
+            "dc": str(row["craft_dc"]) if row["craft_dc"] is not None else "",
+            "time": row["crafting_time"] or "", "priceCrowns": row["price_crowns"],
+            "surchargeCrowns": row["surcharge_crowns"],
+        }
+        if any(recipe[key] != value for key, value in expected.items()):
+            raise sqlite3.DatabaseError(f"Exported recipe fields do not match the database: {recipe_id}")
+        expected_ingredients = [
+            {"name": link["name"], "quantity": link["quantity"], "itemId": link["item_id"]}
+            for link in connection.execute("""
+                SELECT i.name, ri.quantity, ri.item_id
+                FROM recipe_ingredients ri JOIN items i USING(item_id)
+                WHERE ri.recipe_id=? ORDER BY ri.line_number
+            """, (recipe_id,))
+        ]
+        expected_outputs = [
+            {"itemId": link["item_id"], "name": link["name"], "quantity": link["quantity"]}
+            for link in connection.execute("""
+                SELECT o.item_id, i.name, o.quantity
+                FROM recipe_outputs o JOIN items i USING(item_id)
+                WHERE o.recipe_id=? ORDER BY o.item_id
+            """, (recipe_id,))
+        ]
+        if recipe["ingredients"] != expected_ingredients or recipe["outputs"] != expected_outputs:
+            raise sqlite3.DatabaseError(f"Exported recipe links do not match the database: {recipe_id}")
+    database_items = {
+        row["item_id"]: row for row in connection.execute("""
+            SELECT i.item_id, i.name, i.item_type, ty.label AS type_label,
+                   i.description, i.weight_kg, i.cost_crowns
+            FROM items i JOIN item_types ty USING(item_type)
+        """)
+    }
+    exported_items = {item["id"]: item for item in data["items"]}
+    if set(exported_items) != set(database_items):
+        raise sqlite3.DatabaseError("Exported item IDs do not match the database")
+    detail_tables = {
+        "ingredient": ("ingredient_details", ("where_found", "availability", "acquisition_method", "alchemy_group", "notes")),
+        "alchemical": ("alchemical_details", ("effect", "duration", "toxicity", "application", "notes")),
+    }
+    for item_id, row in database_items.items():
+        item = exported_items[item_id]
+        expected = {
+            "name": row["name"], "type": row["item_type"], "typeLabel": row["type_label"],
+            "description": row["description"], "weightKg": row["weight_kg"],
+            "costCrowns": row["cost_crowns"],
+        }
+        if any(item[key] != value for key, value in expected.items()):
+            raise sqlite3.DatabaseError(f"Exported item fields do not match the database: {item_id}")
+        details = {}
+        if row["item_type"] in detail_tables:
+            table, fields = detail_tables[row["item_type"]]
+            stored = connection.execute(
+                f"SELECT {', '.join(fields)} FROM {table} WHERE item_id=?", (item_id,)
+            ).fetchone()
+            if stored:
+                details = {field: stored[field] for field in fields if stored[field] is not None}
+        if item["details"] != details:
+            raise sqlite3.DatabaseError(f"Exported item details do not match the database: {item_id}")
+        attributes = [
+            {"code": attribute["attribute_code"], "label": attribute["label"],
+             "value": attribute["text_value"] if attribute["text_value"] is not None else attribute["numeric_value"],
+             "unit": attribute["unit"], "ordinal": attribute["ordinal"]}
+            for attribute in connection.execute("""
+                SELECT a.attribute_code, d.label, d.unit, a.text_value, a.numeric_value, a.ordinal
+                FROM item_attributes a JOIN attribute_definitions d USING(attribute_code)
+                WHERE a.item_id=? ORDER BY d.label, a.ordinal
+            """, (item_id,))
+        ]
+        effects = [
+            {"order": effect["effect_order"], "text": effect["effect_text"],
+             "duration": effect["duration"], "toxicity": effect["toxicity"],
+             "application": effect["application"]}
+            for effect in connection.execute("""
+                SELECT effect_order, effect_text, duration, toxicity, application
+                FROM item_effects WHERE item_id=? ORDER BY effect_order
+            """, (item_id,))
+        ]
+        if item["attributes"] != attributes or item["effects"] != effects:
+            raise sqlite3.DatabaseError(f"Exported item properties do not match the database: {item_id}")
     for old_id, current_id in data["itemIdAliases"].items():
         if old_id in item_ids or current_id not in item_ids:
             raise sqlite3.DatabaseError(f"Invalid exported item ID alias: {old_id} -> {current_id}")
+    expected_aliases = {
+        row["retired_item_id"]: row["current_item_id"]
+        for row in connection.execute("SELECT retired_item_id,current_item_id FROM item_id_aliases")
+    }
+    if data["itemIdAliases"] != expected_aliases:
+        raise sqlite3.DatabaseError("Exported item ID aliases do not match the database")
+    expected_symbols = {
+        row["item_id"]: {"name": row["name"], "code": row["symbol_code"], "color": row["color"], "path": row["svg_path"]}
+        for row in connection.execute("""
+            SELECT s.item_id, i.name, s.symbol_code, s.color, s.svg_path
+            FROM alchemy_group_symbols s JOIN items i USING(item_id)
+        """)
+    }
+    if data["symbols"] != expected_symbols:
+        raise sqlite3.DatabaseError("Exported alchemy symbols do not match the database")
+    if any(item["symbol"] != expected_symbols.get(item_id) for item_id, item in exported_items.items()):
+        raise sqlite3.DatabaseError("Exported item symbols do not match the database")
     counts = (len(data["items"]), len(data["recipes"]))
     expected = (
         connection.execute("SELECT COUNT(*) FROM items").fetchone()[0],
@@ -273,7 +396,7 @@ def validate_site_data(connection: sqlite3.Connection, data: dict[str, Any]) -> 
                 f"Export count mismatch for {table}: {exported_count}, expected {database_count}"
             )
     detail_fields = {
-        "ingredient_details": ("habitat", "rarity", "acquisition_method", "alchemy_group", "notes"),
+        "ingredient_details": ("where_found", "availability", "acquisition_method", "alchemy_group", "notes"),
         "alchemical_details": ("effect", "duration", "toxicity", "application", "notes"),
     }
     for table, fields in detail_fields.items():
