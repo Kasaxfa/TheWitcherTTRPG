@@ -28,7 +28,7 @@ DEFINITIONS = {
     "armor_region": ("Защищаемая часть тела", "text", None),
 }
 DETAIL_FIELDS = {
-    "ingredient": ("habitat", "rarity", "acquisition_method", "alchemy_group", "notes"),
+    "ingredient": ("where_found", "availability", "acquisition_method", "alchemy_group", "notes"),
     "alchemical": ("effect", "duration", "toxicity", "application", "notes"),
 }
 
