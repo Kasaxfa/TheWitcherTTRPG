@@ -78,7 +78,14 @@
           <p id="weight-warning" class="inline-warning" hidden></p>
         </div>
         <form id="add-inventory-item" class="add-inventory-item">
-          <label class="field grow">Предмет из каталога<select id="inventory-item-select"><option value="">Выберите предмет…</option></select></label>
+          <div class="field grow inventory-picker">
+            <label for="inventory-item-search">Предмет из каталога</label>
+            <div class="inventory-search-control">
+              <input id="inventory-item-search" type="search" placeholder="Начните вводить название…" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="inventory-search-results" aria-expanded="false" aria-describedby="inventory-search-help" required>
+              <div id="inventory-search-results" class="inventory-search-results" role="listbox" aria-label="Найденные предметы" hidden></div>
+            </div>
+            <span id="inventory-search-help" class="inventory-search-help" role="status" aria-live="polite">Введите название и выберите предмет из подсказок.</span>
+          </div>
           <label class="field">Количество<input id="inventory-quantity" type="number" min="0.1" step="0.1" value="1" required></label>
           <label class="field">Вес за шт., кг<input id="inventory-unit-weight" type="number" min="0" step="0.1" placeholder="из каталога"></label>
           <button class="button primary add-button" type="submit">Добавить</button>

@@ -204,10 +204,64 @@
     renderInventory();
   }
 
-  function setupInventorySelect() {
-    const sorted = items.filter(item => item.type !== "transport" && !alchemySymbols[item.id])
-      .sort((a, b) => a.name.localeCompare(b.name, "ru"));
-    $("#inventory-item-select").innerHTML = `<option value="">Выберите предмет…</option>${sorted.map(item => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name)} · ${escapeHtml(item.typeLabel)}</option>`).join("")}`;
+  const inventorySearchItems = items.filter(item => item.type !== "transport" && !alchemySymbols[item.id]);
+  let selectedInventoryItemId = null;
+  let inventoryMatches = [];
+  let activeInventoryMatch = -1;
+
+  function closeInventorySuggestions() {
+    $("#inventory-search-results").hidden = true;
+    $("#inventory-item-search").setAttribute("aria-expanded", "false");
+    $("#inventory-item-search").removeAttribute("aria-activedescendant");
+    activeInventoryMatch = -1;
+  }
+
+  function setActiveInventoryMatch(index) {
+    activeInventoryMatch = index;
+    const options = $("#inventory-search-results").querySelectorAll("[role=option]");
+    options.forEach((option, position) => {
+      option.setAttribute("aria-selected", String(position === index));
+      option.classList.toggle("active", position === index);
+    });
+    if (index >= 0) {
+      $("#inventory-item-search").setAttribute("aria-activedescendant", options[index].id);
+      options[index].scrollIntoView({ block: "nearest" });
+    } else $("#inventory-item-search").removeAttribute("aria-activedescendant");
+  }
+
+  function renderInventorySuggestions() {
+    const query = normalize($("#inventory-item-search").value.trim());
+    const results = $("#inventory-search-results");
+    if (!query) {
+      inventoryMatches = [];
+      closeInventorySuggestions();
+      $("#inventory-search-help").textContent = "Введите название и выберите предмет из подсказок.";
+      return;
+    }
+    const terms = query.split(/\s+/);
+    inventoryMatches = inventorySearchItems
+      .filter(item => terms.every(term => normalize(`${item.name} ${item.typeLabel}`).includes(term)))
+      .sort((a, b) => Number(normalize(b.name).startsWith(query)) - Number(normalize(a.name).startsWith(query))
+        || a.name.localeCompare(b.name, "ru") || a.typeLabel.localeCompare(b.typeLabel, "ru"))
+      .slice(0, 8);
+    results.innerHTML = inventoryMatches.map((item, index) => `<div id="inventory-search-option-${index}" class="inventory-search-option" role="option" aria-selected="false" data-item-id="${escapeHtml(item.id)}">
+      <strong>${escapeHtml(item.name)}</strong><span>${escapeHtml(item.typeLabel)} · ${item.weightKg === null ? "Вес не указан" : `${numberText(item.weightKg)} кг`}</span></div>`).join("");
+    results.hidden = inventoryMatches.length === 0;
+    $("#inventory-item-search").setAttribute("aria-expanded", String(inventoryMatches.length > 0));
+    $("#inventory-search-help").textContent = inventoryMatches.length
+      ? "Выберите предмет: стрелки для перемещения, Enter для подтверждения."
+      : "Совпадений нет. Уточните название или добавьте свой предмет.";
+    setActiveInventoryMatch(-1);
+  }
+
+  function selectInventoryItem(item) {
+    selectedInventoryItemId = item.id;
+    $("#inventory-item-search").value = item.name;
+    $("#inventory-item-search").setCustomValidity("");
+    $("#inventory-unit-weight").value = item.weightKg ?? "";
+    $("#inventory-search-help").textContent = `Выбрано: ${item.name} · ${item.typeLabel}.`;
+    closeInventorySuggestions();
+    $("#inventory-quantity").focus();
   }
 
   function renderInventory() {
@@ -307,19 +361,72 @@
     }
   });
 
-  $("#inventory-item-select").addEventListener("change", event => {
-    const item = itemById.get(event.target.value);
-    $("#inventory-unit-weight").value = item?.weightKg ?? "";
+  $("#inventory-item-search").addEventListener("input", event => {
+    selectedInventoryItemId = null;
+    event.target.setCustomValidity("");
+    $("#inventory-unit-weight").value = "";
+    renderInventorySuggestions();
+  });
+  $("#inventory-item-search").addEventListener("focus", () => {
+    if (!selectedInventoryItemId) renderInventorySuggestions();
+  });
+  $("#inventory-item-search").addEventListener("keydown", event => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      event.stopPropagation();
+      if (!$("#inventory-search-results").hidden) closeInventorySuggestions();
+      else {
+        event.target.value = "";
+        event.target.setCustomValidity("");
+        selectedInventoryItemId = null;
+        $("#inventory-unit-weight").value = "";
+        renderInventorySuggestions();
+      }
+    } else if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      if ($("#inventory-search-results").hidden) renderInventorySuggestions();
+      if (!inventoryMatches.length) return;
+      event.preventDefault();
+      const direction = event.key === "ArrowDown" ? 1 : -1;
+      const next = activeInventoryMatch < 0 && direction < 0
+        ? inventoryMatches.length - 1
+        : (activeInventoryMatch + direction + inventoryMatches.length) % inventoryMatches.length;
+      setActiveInventoryMatch(next);
+    } else if (event.key === "Enter" && !$("#inventory-search-results").hidden && inventoryMatches.length) {
+      event.preventDefault();
+      selectInventoryItem(inventoryMatches[activeInventoryMatch < 0 ? 0 : activeInventoryMatch]);
+    }
+  });
+  $("#inventory-search-results").addEventListener("pointerdown", event => {
+    const option = event.target.closest("[data-item-id]");
+    if (!option) return;
+    event.preventDefault();
+    selectInventoryItem(itemById.get(option.dataset.itemId));
+  });
+  $("#inventory-search-results").addEventListener("click", event => {
+    const option = event.target.closest("[data-item-id]");
+    if (option && selectedInventoryItemId !== option.dataset.itemId) selectInventoryItem(itemById.get(option.dataset.itemId));
+  });
+  $("#inventory-item-search").addEventListener("blur", closeInventorySuggestions);
+  document.addEventListener("pointerdown", event => {
+    if (!event.target.closest(".inventory-search-control")) closeInventorySuggestions();
   });
   $("#add-inventory-item").addEventListener("submit", event => {
     event.preventDefault();
-    const item = itemById.get($("#inventory-item-select").value);
+    const item = itemById.get(selectedInventoryItemId);
+    if (!item) {
+      $("#inventory-item-search").setCustomValidity("Выберите предмет в результатах поиска.");
+      $("#inventory-item-search").reportValidity();
+      return;
+    }
     const quantity = Number($("#inventory-quantity").value);
     const weightRaw = $("#inventory-unit-weight").value;
     const unitWeightKg = weightRaw === "" ? null : Number(weightRaw);
     if (!item || !Number.isFinite(quantity) || quantity <= 0 || (unitWeightKg !== null && (!Number.isFinite(unitWeightKg) || unitWeightKg < 0))) return;
     addInventoryEntry({ id: createEntryId(), itemId: item.id, name: item.name, quantity, unitWeightKg, custom: false });
     event.target.reset();
+    selectedInventoryItemId = null;
+    closeInventorySuggestions();
+    $("#inventory-search-help").textContent = "Введите название и выберите предмет из подсказок.";
     $("#inventory-quantity").value = "1";
     $("#inventory-unit-weight").value = "";
   });
@@ -398,7 +505,6 @@
     } finally { event.target.value = ""; }
   });
 
-  setupInventorySelect();
   updateRecipeFilters();
   updateItemFilters();
   renderRecipes();
