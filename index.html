@@ -6,6 +6,14 @@
   <meta name="theme-color" content="#f5f7f6">
   <meta name="description" content="Рецепты, предметы и личный инвентарь для НРИ Ведьмак.">
   <title>Кодекс ремесленника — Ведьмак НРИ</title>
+  <script>
+    try {
+      if (localStorage.getItem("witcher-workshop-theme") === "dark") {
+        document.documentElement.dataset.theme = "dark";
+        document.querySelector('meta[name="theme-color"]').content = "#141c1e";
+      }
+    } catch (_) { /* Сайт доступен и при отключённом хранилище. */ }
+  </script>
   <link rel="stylesheet" href="./styles.css">
   <script src="./data.js" defer></script>
   <script src="./app.js" defer></script>
@@ -16,7 +24,10 @@
       <span class="brand-mark" aria-hidden="true">✦</span>
       <span>Кодекс <b>ремесленника</b></span>
     </a>
-    <div class="edition-note">НРИ «Ведьмак» <span>·</span> справочник по книге правил</div>
+    <div class="topbar-actions">
+      <div class="edition-note">НРИ «Ведьмак» <span>·</span> справочник по книге правил</div>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Включить тёмную тему" aria-pressed="false" title="Включить тёмную тему"><span class="theme-icon" aria-hidden="true">☾</span><span class="theme-label">Тёмная тема</span></button>
+    </div>
   </header>
 
   <main id="top" class="layout">
