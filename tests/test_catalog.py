@@ -34,7 +34,7 @@ class CatalogTests(unittest.TestCase):
         migrate_database(self.connection)
         validate_catalog(self.connection)
         self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM recipes").fetchone()[0], 147)
-        self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM recipe_ingredients").fetchone()[0], 715)
+        self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM recipe_ingredients").fetchone()[0], 718)
         self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM recipe_sources").fetchone()[0], 147)
         self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM ingredient_link_decisions").fetchone()[0], 54)
         self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM item_field_sources").fetchone()[0], 1036)
@@ -110,7 +110,8 @@ class CatalogTests(unittest.TestCase):
             ("recipe_336d7a6dcefb41125754", 2): ("item_79dd0bd6bd427d246d46", 4),
             ("recipe_336d7a6dcefb41125754", 3): ("item_7b34ef808e8ceb056383", 6),
             ("recipe_336d7a6dcefb41125754", 5): ("item_3b050052261f116f3d6b", 4),
-            ("recipe_336d7a6dcefb41125754", 7): ("item_d1e0bda6bf59017a2b70", 4),
+            ("recipe_336d7a6dcefb41125754", 6): ("item_803aeb9e60ba3d98cce6", 2),
+            ("recipe_336d7a6dcefb41125754", 8): ("item_d1e0bda6bf59017a2b70", 4),
             ("recipe_4ea0890f82f99480622b", 5): ("item_3b050052261f116f3d6b", 5),
             ("recipe_bb3fbf1f580f7aeff5cb", 6): ("item_3b050052261f116f3d6b", 4),
             ("recipe_d9358589b9535eca01e2", 3): ("item_79dd0bd6bd427d246d46", 3),
@@ -141,6 +142,56 @@ class CatalogTests(unittest.TestCase):
             SELECT page_number FROM recipe_sources WHERE recipe_id='recipe_bb3fbf1f580f7aeff5cb'
         """).fetchall()]
         self.assertEqual(sources, [133])
+
+    def test_component_tables_125_to_147_preserve_identity_and_ingredients(self):
+        expected_names = {
+            "item_750e7ca248c20931af6b": "Двимерит",
+            "item_8fc9d1da3476bea64e22": "Махакамский двимерит",
+            "item_d747d12d6dec4318743c": "Махакамская сталь",
+            "item_639060dfddf5da8869e4": "Третогорская сталь",
+            "item_74e9b1c64311635ec1de": "Самоцветы",
+        }
+        for item_id, name in expected_names.items():
+            self.assertEqual(self.connection.execute(
+                "SELECT name FROM items WHERE item_id=?", (item_id,)
+            ).fetchone()[0], name)
+        self.assertEqual(self.connection.execute("""
+            SELECT where_found FROM ingredient_details WHERE item_id='item_6282540f5cf5a0f9692d'
+        """).fetchone()[0], "Костёр и сгоревшие предметы")
+        self.assertEqual(tuple(self.connection.execute("""
+            SELECT item_type, weight_kg, cost_crowns FROM items WHERE item_id='item_168a2bcfd9fac25bc7b9'
+        """).fetchone()), ("material", 3, 48))
+        self.assertEqual(tuple(self.connection.execute("""
+            SELECT item_type, weight_kg, cost_crowns FROM items WHERE item_id='item_748971ecfcbcf43630fc'
+        """).fetchone()), ("armor", 1.5, 130))
+        corrections = {
+            ("recipe_f1d0abf19c44817d301a", 2): ("Тёмная сталь", 1),
+            ("recipe_4ea0890f82f99480622b", 7): ("Кости животных", 2),
+            ("recipe_8546ba9e73b22d4f7913", 2): ("Тёмная сталь", 4),
+            ("recipe_810065109a57b27591c7", 3): ("Двойное полотно", 3),
+            ("recipe_336d7a6dcefb41125754", 6): ("Эфирная смазка", 2),
+            ("recipe_4907fda1e928930f0335", 2): ("Пепел", 10),
+            ("recipe_4907fda1e928930f0335", 6): ("Масло", 4),
+            ("recipe_848e9a2280b710f23b3f", 7): ("Пепел", 10),
+            ("recipe_77a8158473261b09d03a", 7): ("Пепел", 10),
+            ("recipe_f0ac68b423358532fe54", 4): ("Эфирная смазка", 1),
+            ("recipe_a91df62f23e653b8aae3", 2): ("Укреплённая кожа", 1),
+            ("recipe_9ff56667eba3a5a5cb2e", 3): ("Укреплённая кожа", 1),
+            ("recipe_657deaf4c1d70021e808", 2): ("Пепел", 4),
+            ("recipe_25fa64ceb20b52dbc7a0", 5): ("Пепел", 11),
+        }
+        for (recipe_id, line_number), (name, qty) in corrections.items():
+            actual = self.connection.execute("""
+                SELECT i.name, ri.quantity FROM recipe_ingredients ri JOIN items i USING(item_id)
+                WHERE ri.recipe_id=? AND ri.line_number=?
+            """, (recipe_id, line_number)).fetchone()
+            self.assertEqual(tuple(actual), (name, qty), (recipe_id, line_number))
+        self.assertEqual(self.connection.execute("""
+            SELECT COUNT(*) FROM recipe_ingredients WHERE recipe_id='recipe_b07dc0af486fd17b0a49'
+        """).fetchone()[0], 8)
+        self.assertEqual(self.connection.execute("""
+            SELECT recipe_id FROM recipes WHERE title='Двимерит'
+        """).fetchone()[0], "recipe_bfad51784d42aff4c903")
 
     def test_source_names_keep_their_ids_and_printed_spelling(self):
         data = build_site_data(self.connection)

@@ -8,7 +8,7 @@
       "page": 128,
       "weight_kg": 0.1,
       "cost_crowns": 1,
-      "where_found": "Костёр и старые предметы",
+      "where_found": "Костёр и сгоревшие предметы",
       "availability": "Повсеместное"
     },
     {
@@ -18,7 +18,7 @@
       "page": 128,
       "weight_kg": 0.1,
       "cost_crowns": 1,
-      "where_found": "Костёр, горы и подземелья",
+      "where_found": "Костёр, горы или под землёй",
       "availability": "Обычное"
     },
     {
@@ -312,7 +312,7 @@
       "page": 129,
       "weight_kg": 1.5,
       "cost_crowns": 52,
-      "where_found": "Горы и подземелья",
+      "where_found": "Горы и под землёй",
       "availability": "Уникальное"
     },
     {
@@ -329,7 +329,7 @@
     },
     {
       "item_id": "item_750e7ca248c20931af6b",
-      "name": "Диммерит",
+      "name": "Двимерит",
       "type": "material",
       "page": 129,
       "weight_kg": 1.0,
@@ -341,12 +341,12 @@
     },
     {
       "item_id": "item_74e9b1c64311635ec1de",
-      "name": "Самоцвет",
+      "name": "Самоцветы",
       "type": "ingredient",
       "page": 129,
       "weight_kg": 0.1,
       "cost_crowns": 100,
-      "where_found": "Горы и подземелья",
+      "where_found": "Горы и под землёй",
       "availability": "Уникальное"
     },
     {
@@ -356,7 +356,7 @@
       "page": 129,
       "weight_kg": 1.0,
       "cost_crowns": 80,
-      "where_found": "Горы и подземелья",
+      "where_found": "Горы и под землёй",
       "availability": "Уникальное"
     },
     {
@@ -366,7 +366,7 @@
       "page": 129,
       "weight_kg": 1.0,
       "cost_crowns": 85,
-      "where_found": "Горы и подземелья",
+      "where_found": "Горы и под землёй",
       "availability": "Уникальное"
     },
     {
@@ -376,12 +376,12 @@
       "page": 129,
       "weight_kg": 1.5,
       "cost_crowns": 30,
-      "where_found": "Горы и подземелья",
+      "where_found": "Горы и под землёй",
       "availability": "Редкое"
     },
     {
       "item_id": "item_8fc9d1da3476bea64e22",
-      "name": "Махакемский диммерит",
+      "name": "Махакамский двимерит",
       "type": "material",
       "page": 129,
       "weight_kg": 1.0,
@@ -393,7 +393,7 @@
     },
     {
       "item_id": "item_d747d12d6dec4318743c",
-      "name": "Махакемская сталь",
+      "name": "Махакамская сталь",
       "type": "material",
       "page": 129,
       "weight_kg": 1.0,
@@ -410,7 +410,7 @@
       "page": 129,
       "weight_kg": 1.0,
       "cost_crowns": 98,
-      "where_found": "Место падения на поверхности земли",
+      "where_found": "Где угодно на поверхности земли",
       "availability": "Уникальное"
     },
     {
@@ -437,7 +437,7 @@
     },
     {
       "item_id": "item_639060dfddf5da8869e4",
-      "name": "Терегорская сталь",
+      "name": "Третогорская сталь",
       "type": "material",
       "page": 129,
       "weight_kg": 1.0,
