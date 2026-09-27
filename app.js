@@ -5,35 +5,12 @@
   const itemAliases = window.ITEM_ID_ALIASES || {};
   const itemById = new Map(items.map(item => [item.id, item]));
   const storageKey = "witcher-workshop-inventory-v1";
-  const themeStorageKey = "witcher-workshop-theme";
   const sections = { recipes: "Рецепты", items: "Предметы", inventory: "Инвентарь" };
   const $ = selector => document.querySelector(selector);
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
   const normalize = value => String(value ?? "").toLocaleLowerCase("ru-RU").replaceAll("ё", "е");
   const numberText = value => new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(value);
   let activePage = "recipes";
-
-  function syncThemeToggle() {
-    const dark = document.documentElement.dataset.theme === "dark";
-    const action = dark ? "Включить светлую тему" : "Включить тёмную тему";
-    const toggle = $("#theme-toggle");
-    toggle.setAttribute("aria-label", action);
-    toggle.setAttribute("aria-pressed", String(dark));
-    toggle.title = action;
-    toggle.querySelector(".theme-icon").textContent = dark ? "☀" : "☾";
-    toggle.querySelector(".theme-label").textContent = dark ? "Светлая тема" : "Тёмная тема";
-    document.querySelector('meta[name="theme-color"]').content = dark ? "#141c1e" : "#f5f7f6";
-  }
-
-  $("#theme-toggle").addEventListener("click", () => {
-    const dark = document.documentElement.dataset.theme !== "dark";
-    if (dark) document.documentElement.dataset.theme = "dark";
-    else delete document.documentElement.dataset.theme;
-    try { localStorage.setItem(themeStorageKey, dark ? "dark" : "light"); }
-    catch (_) { /* Переключение работает и без сохранения. */ }
-    syncThemeToggle();
-  });
-  syncThemeToggle();
 
   function formula(ingredients) {
     const relevant = ingredients.filter(ingredient => alchemySymbols[ingredient.itemId]);
