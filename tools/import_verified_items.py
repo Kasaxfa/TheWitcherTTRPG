@@ -28,6 +28,11 @@ DEFINITIONS = {
     "armor_region": ("Защищаемая часть тела", "text", None),
     "equipment_category": ("Категория снаряжения", "text", None),
     "capacity": ("Вместимость", "text", None),
+    "capacity_kg": ("Грузовместимость", "number", "кг"),
+    "athletics_dex": ("Атлетика + Лвк", "number", None),
+    "control_modifier": ("Модификатор управления", "number", None),
+    "speed": ("Скорость", "text", None),
+    "hit_points": ("Пункты здоровья", "number", None),
 }
 DETAIL_FIELDS = {
     "ingredient": ("where_found", "availability", "acquisition_method", "alchemy_group", "notes"),
@@ -68,7 +73,7 @@ def import_facts(connection: sqlite3.Connection) -> int:
                 existing = (entry["name"], entry["type"])
             if existing is None or (existing[0], existing[1]) != (entry["name"], entry["type"]):
                 raise ValueError(f"Wrong identity for {item_id}: {existing}")
-            if entry["type"] not in ("weapon", "armor", "material", "ingredient", "alchemical", "equipment"):
+            if entry["type"] not in ("weapon", "armor", "material", "ingredient", "alchemical", "equipment", "transport"):
                 raise ValueError(f"Unexpected item type: {entry['type']}")
             for field in ("weight_kg", "cost_crowns", "description"):
                 if field not in entry:

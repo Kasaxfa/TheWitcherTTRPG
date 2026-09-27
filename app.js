@@ -205,7 +205,8 @@
   }
 
   function setupInventorySelect() {
-    const sorted = [...items].sort((a, b) => a.name.localeCompare(b.name, "ru"));
+    const sorted = items.filter(item => item.type !== "transport" && !alchemySymbols[item.id])
+      .sort((a, b) => a.name.localeCompare(b.name, "ru"));
     $("#inventory-item-select").innerHTML = `<option value="">Выберите предмет…</option>${sorted.map(item => `<option value="${escapeHtml(item.id)}">${escapeHtml(item.name)} · ${escapeHtml(item.typeLabel)}</option>`).join("")}`;
   }
 

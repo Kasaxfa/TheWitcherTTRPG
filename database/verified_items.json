@@ -1465,18 +1465,18 @@
     },
     {
       "item_id": "item_ee837e2daed9957715c3",
-      "name": "Клинок из Викваро",
+      "name": "Клинок из Виковаро",
       "type": "weapon",
       "page": 73,
-      "weight_kg": 2.0,
+      "weight_kg": 1.5,
       "cost_crowns": 955,
       "attributes": {
         "availability": "Уникальное",
-        "damage": "6d6+4",
+        "damage": "5d6+4",
         "accuracy": "+0",
         "reliability": 15,
         "hands": 2,
-        "enhancement_slots": 2,
+        "enhancement_slots": 1,
         "damage_type": "рубящий, колющий",
         "concealment": "Не спрятать под одеждой"
       },
@@ -1567,7 +1567,7 @@
     },
     {
       "item_id": "item_45a08ea4b3f20f66cbae",
-      "name": "Джамия",
+      "name": "Джамбия",
       "type": "weapon",
       "page": 73,
       "weight_kg": 0.5,
@@ -2040,7 +2040,8 @@
       "attributes": {
         "availability": "Повсеместное",
         "damage_type": "колющий",
-        "concealment": "Крупное (под плащом)"
+        "concealment": "Крупное (под плащом)",
+        "reliability": 10
       }
     },
     {
@@ -2053,7 +2054,8 @@
       "attributes": {
         "availability": "Обычное",
         "damage_type": "дробящий",
-        "concealment": "Крупное (под плащом)"
+        "concealment": "Крупное (под плащом)",
+        "reliability": 10
       },
       "effects": [
         "Несмертельное"
@@ -2069,7 +2071,8 @@
       "attributes": {
         "availability": "Обычное",
         "damage_type": "колющий",
-        "concealment": "Крупное (под плащом)"
+        "concealment": "Крупное (под плащом)",
+        "reliability": 10
       },
       "effects": [
         "Кровопускающее (100 %)"
@@ -2085,7 +2088,8 @@
       "attributes": {
         "availability": "Обычное",
         "damage_type": "колющий",
-        "concealment": "Крупное (под плащом)"
+        "concealment": "Крупное (под плащом)",
+        "reliability": 10
       },
       "effects": [
         "Пробивающее броню"
@@ -2111,7 +2115,7 @@
     },
     {
       "item_id": "item_09dd41c61be9dbf82437",
-      "name": "Клинок бригады «Врихед»",
+      "name": "Клинок бригады «Врихедд»",
       "type": "weapon",
       "page": 83,
       "weight_kg": 2.5,
@@ -2216,7 +2220,7 @@
     },
     {
       "item_id": "item_4e8420c10fd69bfc4451",
-      "name": "Краснолюдский тесак",
+      "name": "Краснолюдский секач",
       "type": "weapon",
       "page": 83,
       "weight_kg": 1.5,
@@ -2270,7 +2274,7 @@
     },
     {
       "item_id": "item_2ce91c1d348060d35dac",
-      "name": "Махакемский мартель",
+      "name": "Махакамский мартель",
       "type": "weapon",
       "page": 83,
       "weight_kg": 3.5,
@@ -2481,7 +2485,7 @@
     },
     {
       "item_id": "item_6d82db782aabe22ad36d",
-      "name": "Эльфские ввинчивающиеся",
+      "name": "Эльфские ввинчивающиеся стрелы",
       "type": "weapon",
       "page": 84,
       "weight_kg": 0.1,
@@ -2489,7 +2493,8 @@
       "attributes": {
         "availability": "Уникальное",
         "damage_type": "колющий",
-        "concealment": "Крупное (под плащом)"
+        "concealment": "Крупное (под плащом)",
+        "reliability": 10
       },
       "effects": [
         "Кровопускающее (100 %). Чтобы извлечь наконечник из раны и остановить кровотечение, нужна проверка Первой помощи со СЛ 16."
@@ -2505,7 +2510,8 @@
       "attributes": {
         "availability": "Уникальное",
         "damage_type": "дробящий",
-        "concealment": "Крупное (под плащом)"
+        "concealment": "Крупное (под плащом)",
+        "reliability": 15
       },
       "effects": [
         "Разрушающее"
@@ -2513,7 +2519,7 @@
     },
     {
       "item_id": "item_e421f303955f0febc6fe",
-      "name": "Капюшон верденского лучника",
+      "name": "Капюшон вердэнского лучника",
       "type": "armor",
       "page": 79,
       "weight_kg": 0.5,
@@ -2900,7 +2906,7 @@
     },
     {
       "item_id": "item_16cd7482ecdd9ef4213d",
-      "name": "Хиндарсфьяльские тяжёлые штаны",
+      "name": "Хиндарсфьяльские тяжёлые шоссы",
       "type": "armor",
       "page": 80,
       "weight_kg": 5.0,
@@ -2990,7 +2996,7 @@
     },
     {
       "item_id": "item_010f8e54ccd4c3d0a3b6",
-      "name": "Кэдвенский щит",
+      "name": "Каэдвенский щит",
       "type": "armor",
       "page": 80,
       "weight_kg": 2.5,
@@ -3107,7 +3113,7 @@
     },
     {
       "item_id": "item_17411ca4f734ba75a3f7",
-      "name": "Броня скоя'таэлей",
+      "name": "Броня скоя’таэля",
       "type": "armor",
       "page": 84,
       "weight_kg": 12.0,
@@ -3144,7 +3150,7 @@
     },
     {
       "item_id": "item_b8c44c37e3d3d724806f",
-      "name": "Махакемские латы",
+      "name": "Махакамские латы",
       "type": "armor",
       "page": 84,
       "weight_kg": 30.0,
@@ -3192,7 +3198,7 @@
     },
     {
       "item_id": "item_a5f62af7a444e5a8770f",
-      "name": "Махакемская павеза",
+      "name": "Махакамская павеза",
       "type": "armor",
       "page": 84,
       "weight_kg": 5.5,
@@ -3406,7 +3412,7 @@
     },
     {
       "item_id": "item_ae53589ddcce1c2e9ab5",
-      "name": "Ярость Бредена",
+      "name": "Ярость Бредана",
       "type": "alchemical",
       "page": 87,
       "weight_kg": 0.5,
@@ -3438,7 +3444,7 @@
     },
     {
       "item_id": "item_be70f9a9f07ef034f398",
-      "name": "Кровосвертывающий порошок",
+      "name": "Кровосвёртывающий порошок",
       "type": "alchemical",
       "page": 87,
       "weight_kg": 0.1,
@@ -3455,7 +3461,7 @@
     },
     {
       "item_id": "item_d1c57a0a9a154038897a",
-      "name": "Фистех",
+      "name": "Фисштех",
       "type": "alchemical",
       "page": 87,
       "weight_kg": 0.1,
@@ -4454,7 +4460,8 @@
       "cost_crowns": 19,
       "attributes": {
         "equipment_category": "Контейнер",
-        "capacity": "До 25 кг мелких предметов; можно закрепить и более крупные вещи."
+        "capacity": "До 25 кг мелких предметов; можно закрепить и более крупные вещи.",
+        "capacity_kg": 25
       },
       "new": true
     },
@@ -4467,7 +4474,8 @@
       "cost_crowns": 10,
       "attributes": {
         "equipment_category": "Контейнер",
-        "capacity": "До 15 кг мелких предметов."
+        "capacity": "До 15 кг мелких предметов.",
+        "capacity_kg": 15
       },
       "new": true
     },
@@ -4480,7 +4488,8 @@
       "cost_crowns": 7,
       "attributes": {
         "equipment_category": "Контейнер",
-        "capacity": "До 5 кг."
+        "capacity": "До 5 кг.",
+        "capacity_kg": 5
       },
       "new": true
     },
@@ -4493,7 +4502,8 @@
       "cost_crowns": 3,
       "attributes": {
         "equipment_category": "Контейнер",
-        "capacity": "До 20 кг."
+        "capacity": "До 20 кг.",
+        "capacity_kg": 20
       },
       "new": true
     },
@@ -4506,7 +4516,8 @@
       "cost_crowns": 14,
       "attributes": {
         "equipment_category": "Контейнер",
-        "capacity": "До 30 кг."
+        "capacity": "До 30 кг.",
+        "capacity_kg": 30
       },
       "new": true
     },
@@ -4519,7 +4530,8 @@
       "cost_crowns": 11,
       "attributes": {
         "equipment_category": "Контейнер",
-        "capacity": "До 5 кг. Обнаружение требует проверки Внимания со СЛ 16."
+        "capacity": "До 5 кг. Обнаружение требует проверки Внимания со СЛ 16.",
+        "capacity_kg": 5
       },
       "new": true,
       "effects": [
@@ -4578,7 +4590,8 @@
       "cost_crowns": 18,
       "attributes": {
         "equipment_category": "Контейнер",
-        "capacity": "До 30 кг мелких предметов."
+        "capacity": "До 30 кг мелких предметов.",
+        "capacity_kg": 30
       },
       "new": true
     },
@@ -4591,7 +4604,8 @@
       "cost_crowns": 30,
       "attributes": {
         "equipment_category": "Контейнер",
-        "capacity": "До 50 кг крупных предметов."
+        "capacity": "До 50 кг крупных предметов.",
+        "capacity_kg": 50
       },
       "new": true
     },
@@ -4777,6 +4791,280 @@
         "equipment_category": "Одежда"
       },
       "new": true
+    },
+    {
+      "item_id": "item_9f84938c73d44650a4b268b5b3a93941",
+      "name": "Карета",
+      "type": "transport",
+      "page": 91,
+      "weight_kg": 600,
+      "cost_crowns": 660,
+      "attributes": {
+        "control_modifier": -1,
+        "speed": "Животного − 3",
+        "hit_points": 60
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_15fd70cf3ad04153801b0c5889de6fde",
+      "name": "Повозка",
+      "type": "transport",
+      "page": 91,
+      "weight_kg": 300,
+      "cost_crowns": 200,
+      "attributes": {
+        "control_modifier": 0,
+        "speed": "Животного − 1",
+        "hit_points": 30
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_8d91009cf2ae4191a1d7178ea9c89ef7",
+      "name": "Куттер",
+      "type": "transport",
+      "page": 91,
+      "weight_kg": 610,
+      "cost_crowns": 1670,
+      "attributes": {
+        "control_modifier": 0,
+        "speed": "10",
+        "hit_points": 60
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_84ce08b597d54e4da5dfbe8df7888504",
+      "name": "Лошадь",
+      "type": "transport",
+      "page": 91,
+      "weight_kg": 100,
+      "cost_crowns": 520,
+      "attributes": {
+        "control_modifier": 2,
+        "speed": "12",
+        "hit_points": 40,
+        "athletics_dex": 11
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_dd93c155b22049d79aab4f0c2f1001f6",
+      "name": "Мул",
+      "type": "transport",
+      "page": 91,
+      "weight_kg": 150,
+      "cost_crowns": 200,
+      "attributes": {
+        "control_modifier": 0,
+        "speed": "9",
+        "hit_points": 45,
+        "athletics_dex": 7
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_5d40bffa6b6548f29fe802feedb1c6b8",
+      "name": "Вол",
+      "type": "transport",
+      "page": 91,
+      "weight_kg": 300,
+      "cost_crowns": 278,
+      "attributes": {
+        "control_modifier": -2,
+        "speed": "6",
+        "hit_points": 50,
+        "athletics_dex": 5
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_633bdd33f0ef4a258d56b3d081fbdb3c",
+      "name": "Парусная лодка",
+      "type": "transport",
+      "page": 91,
+      "weight_kg": 130,
+      "cost_crowns": 230,
+      "attributes": {
+        "control_modifier": -1,
+        "speed": "6",
+        "hit_points": 30
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_63c27a772e0c4174b4e4817bcbcac542",
+      "name": "Парусный корабль",
+      "type": "transport",
+      "page": 91,
+      "weight_kg": 2040,
+      "cost_crowns": 2180,
+      "attributes": {
+        "control_modifier": -2,
+        "speed": "8",
+        "hit_points": 80
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_23cb3379c7ae40a3b1aabddaefe7d722",
+      "name": "Боевой конь",
+      "type": "transport",
+      "page": 91,
+      "weight_kg": 270,
+      "cost_crowns": 1600,
+      "attributes": {
+        "control_modifier": -2,
+        "speed": "11",
+        "hit_points": 50,
+        "athletics_dex": 12
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_bd574057b08f45f19724bbe596add01a",
+      "name": "Седло",
+      "type": "equipment",
+      "page": 91,
+      "weight_kg": 5,
+      "cost_crowns": 100,
+      "attributes": {
+        "equipment_category": "Сёдла",
+        "availability": "Повсеместное"
+      },
+      "new": true,
+      "effects": [
+        "Нет штрафов к Верховой езде."
+      ]
+    },
+    {
+      "item_id": "item_e59afd6689cb410997da81085fb9bb0c",
+      "name": "Кавалерийское седло",
+      "type": "equipment",
+      "page": 91,
+      "weight_kg": 6,
+      "cost_crowns": 325,
+      "attributes": {
+        "equipment_category": "Сёдла",
+        "availability": "Редкое"
+      },
+      "new": true,
+      "effects": [
+        "+1 к проверкам управления для атаки; встроенные ножны для оружия."
+      ]
+    },
+    {
+      "item_id": "item_b03188ea8e7f448cac05db8d30f9d6ef",
+      "name": "Скаковое седло",
+      "type": "equipment",
+      "page": 91,
+      "weight_kg": 3,
+      "cost_crowns": 200,
+      "attributes": {
+        "equipment_category": "Сёдла",
+        "availability": "Обычное"
+      },
+      "new": true,
+      "effects": [
+        "+1 к проверкам управления для Верховой езды; +1 к Скорости скакуна."
+      ]
+    },
+    {
+      "item_id": "item_e0c124afaf1f4fd4b3a91c69865fb7f7",
+      "name": "Шоры",
+      "type": "equipment",
+      "page": 91,
+      "weight_kg": 0.1,
+      "cost_crowns": 100,
+      "attributes": {
+        "equipment_category": "Шоры",
+        "availability": "Повсеместное"
+      },
+      "new": true,
+      "effects": [
+        "+1 к проверкам успокоения скакуна."
+      ]
+    },
+    {
+      "item_id": "item_98643548564244df89ab68f4c80500bd",
+      "name": "Скаковые шоры",
+      "type": "equipment",
+      "page": 91,
+      "weight_kg": 0.1,
+      "cost_crowns": 125,
+      "attributes": {
+        "equipment_category": "Шоры",
+        "availability": "Обычное"
+      },
+      "new": true,
+      "effects": [
+        "+2 к проверкам успокоения скакуна."
+      ]
+    },
+    {
+      "item_id": "item_120e1744272a4442b8406ddd3b31aae6",
+      "name": "Перемётная сума",
+      "type": "equipment",
+      "page": 91,
+      "weight_kg": 1.5,
+      "cost_crowns": 100,
+      "attributes": {
+        "equipment_category": "Перемётные сумы",
+        "availability": "Повсеместное",
+        "capacity_kg": 50
+      },
+      "new": true,
+      "description": "В каждом из двух отделений по 25 кг небольших или средних предметов."
+    },
+    {
+      "item_id": "item_f34d735f4d8b48e89b4a019898857fa8",
+      "name": "Военная перемётная сума",
+      "type": "equipment",
+      "page": 91,
+      "weight_kg": 2,
+      "cost_crowns": 150,
+      "attributes": {
+        "equipment_category": "Перемётные сумы",
+        "availability": "Редкое",
+        "capacity_kg": 100
+      },
+      "new": true,
+      "description": "В каждом из двух отделений по 50 кг небольших или средних предметов.",
+      "effects": [
+        "Снаружи есть крепления для 6 крупных предметов."
+      ]
+    },
+    {
+      "item_id": "item_6b510b6464ea499b8626313a178aa7ea",
+      "name": "Кожаные доспехи",
+      "type": "equipment",
+      "page": 91,
+      "weight_kg": 10,
+      "cost_crowns": 550,
+      "attributes": {
+        "equipment_category": "Конские доспехи",
+        "availability": "Редкое",
+        "reliability": 10
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_911d2cfe946b444f931bdada502e4abb",
+      "name": "Кольчужные доспехи",
+      "type": "equipment",
+      "page": 91,
+      "weight_kg": 25,
+      "cost_crowns": 1050,
+      "attributes": {
+        "equipment_category": "Конские доспехи",
+        "availability": "Уникальное",
+        "reliability": 15
+      },
+      "new": true,
+      "effects": [
+        "−1 к проверкам управления для Верховой езды."
+      ]
     }
   ]
 }
