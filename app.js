@@ -112,13 +112,20 @@
 
   function updateItemFilters() {
     const isIngredient = $("#item-type-filter").value === "ingredient";
+    const isEquipment = $("#item-type-filter").value === "equipment";
     const ingredients = items.filter(item => item.type === "ingredient");
     const availabilities = [...new Set(ingredients.map(item => item.details?.availability).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ru"));
     const groups = [...new Set(ingredients.map(item => item.details?.alchemy_group).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ru"));
+    const equipmentCategories = [...new Set(items.filter(item => item.type === "equipment")
+      .flatMap(item => item.attributes || [])
+      .filter(attribute => attribute.code === "equipment_category")
+      .map(attribute => attribute.value))].sort((a, b) => a.localeCompare(b, "ru"));
     setItemFilterOptions($("#item-availability-filter"), "Любая доступность", availabilities);
     setItemFilterOptions($("#item-group-filter"), "Любая группа", groups);
+    setItemFilterOptions($("#item-equipment-category-filter"), "Всё снаряжение", equipmentCategories);
     $("#item-availability-wrap").hidden = !isIngredient || availabilities.length < 2;
     $("#item-group-wrap").hidden = !isIngredient || groups.length < 2;
+    $("#item-equipment-category-wrap").hidden = !isEquipment || equipmentCategories.length < 2;
   }
 
   function renderItems() {
@@ -126,10 +133,12 @@
     const type = $("#item-type-filter").value;
     const availability = $("#item-availability-filter").value;
     const group = $("#item-group-filter").value;
+    const equipmentCategory = $("#item-equipment-category-filter").value;
     const visible = items.filter(item => {
       if (type && item.type !== type) return false;
       if (availability && item.details?.availability !== availability) return false;
       if (group && item.details?.alchemy_group !== group) return false;
+      if (equipmentCategory && !item.attributes?.some(attribute => attribute.code === "equipment_category" && attribute.value === equipmentCategory)) return false;
       const detailLabels = { where_found: "где найти", availability: "доступность", acquisition_method: "где найти", alchemy_group: "алхимическая группа", effect: "эффект", duration: "длительность", toxicity: "токсичность", application: "применение", notes: "примечание" };
       const searchable = normalize([
         item.name, item.typeLabel, item.description,
@@ -141,7 +150,7 @@
     });
     $("#item-list").innerHTML = visible.map(itemCard).join("");
     $("#item-empty").hidden = visible.length > 0;
-    $("#clear-item-filters").disabled = !$("#item-search").value && !type && !availability && !group;
+    $("#clear-item-filters").disabled = !$("#item-search").value && !type && !availability && !group && !equipmentCategory;
   }
 
   function resolveItemId(itemId) {
@@ -275,9 +284,11 @@
   $("#item-type-filter").addEventListener("change", () => { updateItemFilters(); renderItems(); });
   $("#item-availability-filter").addEventListener("change", renderItems);
   $("#item-group-filter").addEventListener("change", renderItems);
+  $("#item-equipment-category-filter").addEventListener("change", renderItems);
   $("#clear-item-filters").addEventListener("click", () => {
     $("#item-search").value = "";
     $("#item-type-filter").value = "";
+    $("#item-equipment-category-filter").value = "";
     updateItemFilters();
     renderItems();
     $("#item-search").focus();
