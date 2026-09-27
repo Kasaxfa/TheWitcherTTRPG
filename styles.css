@@ -190,7 +190,6 @@ kbd { padding: 1px 6px 2px; border: 1px solid var(--line); border-radius: 4px; c
 .inventory-search-option:hover, .inventory-search-option.active { background: var(--panel-soft); }
 .inventory-search-option strong { min-width: 0; font-weight: 600; }
 .inventory-search-option span { flex: 0 0 auto; color: var(--muted); font-size: 11px; }
-.inventory-search-help { min-height: 13px; color: var(--muted); font-size: 10px; font-weight: 400; }
 .add-button { height: 39px; min-height: 39px; white-space: nowrap; }
 .custom-item-details { margin: 11px 0 21px; padding: 0 2px; color: var(--muted); font-size: 11px; }
 .custom-item-details summary { width: fit-content; cursor: pointer; }

@@ -235,7 +235,7 @@
     if (!query) {
       inventoryMatches = [];
       closeInventorySuggestions();
-      $("#inventory-search-help").textContent = "Введите название и выберите предмет из подсказок.";
+      $("#inventory-search-help").textContent = "";
       return;
     }
     const terms = query.split(/\s+/);
@@ -426,7 +426,7 @@
     event.target.reset();
     selectedInventoryItemId = null;
     closeInventorySuggestions();
-    $("#inventory-search-help").textContent = "Введите название и выберите предмет из подсказок.";
+    $("#inventory-search-help").textContent = "";
     $("#inventory-quantity").value = "1";
     $("#inventory-unit-weight").value = "";
   });
