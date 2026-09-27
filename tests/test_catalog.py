@@ -34,12 +34,14 @@ class CatalogTests(unittest.TestCase):
         migrate_database(self.connection)
         validate_catalog(self.connection)
         self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM recipes").fetchone()[0], 147)
-        self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM recipe_ingredients").fetchone()[0], 715)
+        self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM recipe_ingredients").fetchone()[0], 718)
         self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM recipe_sources").fetchone()[0], 147)
         self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM ingredient_link_decisions").fetchone()[0], 54)
-        self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM item_field_sources").fetchone()[0], 846)
-        self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM items").fetchone()[0], 256)
-        self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM item_attributes").fetchone()[0], 739)
+        self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM item_field_sources").fetchone()[0], 1036)
+        self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM items").fetchone()[0], 350)
+        self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM item_attributes").fetchone()[0], 923)
+        self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM items WHERE item_type='equipment'").fetchone()[0], 85)
+        self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM items WHERE item_type='transport'").fetchone()[0], 9)
         self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM ingredient_details").fetchone()[0], 110)
         self.assertEqual(self.connection.execute("SELECT COUNT(*) FROM item_id_aliases").fetchone()[0], 4)
         self.assertEqual(self.connection.execute("""
@@ -67,7 +69,7 @@ class CatalogTests(unittest.TestCase):
     def test_export_contains_full_catalog_and_all_id_links(self):
         data = build_site_data(self.connection)
         validate_site_data(self.connection, data)
-        self.assertEqual(len(data["items"]), 256)
+        self.assertEqual(len(data["items"]), 350)
         self.assertEqual(len(data["recipes"]), 147)
         self.assertEqual(len(data["symbols"]), 9)
         self.assertEqual(len(data["itemIdAliases"]), 4)
@@ -108,7 +110,8 @@ class CatalogTests(unittest.TestCase):
             ("recipe_336d7a6dcefb41125754", 2): ("item_79dd0bd6bd427d246d46", 4),
             ("recipe_336d7a6dcefb41125754", 3): ("item_7b34ef808e8ceb056383", 6),
             ("recipe_336d7a6dcefb41125754", 5): ("item_3b050052261f116f3d6b", 4),
-            ("recipe_336d7a6dcefb41125754", 7): ("item_d1e0bda6bf59017a2b70", 4),
+            ("recipe_336d7a6dcefb41125754", 6): ("item_803aeb9e60ba3d98cce6", 2),
+            ("recipe_336d7a6dcefb41125754", 8): ("item_d1e0bda6bf59017a2b70", 4),
             ("recipe_4ea0890f82f99480622b", 5): ("item_3b050052261f116f3d6b", 5),
             ("recipe_bb3fbf1f580f7aeff5cb", 6): ("item_3b050052261f116f3d6b", 4),
             ("recipe_d9358589b9535eca01e2", 3): ("item_79dd0bd6bd427d246d46", 3),
@@ -139,6 +142,56 @@ class CatalogTests(unittest.TestCase):
             SELECT page_number FROM recipe_sources WHERE recipe_id='recipe_bb3fbf1f580f7aeff5cb'
         """).fetchall()]
         self.assertEqual(sources, [133])
+
+    def test_component_tables_125_to_147_preserve_identity_and_ingredients(self):
+        expected_names = {
+            "item_750e7ca248c20931af6b": "Двимерит",
+            "item_8fc9d1da3476bea64e22": "Махакамский двимерит",
+            "item_d747d12d6dec4318743c": "Махакамская сталь",
+            "item_639060dfddf5da8869e4": "Третогорская сталь",
+            "item_74e9b1c64311635ec1de": "Самоцветы",
+        }
+        for item_id, name in expected_names.items():
+            self.assertEqual(self.connection.execute(
+                "SELECT name FROM items WHERE item_id=?", (item_id,)
+            ).fetchone()[0], name)
+        self.assertEqual(self.connection.execute("""
+            SELECT where_found FROM ingredient_details WHERE item_id='item_6282540f5cf5a0f9692d'
+        """).fetchone()[0], "Костёр и сгоревшие предметы")
+        self.assertEqual(tuple(self.connection.execute("""
+            SELECT item_type, weight_kg, cost_crowns FROM items WHERE item_id='item_168a2bcfd9fac25bc7b9'
+        """).fetchone()), ("material", 3, 48))
+        self.assertEqual(tuple(self.connection.execute("""
+            SELECT item_type, weight_kg, cost_crowns FROM items WHERE item_id='item_748971ecfcbcf43630fc'
+        """).fetchone()), ("armor", 1.5, 130))
+        corrections = {
+            ("recipe_f1d0abf19c44817d301a", 2): ("Тёмная сталь", 1),
+            ("recipe_4ea0890f82f99480622b", 7): ("Кости животных", 2),
+            ("recipe_8546ba9e73b22d4f7913", 2): ("Тёмная сталь", 4),
+            ("recipe_810065109a57b27591c7", 3): ("Двойное полотно", 3),
+            ("recipe_336d7a6dcefb41125754", 6): ("Эфирная смазка", 2),
+            ("recipe_4907fda1e928930f0335", 2): ("Пепел", 10),
+            ("recipe_4907fda1e928930f0335", 6): ("Масло", 4),
+            ("recipe_848e9a2280b710f23b3f", 7): ("Пепел", 10),
+            ("recipe_77a8158473261b09d03a", 7): ("Пепел", 10),
+            ("recipe_f0ac68b423358532fe54", 4): ("Эфирная смазка", 1),
+            ("recipe_a91df62f23e653b8aae3", 2): ("Укреплённая кожа", 1),
+            ("recipe_9ff56667eba3a5a5cb2e", 3): ("Укреплённая кожа", 1),
+            ("recipe_657deaf4c1d70021e808", 2): ("Пепел", 4),
+            ("recipe_25fa64ceb20b52dbc7a0", 5): ("Пепел", 11),
+        }
+        for (recipe_id, line_number), (name, qty) in corrections.items():
+            actual = self.connection.execute("""
+                SELECT i.name, ri.quantity FROM recipe_ingredients ri JOIN items i USING(item_id)
+                WHERE ri.recipe_id=? AND ri.line_number=?
+            """, (recipe_id, line_number)).fetchone()
+            self.assertEqual(tuple(actual), (name, qty), (recipe_id, line_number))
+        self.assertEqual(self.connection.execute("""
+            SELECT COUNT(*) FROM recipe_ingredients WHERE recipe_id='recipe_b07dc0af486fd17b0a49'
+        """).fetchone()[0], 8)
+        self.assertEqual(self.connection.execute("""
+            SELECT recipe_id FROM recipes WHERE title='Двимерит'
+        """).fetchone()[0], "recipe_bfad51784d42aff4c903")
 
     def test_source_names_keep_their_ids_and_printed_spelling(self):
         data = build_site_data(self.connection)
@@ -212,6 +265,57 @@ class CatalogTests(unittest.TestCase):
         self.assertEqual(by_name["Стилет"]["concealment"], "Маленькое (в кармане)")
         self.assertEqual(by_name["Эльфская глефа"]["damage_type"], "рубящий, колющий, дробящий")
 
+    def test_standard_equipment_catalog_includes_rules_and_inventory_data(self):
+        items = [item for item in build_site_data(self.connection)["items"] if item["type"] == "equipment"]
+        self.assertEqual(len(items), 85)
+        by_name = {item["name"]: item for item in items}
+        dice = by_name["Шулерские кости"]
+        self.assertEqual((dice["weightKg"], dice["costCrowns"]), (0.1, 12))
+        self.assertIn("+3", dice["effects"][0]["text"])
+        self.assertIn("СЛ 16", dice["effects"][0]["text"])
+        disguise = by_name["Набор для маскировки"]
+        disguise_attributes = {attribute["code"]: attribute["value"] for attribute in disguise["attributes"]}
+        self.assertEqual(disguise_attributes["equipment_category"], "Набор инструментов")
+        self.assertEqual(disguise_attributes["availability"], "Редкое")
+        self.assertIn("+2", disguise["effects"][0]["text"])
+        capacity = {attribute["code"]: attribute["value"] for attribute in by_name["Мешок"]["attributes"]}
+        self.assertEqual(capacity["capacity"], "До 20 кг.")
+        self.assertEqual({
+            attribute["value"] for item in items for attribute in item["attributes"]
+            if attribute["code"] == "equipment_category"
+        }, {"Набор инструментов", "Снаряжение", "Контейнер", "Еда и напитки", "Одежда", "Сёдла", "Шоры", "Перемётные сумы", "Конские доспехи"})
+        source_page = self.connection.execute("""
+            SELECT source_page FROM item_effects e JOIN items i USING(item_id)
+            WHERE i.name='Шулерские кости'
+        """).fetchone()[0]
+        self.assertEqual(source_page, 93)
+
+    def test_transport_and_tack_match_printed_table_without_changing_recipe_ids(self):
+        data = build_site_data(self.connection)
+        by_name = {item["name"]: item for item in data["items"]}
+        transports = [item for item in data["items"] if item["type"] == "transport"]
+        self.assertEqual(len(transports), 9)
+        ship = by_name["Парусный корабль"]
+        self.assertEqual((ship["weightKg"], ship["costCrowns"]), (2040, 2180))
+        self.assertEqual({a["code"]: a["value"] for a in ship["attributes"]}["hit_points"], 80)
+        saddlebag = by_name["Военная перемётная сума"]
+        self.assertEqual((saddlebag["weightKg"], saddlebag["costCrowns"]), (2, 150))
+        self.assertEqual({a["code"]: a["value"] for a in saddlebag["attributes"]}["capacity_kg"], 100)
+        self.assertEqual({a["code"]: a["value"] for a in by_name["Кольчужные доспехи"]["attributes"]}["reliability"], 15)
+        for name in ("Карета", "Повозка", "Куттер", "Лошадь", "Мул", "Вол", "Парусная лодка", "Парусный корабль", "Боевой конь",
+                     "Седло", "Кавалерийское седло", "Скаковое седло", "Шоры", "Скаковые шоры", "Перемётная сума", "Военная перемётная сума", "Кожаные доспехи", "Кольчужные доспехи"):
+            self.assertIn(name, by_name)
+        for name in ("Седло", "Лошадь"):
+            self.assertEqual(self.connection.execute("SELECT page_number FROM item_sources WHERE item_id=?", (by_name[name]["id"],)).fetchone()[0], 91)
+        sword = by_name["Клинок из Виковаро"]
+        self.assertEqual(sword["id"], "item_ee837e2daed9957715c3")
+        self.assertEqual(sword["weightKg"], 1.5)
+        self.assertEqual({a["code"]: a["value"] for a in sword["attributes"]}["damage"], "5d6+4")
+        self.assertEqual({a["code"]: a["value"] for a in sword["attributes"]}["enhancement_slots"], 1)
+        self.assertEqual(self.connection.execute("SELECT recipe_id FROM recipes WHERE title='Клинок из Виковаро'").fetchone()[0], "recipe_8546ba9e73b22d4f7913")
+        for name in ("Боеприпасы стандартные", "Боеприпасы с затупленным наконечником", "Боеприпасы с широким наконечником", "Боеприпасы бронебойные", "Эльфские ввинчивающиеся стрелы", "Краснолюдские пробивные"):
+            self.assertIn("reliability", {a["code"] for a in by_name[name]["attributes"]})
+
     def test_armor_cards_include_source_effects_and_coverage(self):
         items = {item["id"]: item for item in build_site_data(self.connection)["items"]}
         pavise = items["item_5f91a8ddc7abffa50de9"]
@@ -252,7 +356,7 @@ class CatalogTests(unittest.TestCase):
         expected = {
             "Могила Адды": "Эфир Эфир Гидраген Киноварь",
             "Щелочной порошок": "Киноварь Квебрит",
-            "Кровосвертывающий порошок": "Эфир Ребис",
+            "Кровосвёртывающий порошок": "Эфир Ребис",
             "Галлюциноген": "Купорос Ребис",
             "Невидимые чернила": "Квебрит Эфир",
             "Обезболивающие травы": "Квебрит Киноварь",
@@ -266,8 +370,8 @@ class CatalogTests(unittest.TestCase):
             "Чёрный яд": "Квебрит Квебрит Эфир Эфир Ребис",
             "Хлороформ": "Квебрит Квебрит Киноварь Киноварь Эфир Купорос",
             "Быстрый огонь": "Квебрит Ребис Ребис Аер Купорос Киноварь",
-            "Ярость Бредена": "Солнце Солнце Солнце Фульгор Фульгор Фульгор Аер Киноварь",
-            "Фистех": "Ребис Ребис Ребис Гидраген Гидраген Купорос Купорос Киноварь",
+            "Ярость Бредана": "Солнце Солнце Солнце Фульгор Фульгор Фульгор Аер Киноварь",
+            "Фисштех": "Ребис Ребис Ребис Гидраген Гидраген Купорос Купорос Киноварь",
             "Эликсир Пантаграна": "Киноварь Киноварь Эфир Эфир Аер Солнце Фульгор",
             "Ароматное зелье": "Квебрит Квебрит Эфир Купорос Купорос Киноварь Гидраген Гидраген",
             "Слёзы Тальгара": "Гидраген Гидраген Гидраген Эфир Эфир Киноварь Купорос Купорос",

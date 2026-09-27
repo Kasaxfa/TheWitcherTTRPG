@@ -8,7 +8,7 @@
       "page": 128,
       "weight_kg": 0.1,
       "cost_crowns": 1,
-      "where_found": "Костёр и старые предметы",
+      "where_found": "Костёр и сгоревшие предметы",
       "availability": "Повсеместное"
     },
     {
@@ -18,7 +18,7 @@
       "page": 128,
       "weight_kg": 0.1,
       "cost_crowns": 1,
-      "where_found": "Костёр, горы и подземелья",
+      "where_found": "Костёр, горы или под землёй",
       "availability": "Обычное"
     },
     {
@@ -312,7 +312,7 @@
       "page": 129,
       "weight_kg": 1.5,
       "cost_crowns": 52,
-      "where_found": "Горы и подземелья",
+      "where_found": "Горы и под землёй",
       "availability": "Уникальное"
     },
     {
@@ -329,7 +329,7 @@
     },
     {
       "item_id": "item_750e7ca248c20931af6b",
-      "name": "Диммерит",
+      "name": "Двимерит",
       "type": "material",
       "page": 129,
       "weight_kg": 1.0,
@@ -341,12 +341,12 @@
     },
     {
       "item_id": "item_74e9b1c64311635ec1de",
-      "name": "Самоцвет",
+      "name": "Самоцветы",
       "type": "ingredient",
       "page": 129,
       "weight_kg": 0.1,
       "cost_crowns": 100,
-      "where_found": "Горы и подземелья",
+      "where_found": "Горы и под землёй",
       "availability": "Уникальное"
     },
     {
@@ -356,7 +356,7 @@
       "page": 129,
       "weight_kg": 1.0,
       "cost_crowns": 80,
-      "where_found": "Горы и подземелья",
+      "where_found": "Горы и под землёй",
       "availability": "Уникальное"
     },
     {
@@ -366,7 +366,7 @@
       "page": 129,
       "weight_kg": 1.0,
       "cost_crowns": 85,
-      "where_found": "Горы и подземелья",
+      "where_found": "Горы и под землёй",
       "availability": "Уникальное"
     },
     {
@@ -376,12 +376,12 @@
       "page": 129,
       "weight_kg": 1.5,
       "cost_crowns": 30,
-      "where_found": "Горы и подземелья",
+      "where_found": "Горы и под землёй",
       "availability": "Редкое"
     },
     {
       "item_id": "item_8fc9d1da3476bea64e22",
-      "name": "Махакемский диммерит",
+      "name": "Махакамский двимерит",
       "type": "material",
       "page": 129,
       "weight_kg": 1.0,
@@ -393,7 +393,7 @@
     },
     {
       "item_id": "item_d747d12d6dec4318743c",
-      "name": "Махакемская сталь",
+      "name": "Махакамская сталь",
       "type": "material",
       "page": 129,
       "weight_kg": 1.0,
@@ -410,7 +410,7 @@
       "page": 129,
       "weight_kg": 1.0,
       "cost_crowns": 98,
-      "where_found": "Место падения на поверхности земли",
+      "where_found": "Где угодно на поверхности земли",
       "availability": "Уникальное"
     },
     {
@@ -437,7 +437,7 @@
     },
     {
       "item_id": "item_639060dfddf5da8869e4",
-      "name": "Терегорская сталь",
+      "name": "Третогорская сталь",
       "type": "material",
       "page": 129,
       "weight_kg": 1.0,
@@ -1465,18 +1465,18 @@
     },
     {
       "item_id": "item_ee837e2daed9957715c3",
-      "name": "Клинок из Викваро",
+      "name": "Клинок из Виковаро",
       "type": "weapon",
       "page": 73,
-      "weight_kg": 2.0,
+      "weight_kg": 1.5,
       "cost_crowns": 955,
       "attributes": {
         "availability": "Уникальное",
-        "damage": "6d6+4",
+        "damage": "5d6+4",
         "accuracy": "+0",
         "reliability": 15,
         "hands": 2,
-        "enhancement_slots": 2,
+        "enhancement_slots": 1,
         "damage_type": "рубящий, колющий",
         "concealment": "Не спрятать под одеждой"
       },
@@ -1567,7 +1567,7 @@
     },
     {
       "item_id": "item_45a08ea4b3f20f66cbae",
-      "name": "Джамия",
+      "name": "Джамбия",
       "type": "weapon",
       "page": 73,
       "weight_kg": 0.5,
@@ -2040,7 +2040,8 @@
       "attributes": {
         "availability": "Повсеместное",
         "damage_type": "колющий",
-        "concealment": "Крупное (под плащом)"
+        "concealment": "Крупное (под плащом)",
+        "reliability": 10
       }
     },
     {
@@ -2053,7 +2054,8 @@
       "attributes": {
         "availability": "Обычное",
         "damage_type": "дробящий",
-        "concealment": "Крупное (под плащом)"
+        "concealment": "Крупное (под плащом)",
+        "reliability": 10
       },
       "effects": [
         "Несмертельное"
@@ -2069,7 +2071,8 @@
       "attributes": {
         "availability": "Обычное",
         "damage_type": "колющий",
-        "concealment": "Крупное (под плащом)"
+        "concealment": "Крупное (под плащом)",
+        "reliability": 10
       },
       "effects": [
         "Кровопускающее (100 %)"
@@ -2085,7 +2088,8 @@
       "attributes": {
         "availability": "Обычное",
         "damage_type": "колющий",
-        "concealment": "Крупное (под плащом)"
+        "concealment": "Крупное (под плащом)",
+        "reliability": 10
       },
       "effects": [
         "Пробивающее броню"
@@ -2111,7 +2115,7 @@
     },
     {
       "item_id": "item_09dd41c61be9dbf82437",
-      "name": "Клинок бригады «Врихед»",
+      "name": "Клинок бригады «Врихедд»",
       "type": "weapon",
       "page": 83,
       "weight_kg": 2.5,
@@ -2216,7 +2220,7 @@
     },
     {
       "item_id": "item_4e8420c10fd69bfc4451",
-      "name": "Краснолюдский тесак",
+      "name": "Краснолюдский секач",
       "type": "weapon",
       "page": 83,
       "weight_kg": 1.5,
@@ -2270,7 +2274,7 @@
     },
     {
       "item_id": "item_2ce91c1d348060d35dac",
-      "name": "Махакемский мартель",
+      "name": "Махакамский мартель",
       "type": "weapon",
       "page": 83,
       "weight_kg": 3.5,
@@ -2481,7 +2485,7 @@
     },
     {
       "item_id": "item_6d82db782aabe22ad36d",
-      "name": "Эльфские ввинчивающиеся",
+      "name": "Эльфские ввинчивающиеся стрелы",
       "type": "weapon",
       "page": 84,
       "weight_kg": 0.1,
@@ -2489,7 +2493,8 @@
       "attributes": {
         "availability": "Уникальное",
         "damage_type": "колющий",
-        "concealment": "Крупное (под плащом)"
+        "concealment": "Крупное (под плащом)",
+        "reliability": 10
       },
       "effects": [
         "Кровопускающее (100 %). Чтобы извлечь наконечник из раны и остановить кровотечение, нужна проверка Первой помощи со СЛ 16."
@@ -2505,7 +2510,8 @@
       "attributes": {
         "availability": "Уникальное",
         "damage_type": "дробящий",
-        "concealment": "Крупное (под плащом)"
+        "concealment": "Крупное (под плащом)",
+        "reliability": 15
       },
       "effects": [
         "Разрушающее"
@@ -2513,7 +2519,7 @@
     },
     {
       "item_id": "item_e421f303955f0febc6fe",
-      "name": "Капюшон верденского лучника",
+      "name": "Капюшон вердэнского лучника",
       "type": "armor",
       "page": 79,
       "weight_kg": 0.5,
@@ -2900,7 +2906,7 @@
     },
     {
       "item_id": "item_16cd7482ecdd9ef4213d",
-      "name": "Хиндарсфьяльские тяжёлые штаны",
+      "name": "Хиндарсфьяльские тяжёлые шоссы",
       "type": "armor",
       "page": 80,
       "weight_kg": 5.0,
@@ -2990,7 +2996,7 @@
     },
     {
       "item_id": "item_010f8e54ccd4c3d0a3b6",
-      "name": "Кэдвенский щит",
+      "name": "Каэдвенский щит",
       "type": "armor",
       "page": 80,
       "weight_kg": 2.5,
@@ -3107,7 +3113,7 @@
     },
     {
       "item_id": "item_17411ca4f734ba75a3f7",
-      "name": "Броня скоя'таэлей",
+      "name": "Броня скоя’таэля",
       "type": "armor",
       "page": 84,
       "weight_kg": 12.0,
@@ -3144,7 +3150,7 @@
     },
     {
       "item_id": "item_b8c44c37e3d3d724806f",
-      "name": "Махакемские латы",
+      "name": "Махакамские латы",
       "type": "armor",
       "page": 84,
       "weight_kg": 30.0,
@@ -3192,7 +3198,7 @@
     },
     {
       "item_id": "item_a5f62af7a444e5a8770f",
-      "name": "Махакемская павеза",
+      "name": "Махакамская павеза",
       "type": "armor",
       "page": 84,
       "weight_kg": 5.5,
@@ -3406,7 +3412,7 @@
     },
     {
       "item_id": "item_ae53589ddcce1c2e9ab5",
-      "name": "Ярость Бредена",
+      "name": "Ярость Бредана",
       "type": "alchemical",
       "page": 87,
       "weight_kg": 0.5,
@@ -3438,7 +3444,7 @@
     },
     {
       "item_id": "item_be70f9a9f07ef034f398",
-      "name": "Кровосвертывающий порошок",
+      "name": "Кровосвёртывающий порошок",
       "type": "alchemical",
       "page": 87,
       "weight_kg": 0.1,
@@ -3455,7 +3461,7 @@
     },
     {
       "item_id": "item_d1c57a0a9a154038897a",
-      "name": "Фистех",
+      "name": "Фисштех",
       "type": "alchemical",
       "page": 87,
       "weight_kg": 0.1,
@@ -3725,6 +3731,1340 @@
       "cost_crowns": 30,
       "where_found": "Горы или под землёй",
       "availability": "Редкое"
+    },
+    {
+      "item_id": "item_d332c9907a9048219479",
+      "name": "Инструменты алхимика",
+      "type": "equipment",
+      "page": 92,
+      "weight_kg": 3,
+      "cost_crowns": 80,
+      "attributes": {
+        "equipment_category": "Набор инструментов",
+        "availability": "Редкое",
+        "concealment": "Крупное (под плащом)"
+      },
+      "new": true,
+      "effects": [
+        "Позволяют изготавливать алхимические смеси."
+      ]
+    },
+    {
+      "item_id": "item_db895e04e3a441e796cc",
+      "name": "Амулет с самоцветом",
+      "type": "equipment",
+      "page": 92,
+      "weight_kg": 0.1,
+      "cost_crowns": 500,
+      "attributes": {
+        "equipment_category": "Набор инструментов",
+        "availability": "Уникальное",
+        "concealment": "Маленькое (в кармане)"
+      },
+      "new": true,
+      "effects": [
+        "Фокусирующий амулет (3)."
+      ]
+    },
+    {
+      "item_id": "item_a578b7dc4c3541aa8467",
+      "name": "Простой амулет",
+      "type": "equipment",
+      "page": 92,
+      "weight_kg": 0.1,
+      "cost_crowns": 250,
+      "attributes": {
+        "equipment_category": "Набор инструментов",
+        "availability": "Уникальное",
+        "concealment": "Маленькое (в кармане)"
+      },
+      "new": true,
+      "effects": [
+        "Фокусирующий амулет (1)."
+      ]
+    },
+    {
+      "item_id": "item_9e32408bbfa64f61bb20",
+      "name": "Принадлежности для готовки",
+      "type": "equipment",
+      "page": 92,
+      "weight_kg": 3,
+      "cost_crowns": 15,
+      "attributes": {
+        "equipment_category": "Набор инструментов",
+        "availability": "Повсеместное",
+        "concealment": "Крупное (под плащом)"
+      },
+      "new": true,
+      "effects": [
+        "Позволяют готовить пищу."
+      ]
+    },
+    {
+      "item_id": "item_2c5bd03ba35945c1b9f4",
+      "name": "Инструменты ремесленника",
+      "type": "equipment",
+      "page": 92,
+      "weight_kg": 5,
+      "cost_crowns": 83,
+      "attributes": {
+        "equipment_category": "Набор инструментов",
+        "availability": "Обычное",
+        "concealment": "Крупное (под плащом)"
+      },
+      "new": true,
+      "effects": [
+        "Позволяют изготавливать оружие и броню."
+      ]
+    },
+    {
+      "item_id": "item_b7d759adae5741388767",
+      "name": "Набор для маскировки",
+      "type": "equipment",
+      "page": 92,
+      "weight_kg": 1,
+      "cost_crowns": 58,
+      "attributes": {
+        "equipment_category": "Набор инструментов",
+        "availability": "Редкое",
+        "concealment": "Небольшое (под курткой)"
+      },
+      "new": true,
+      "effects": [
+        "Даёт +2 к проверкам Маскировки."
+      ]
+    },
+    {
+      "item_id": "item_86c96d8bae524a8fab76",
+      "name": "Инструменты для творчества",
+      "type": "equipment",
+      "page": 92,
+      "weight_kg": 2,
+      "cost_crowns": 55,
+      "attributes": {
+        "equipment_category": "Набор инструментов",
+        "availability": "Обычное",
+        "concealment": "Небольшое (под курткой)"
+      },
+      "new": true,
+      "effects": [
+        "Позволяют создавать произведения искусства."
+      ]
+    },
+    {
+      "item_id": "item_f31d96c16d3a442a8a05",
+      "name": "Рыболовные снасти",
+      "type": "equipment",
+      "page": 92,
+      "weight_kg": 0.5,
+      "cost_crowns": 27,
+      "attributes": {
+        "equipment_category": "Набор инструментов",
+        "availability": "Повсеместное",
+        "concealment": "Маленькое (в кармане)"
+      },
+      "new": true,
+      "effects": [
+        "Даёт +2 к проверкам Выживания при ловле рыбы."
+      ]
+    },
+    {
+      "item_id": "item_7fbb5eb80f17421f9681",
+      "name": "Инструменты для подделки",
+      "type": "equipment",
+      "page": 92,
+      "weight_kg": 0.5,
+      "cost_crowns": 58,
+      "attributes": {
+        "equipment_category": "Набор инструментов",
+        "availability": "Редкое",
+        "concealment": "Небольшое (под курткой)"
+      },
+      "new": true,
+      "effects": [
+        "Позволяют подделывать монеты и документы."
+      ]
+    },
+    {
+      "item_id": "item_6ac9be7169f745ba941f",
+      "name": "Набор для макияжа",
+      "type": "equipment",
+      "page": 92,
+      "weight_kg": 0.5,
+      "cost_crowns": 35,
+      "attributes": {
+        "equipment_category": "Набор инструментов",
+        "availability": "Повсеместное",
+        "concealment": "Маленькое (в кармане)"
+      },
+      "new": true,
+      "effects": [
+        "Даёт +2 к проверкам Соблазнения и Харизмы."
+      ]
+    },
+    {
+      "item_id": "item_03ae5dd1f02141ecbc5c",
+      "name": "Инструменты торговца",
+      "type": "equipment",
+      "page": 92,
+      "weight_kg": 1.5,
+      "cost_crowns": 60,
+      "attributes": {
+        "equipment_category": "Набор инструментов",
+        "availability": "Обычное",
+        "concealment": "Небольшое (под курткой)"
+      },
+      "new": true,
+      "effects": [
+        "Даёт +2 к проверкам Торговли при оценке предметов."
+      ]
+    },
+    {
+      "item_id": "item_ac244d076a50497db6db",
+      "name": "Хирургические инструменты",
+      "type": "equipment",
+      "page": 92,
+      "weight_kg": 1,
+      "cost_crowns": 83,
+      "attributes": {
+        "equipment_category": "Набор инструментов",
+        "availability": "Обычное",
+        "concealment": "Небольшое (под курткой)"
+      },
+      "new": true,
+      "effects": [
+        "Позволяют проводить хирургические операции."
+      ]
+    },
+    {
+      "item_id": "item_63cea23a3c2c4e6fa157",
+      "name": "Телекоммуникатор",
+      "type": "equipment",
+      "page": 92,
+      "weight_kg": 4,
+      "cost_crowns": 1000,
+      "attributes": {
+        "equipment_category": "Набор инструментов",
+        "availability": "Уникальное",
+        "concealment": "Крупное (под плащом)"
+      },
+      "new": true,
+      "effects": [
+        "Позволяет общаться с помощью ритуала «Телекоммуникация»."
+      ]
+    },
+    {
+      "item_id": "item_40f807521a6f47938d02",
+      "name": "Воровские инструменты",
+      "type": "equipment",
+      "page": 92,
+      "weight_kg": 1,
+      "cost_crowns": 80,
+      "attributes": {
+        "equipment_category": "Набор инструментов",
+        "availability": "Повсеместное",
+        "concealment": "Маленькое (в кармане)"
+      },
+      "new": true,
+      "effects": [
+        "Позволяют вскрывать замки."
+      ]
+    },
+    {
+      "item_id": "item_0cb7ecdcef2e4bd4a919",
+      "name": "Походная кузница",
+      "type": "equipment",
+      "page": 92,
+      "weight_kg": 5,
+      "cost_crowns": 111,
+      "attributes": {
+        "equipment_category": "Набор инструментов",
+        "availability": "Повсеместное",
+        "concealment": "Крупное (под плащом)"
+      },
+      "new": true,
+      "effects": [
+        "Позволяет ковать оружие и броню в полевых условиях."
+      ]
+    },
+    {
+      "item_id": "item_ca8fa23e6da648788349",
+      "name": "Письменные принадлежности",
+      "type": "equipment",
+      "page": 92,
+      "weight_kg": 1,
+      "cost_crowns": 25,
+      "attributes": {
+        "equipment_category": "Набор инструментов",
+        "availability": "Повсеместное",
+        "concealment": "Небольшое (под курткой)"
+      },
+      "new": true,
+      "effects": [
+        "Позволяют писать письма и заметки."
+      ]
+    },
+    {
+      "item_id": "item_ae2a1d6e584e41a4bed2",
+      "name": "Верёвка (20 метров)",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 1.5,
+      "cost_crowns": 20,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true,
+      "effects": [
+        "Используется для лазания и страховки."
+      ]
+    },
+    {
+      "item_id": "item_4da60b0f061f4c8ea87d",
+      "name": "Доска для покера на костях",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 0.5,
+      "cost_crowns": 25,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true,
+      "effects": [
+        "Стандартная доска для игры в кости с кубком и десятью костями."
+      ]
+    },
+    {
+      "item_id": "item_7d8dccee129d4b16930d",
+      "name": "Походная постель",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 1.5,
+      "cost_crowns": 16,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_25df1f59a3e94ace8748",
+      "name": "Свечи (×5)",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 0.5,
+      "cost_crowns": 5,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true,
+      "effects": [
+        "Даёт +1 к освещению в радиусе 2 м; ветер может погасить пламя."
+      ]
+    },
+    {
+      "item_id": "item_70dda414725444dd9958",
+      "name": "Мелок",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 0.1,
+      "cost_crowns": 2,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_904c91a6607b46f69f6a",
+      "name": "Огниво",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 0.1,
+      "cost_crowns": 6,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_4ddb96190f244548b23c",
+      "name": "Крюк-кошка",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 0.5,
+      "cost_crowns": 13,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true,
+      "effects": [
+        "Даёт +2 к проверкам Лазания."
+      ]
+    },
+    {
+      "item_id": "item_3ac613553aa0492bbc6e",
+      "name": "Колода для гвинта",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 0.1,
+      "cost_crowns": 5,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_b44c24cb143e4f048f70",
+      "name": "Ручное зеркальце",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 0.5,
+      "cost_crowns": 27,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_556058111ae0478fa369",
+      "name": "Священный символ",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 0.1,
+      "cost_crowns": 14,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_a87884ff41ff477d83ca",
+      "name": "Песочные часы (час)",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 1,
+      "cost_crowns": 38,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_0e2af84781bb4aa9a323",
+      "name": "Песочные часы (минута)",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 0.1,
+      "cost_crowns": 18,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_0088b919acf44a98b1b0",
+      "name": "Музыкальный инструмент",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 1,
+      "cost_crowns": 38,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_137043829d9348d6b626",
+      "name": "Дневник/гроссбух",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 0.5,
+      "cost_crowns": 8,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_fe26eb9932fd480c9f14",
+      "name": "Фонарь",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 1,
+      "cost_crowns": 33,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true,
+      "effects": [
+        "Даёт +2 к освещению в радиусе 3 м."
+      ]
+    },
+    {
+      "item_id": "item_1563b163d4064e029617",
+      "name": "Фонарь «бычий глаз»",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 1,
+      "cost_crowns": 39,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true,
+      "effects": [
+        "Даёт +3 к освещению в конусе длиной 5 м."
+      ]
+    },
+    {
+      "item_id": "item_4c21db456e734c9c891e",
+      "name": "Шулерские кости",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 0.1,
+      "cost_crowns": 12,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true,
+      "effects": [
+        "Даёт +3 к проверкам азартных игр. Обман можно заметить проверкой Внимания со СЛ 16."
+      ]
+    },
+    {
+      "item_id": "item_0c2244d8a0e642ee836e",
+      "name": "Замок",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 0.1,
+      "cost_crowns": 34,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true,
+      "effects": [
+        "Вскрытие требует проверку Взлома со СЛ 15."
+      ]
+    },
+    {
+      "item_id": "item_66d92855a82b4b2cb761",
+      "name": "Надёжный замок",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 0.1,
+      "cost_crowns": 68,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true,
+      "effects": [
+        "Вскрытие требует проверку Взлома со СЛ 18."
+      ]
+    },
+    {
+      "item_id": "item_9aa6a0a06a6a4e66a2af",
+      "name": "Наручники",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 0.5,
+      "cost_crowns": 30,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true,
+      "effects": [
+        "Освободиться можно проверкой Взлома со СЛ 16 или проверкой Силы со СЛ 18."
+      ]
+    },
+    {
+      "item_id": "item_066c025d907447f0a988",
+      "name": "Карта Континента",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 0.1,
+      "cost_crowns": 18,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true,
+      "effects": [
+        "Даёт +3 к проверкам Навигации; применимость зависит от региона."
+      ]
+    },
+    {
+      "item_id": "item_7110e21a5faf4556a983",
+      "name": "Духи/одеколон",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 0.1,
+      "cost_crowns": 22,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_9f7a7f849b5b49d0b8c7",
+      "name": "Трубка",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 0.1,
+      "cost_crowns": 19,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_b81233a773b745799342",
+      "name": "Колышки (×5)",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 0.5,
+      "cost_crowns": 10,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true,
+      "effects": [
+        "Можно использовать как колышки для верёвки или как импровизированное оружие (1к6 урона)."
+      ]
+    },
+    {
+      "item_id": "item_6d9998cb617a4e858fe9",
+      "name": "Простой протез",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 1,
+      "cost_crowns": 50,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_f9e23953d18c47c98a7d",
+      "name": "Качественный протез",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 1.5,
+      "cost_crowns": 100,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_cc00ecf9bccb495283bf",
+      "name": "Кандалы",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 2,
+      "cost_crowns": 50,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true,
+      "effects": [
+        "Освободиться можно проверкой Взлома со СЛ 20 или проверкой Силы со СЛ 22."
+      ]
+    },
+    {
+      "item_id": "item_e3796eb30cd545e8aeb6",
+      "name": "Мыло",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 0.1,
+      "cost_crowns": 4,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_4518ce8de5744f70b8ec",
+      "name": "Брезент",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 1.5,
+      "cost_crowns": 10,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_b366e902fb884f89b9bc",
+      "name": "Палатка",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 4,
+      "cost_crowns": 19,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_1efa73d3929d4a7294b2",
+      "name": "Большая палатка",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 8,
+      "cost_crowns": 36,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_0526e72d663d479981c3",
+      "name": "Табак",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 0.1,
+      "cost_crowns": 4,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_ff7f0eb37dfb47779d77",
+      "name": "Факел",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 0.1,
+      "cost_crowns": 1,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_f2b6321dc7d5436c9bcd",
+      "name": "Бурдюк",
+      "type": "equipment",
+      "page": 93,
+      "weight_kg": 1,
+      "cost_crowns": 8,
+      "attributes": {
+        "equipment_category": "Снаряжение"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_db04d717e29849e385ff",
+      "name": "Бандольера",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 1,
+      "cost_crowns": 19,
+      "attributes": {
+        "equipment_category": "Контейнер",
+        "capacity": "До 25 кг мелких предметов; можно закрепить и более крупные вещи.",
+        "capacity_kg": 25
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_fba358bc243f4bff8686",
+      "name": "Корзина",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 0.5,
+      "cost_crowns": 10,
+      "attributes": {
+        "equipment_category": "Контейнер",
+        "capacity": "До 15 кг мелких предметов.",
+        "capacity_kg": 15
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_dcdc265dc22f4c0eb52a",
+      "name": "Поясная сумка",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 0.1,
+      "cost_crowns": 7,
+      "attributes": {
+        "equipment_category": "Контейнер",
+        "capacity": "До 5 кг.",
+        "capacity_kg": 5
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_b1d61b8518af413f8265",
+      "name": "Мешок",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 0.1,
+      "cost_crowns": 3,
+      "attributes": {
+        "equipment_category": "Контейнер",
+        "capacity": "До 20 кг.",
+        "capacity_kg": 20
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_f416015aba444e928fa2",
+      "name": "Наплечная сумка",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 1,
+      "cost_crowns": 14,
+      "attributes": {
+        "equipment_category": "Контейнер",
+        "capacity": "До 30 кг.",
+        "capacity_kg": 30
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_a68bdf178035449591e7",
+      "name": "Потайной карман",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 0.1,
+      "cost_crowns": 11,
+      "attributes": {
+        "equipment_category": "Контейнер",
+        "capacity": "До 5 кг. Обнаружение требует проверки Внимания со СЛ 16.",
+        "capacity_kg": 5
+      },
+      "new": true,
+      "effects": [
+        "Скрытый карман можно обнаружить проверкой Внимания со СЛ 16."
+      ]
+    },
+    {
+      "item_id": "item_84c6560257f446408bf3",
+      "name": "Чехол для лука",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 1.5,
+      "cost_crowns": 24,
+      "attributes": {
+        "equipment_category": "Контейнер",
+        "capacity": "Вмещает лук, колчан и стрелы."
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_eaa9825c9bf84683a03f",
+      "name": "Набедренные ножны",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 0.1,
+      "cost_crowns": 11,
+      "attributes": {
+        "equipment_category": "Контейнер"
+      },
+      "new": true,
+      "effects": [
+        "Скрытые ножны можно обнаружить проверкой Внимания со СЛ 18."
+      ]
+    },
+    {
+      "item_id": "item_f091fab6a93c4a57bdde",
+      "name": "Наручные ножны",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 0.1,
+      "cost_crowns": 13,
+      "attributes": {
+        "equipment_category": "Контейнер"
+      },
+      "new": true,
+      "effects": [
+        "Скрытые ножны можно обнаружить проверкой Внимания со СЛ 15."
+      ]
+    },
+    {
+      "item_id": "item_e5e31625044c48f2afd3",
+      "name": "Деревянный сундук",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 1,
+      "cost_crowns": 18,
+      "attributes": {
+        "equipment_category": "Контейнер",
+        "capacity": "До 30 кг мелких предметов.",
+        "capacity_kg": 30
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_1c69547dbb9548759f6d",
+      "name": "Большой деревянный сундук",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 10,
+      "cost_crowns": 30,
+      "attributes": {
+        "equipment_category": "Контейнер",
+        "capacity": "До 50 кг крупных предметов.",
+        "capacity_kg": 50
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_84b1b170715e44ee98e9",
+      "name": "Простой обед",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 1,
+      "cost_crowns": 10,
+      "attributes": {
+        "equipment_category": "Еда и напитки"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_37d214809b894e29bbc4",
+      "name": "Хороший обед",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 2.5,
+      "cost_crowns": 30,
+      "attributes": {
+        "equipment_category": "Еда и напитки"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_23622b8a991942e39ace",
+      "name": "Пир",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 5,
+      "cost_crowns": 100,
+      "attributes": {
+        "equipment_category": "Еда и напитки"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_fbea988350cd451a9cac",
+      "name": "Сырое мясо",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 1,
+      "cost_crowns": 8,
+      "attributes": {
+        "equipment_category": "Еда и напитки"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_bc39b1637f0743faabe6",
+      "name": "Сладости",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 1,
+      "cost_crowns": 5,
+      "attributes": {
+        "equipment_category": "Еда и напитки"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_0951557b38ed44d09f94",
+      "name": "Сухой паёк (на 1 день)",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 1,
+      "cost_crowns": 5,
+      "attributes": {
+        "equipment_category": "Еда и напитки"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_e119a289fb2f4ca6aa44",
+      "name": "Алкагест",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 1,
+      "cost_crowns": 8,
+      "attributes": {
+        "equipment_category": "Еда и напитки"
+      },
+      "new": true,
+      "effects": [
+        "Употребление вызывает отравление и опьянение. СЛ 16 по Стойкости снимает отравление; опьянение длится 12 − Тел часов и может быть снято «Слёзами жён»."
+      ]
+    },
+    {
+      "item_id": "item_4d0f7d6ecab348188442",
+      "name": "Пиво",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 1,
+      "cost_crowns": 5,
+      "attributes": {
+        "equipment_category": "Еда и напитки"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_186ac99828d2456a9bb5",
+      "name": "Крепкий алкоголь",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 1,
+      "cost_crowns": 10,
+      "attributes": {
+        "equipment_category": "Еда и напитки"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_8107726dee6e4841b0d9",
+      "name": "Вино",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 1,
+      "cost_crowns": 8,
+      "attributes": {
+        "equipment_category": "Еда и напитки"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_f1a47ab2409f4bf2adae",
+      "name": "Простая одежда",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 2,
+      "cost_crowns": 10,
+      "attributes": {
+        "equipment_category": "Одежда"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_70887350ad9847b988b9",
+      "name": "Тёплая одежда",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 3,
+      "cost_crowns": 45,
+      "attributes": {
+        "equipment_category": "Одежда"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_46b583edc9194b4799f5",
+      "name": "Модная одежда",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 2,
+      "cost_crowns": 70,
+      "attributes": {
+        "equipment_category": "Одежда"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_42cb25fdbab14816ada9",
+      "name": "Украшения",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 0.5,
+      "cost_crowns": 50,
+      "attributes": {
+        "equipment_category": "Одежда"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_1e03b8790313418b828b",
+      "name": "Тёмная одежда",
+      "type": "equipment",
+      "page": 95,
+      "weight_kg": 1.5,
+      "cost_crowns": 50,
+      "attributes": {
+        "equipment_category": "Одежда"
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_9f84938c73d44650a4b268b5b3a93941",
+      "name": "Карета",
+      "type": "transport",
+      "page": 91,
+      "weight_kg": 600,
+      "cost_crowns": 660,
+      "attributes": {
+        "control_modifier": -1,
+        "speed": "Животного − 3",
+        "hit_points": 60
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_15fd70cf3ad04153801b0c5889de6fde",
+      "name": "Повозка",
+      "type": "transport",
+      "page": 91,
+      "weight_kg": 300,
+      "cost_crowns": 200,
+      "attributes": {
+        "control_modifier": 0,
+        "speed": "Животного − 1",
+        "hit_points": 30
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_8d91009cf2ae4191a1d7178ea9c89ef7",
+      "name": "Куттер",
+      "type": "transport",
+      "page": 91,
+      "weight_kg": 610,
+      "cost_crowns": 1670,
+      "attributes": {
+        "control_modifier": 0,
+        "speed": "10",
+        "hit_points": 60
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_84ce08b597d54e4da5dfbe8df7888504",
+      "name": "Лошадь",
+      "type": "transport",
+      "page": 91,
+      "weight_kg": 100,
+      "cost_crowns": 520,
+      "attributes": {
+        "control_modifier": 2,
+        "speed": "12",
+        "hit_points": 40,
+        "athletics_dex": 11
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_dd93c155b22049d79aab4f0c2f1001f6",
+      "name": "Мул",
+      "type": "transport",
+      "page": 91,
+      "weight_kg": 150,
+      "cost_crowns": 200,
+      "attributes": {
+        "control_modifier": 0,
+        "speed": "9",
+        "hit_points": 45,
+        "athletics_dex": 7
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_5d40bffa6b6548f29fe802feedb1c6b8",
+      "name": "Вол",
+      "type": "transport",
+      "page": 91,
+      "weight_kg": 300,
+      "cost_crowns": 278,
+      "attributes": {
+        "control_modifier": -2,
+        "speed": "6",
+        "hit_points": 50,
+        "athletics_dex": 5
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_633bdd33f0ef4a258d56b3d081fbdb3c",
+      "name": "Парусная лодка",
+      "type": "transport",
+      "page": 91,
+      "weight_kg": 130,
+      "cost_crowns": 230,
+      "attributes": {
+        "control_modifier": -1,
+        "speed": "6",
+        "hit_points": 30
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_63c27a772e0c4174b4e4817bcbcac542",
+      "name": "Парусный корабль",
+      "type": "transport",
+      "page": 91,
+      "weight_kg": 2040,
+      "cost_crowns": 2180,
+      "attributes": {
+        "control_modifier": -2,
+        "speed": "8",
+        "hit_points": 80
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_23cb3379c7ae40a3b1aabddaefe7d722",
+      "name": "Боевой конь",
+      "type": "transport",
+      "page": 91,
+      "weight_kg": 270,
+      "cost_crowns": 1600,
+      "attributes": {
+        "control_modifier": -2,
+        "speed": "11",
+        "hit_points": 50,
+        "athletics_dex": 12
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_bd574057b08f45f19724bbe596add01a",
+      "name": "Седло",
+      "type": "equipment",
+      "page": 91,
+      "weight_kg": 5,
+      "cost_crowns": 100,
+      "attributes": {
+        "equipment_category": "Сёдла",
+        "availability": "Повсеместное"
+      },
+      "new": true,
+      "effects": [
+        "Нет штрафов к Верховой езде."
+      ]
+    },
+    {
+      "item_id": "item_e59afd6689cb410997da81085fb9bb0c",
+      "name": "Кавалерийское седло",
+      "type": "equipment",
+      "page": 91,
+      "weight_kg": 6,
+      "cost_crowns": 325,
+      "attributes": {
+        "equipment_category": "Сёдла",
+        "availability": "Редкое"
+      },
+      "new": true,
+      "effects": [
+        "+1 к проверкам управления для атаки; встроенные ножны для оружия."
+      ]
+    },
+    {
+      "item_id": "item_b03188ea8e7f448cac05db8d30f9d6ef",
+      "name": "Скаковое седло",
+      "type": "equipment",
+      "page": 91,
+      "weight_kg": 3,
+      "cost_crowns": 200,
+      "attributes": {
+        "equipment_category": "Сёдла",
+        "availability": "Обычное"
+      },
+      "new": true,
+      "effects": [
+        "+1 к проверкам управления для Верховой езды; +1 к Скорости скакуна."
+      ]
+    },
+    {
+      "item_id": "item_e0c124afaf1f4fd4b3a91c69865fb7f7",
+      "name": "Шоры",
+      "type": "equipment",
+      "page": 91,
+      "weight_kg": 0.1,
+      "cost_crowns": 100,
+      "attributes": {
+        "equipment_category": "Шоры",
+        "availability": "Повсеместное"
+      },
+      "new": true,
+      "effects": [
+        "+1 к проверкам успокоения скакуна."
+      ]
+    },
+    {
+      "item_id": "item_98643548564244df89ab68f4c80500bd",
+      "name": "Скаковые шоры",
+      "type": "equipment",
+      "page": 91,
+      "weight_kg": 0.1,
+      "cost_crowns": 125,
+      "attributes": {
+        "equipment_category": "Шоры",
+        "availability": "Обычное"
+      },
+      "new": true,
+      "effects": [
+        "+2 к проверкам успокоения скакуна."
+      ]
+    },
+    {
+      "item_id": "item_120e1744272a4442b8406ddd3b31aae6",
+      "name": "Перемётная сума",
+      "type": "equipment",
+      "page": 91,
+      "weight_kg": 1.5,
+      "cost_crowns": 100,
+      "attributes": {
+        "equipment_category": "Перемётные сумы",
+        "availability": "Повсеместное",
+        "capacity_kg": 50
+      },
+      "new": true,
+      "description": "В каждом из двух отделений по 25 кг небольших или средних предметов."
+    },
+    {
+      "item_id": "item_f34d735f4d8b48e89b4a019898857fa8",
+      "name": "Военная перемётная сума",
+      "type": "equipment",
+      "page": 91,
+      "weight_kg": 2,
+      "cost_crowns": 150,
+      "attributes": {
+        "equipment_category": "Перемётные сумы",
+        "availability": "Редкое",
+        "capacity_kg": 100
+      },
+      "new": true,
+      "description": "В каждом из двух отделений по 50 кг небольших или средних предметов.",
+      "effects": [
+        "Снаружи есть крепления для 6 крупных предметов."
+      ]
+    },
+    {
+      "item_id": "item_6b510b6464ea499b8626313a178aa7ea",
+      "name": "Кожаные доспехи",
+      "type": "equipment",
+      "page": 91,
+      "weight_kg": 10,
+      "cost_crowns": 550,
+      "attributes": {
+        "equipment_category": "Конские доспехи",
+        "availability": "Редкое",
+        "reliability": 10
+      },
+      "new": true
+    },
+    {
+      "item_id": "item_911d2cfe946b444f931bdada502e4abb",
+      "name": "Кольчужные доспехи",
+      "type": "equipment",
+      "page": 91,
+      "weight_kg": 25,
+      "cost_crowns": 1050,
+      "attributes": {
+        "equipment_category": "Конские доспехи",
+        "availability": "Уникальное",
+        "reliability": 15
+      },
+      "new": true,
+      "effects": [
+        "−1 к проверкам управления для Верховой езды."
+      ]
     }
   ]
 }

@@ -6,7 +6,16 @@
   <meta name="theme-color" content="#f5f7f6">
   <meta name="description" content="Рецепты, предметы и личный инвентарь для НРИ Ведьмак.">
   <title>Кодекс ремесленника — Ведьмак НРИ</title>
+  <script>
+    try {
+      if (localStorage.getItem("witcher-workshop-theme") === "dark") {
+        document.documentElement.dataset.theme = "dark";
+        document.querySelector('meta[name="theme-color"]').content = "#141c1e";
+      }
+    } catch (_) { /* Сайт доступен и при отключённом хранилище. */ }
+  </script>
   <link rel="stylesheet" href="./styles.css">
+  <script src="./theme.js" defer></script>
   <script src="./data.js" defer></script>
   <script src="./app.js" defer></script>
 </head>
@@ -16,7 +25,10 @@
       <span class="brand-mark" aria-hidden="true">✦</span>
       <span>Кодекс <b>ремесленника</b></span>
     </a>
-    <div class="edition-note">НРИ «Ведьмак» <span>·</span> справочник по книге правил</div>
+    <div class="topbar-actions">
+      <div class="edition-note">НРИ «Ведьмак» <span>·</span> справочник по книге правил</div>
+      <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Включить тёмную тему" aria-pressed="false" title="Включить тёмную тему"><span class="theme-icon" aria-hidden="true">☾</span><span class="theme-label">Тёмная тема</span></button>
+    </div>
   </header>
 
   <main id="top" class="layout">
@@ -52,13 +64,14 @@
 
       <section id="items-page" class="page-view" aria-labelledby="items-title" hidden>
         <div class="workspace-head">
-          <div><div class="eyebrow"><span class="eyebrow-line"></span>Каталог</div><h1 id="items-title">Предметы</h1><p class="intro">Ингредиенты, алхимия, материалы, оружие и броня.</p></div>
+          <div><div class="eyebrow"><span class="eyebrow-line"></span>Каталог</div><h1 id="items-title">Предметы</h1><p class="intro">Ингредиенты, алхимия, снаряжение, материалы, оружие, броня и транспорт.</p></div>
         </div>
         <div class="controls item-controls" aria-label="Поиск и фильтры предметов">
           <label class="searchbox"><span aria-hidden="true">⌕</span><input id="item-search" type="search" placeholder="Название, описание или свойство…" autocomplete="off" aria-label="Поиск по названию, описанию и свойствам предметов"><kbd>/</kbd></label>
-          <label class="select-wrap"><span class="sr-only">Тип предмета</span><select id="item-type-filter"><option value="">Все предметы</option><option value="ingredient">Ингредиенты</option><option value="alchemical">Алхимические средства</option><option value="material">Материалы</option><option value="weapon">Оружие</option><option value="armor">Броня</option></select></label>
+          <label class="select-wrap"><span class="sr-only">Тип предмета</span><select id="item-type-filter"><option value="">Все предметы</option><option value="ingredient">Ингредиенты</option><option value="alchemical">Алхимические средства</option><option value="equipment">Снаряжение</option><option value="transport">Скакуны и транспорт</option><option value="material">Материалы</option><option value="weapon">Оружие</option><option value="armor">Броня</option></select></label>
           <label class="select-wrap" id="item-availability-wrap" hidden><span class="sr-only">Доступность ингредиента</span><select id="item-availability-filter"><option value="">Любая доступность</option></select></label>
           <label class="select-wrap" id="item-group-wrap" hidden><span class="sr-only">Алхимическая группа ингредиента</span><select id="item-group-filter"><option value="">Любая группа</option></select></label>
+          <label class="select-wrap" id="item-equipment-category-wrap" hidden><span class="sr-only">Категория снаряжения</span><select id="item-equipment-category-filter"><option value="">Всё снаряжение</option></select></label>
           <button class="clear-button" id="clear-item-filters" type="button">Сбросить</button>
         </div>
         <div id="item-list" class="item-list" aria-live="polite"></div>
@@ -77,7 +90,14 @@
           <p id="weight-warning" class="inline-warning" hidden></p>
         </div>
         <form id="add-inventory-item" class="add-inventory-item">
-          <label class="field grow">Предмет из каталога<select id="inventory-item-select"><option value="">Выберите предмет…</option></select></label>
+          <div class="field grow inventory-picker">
+            <label for="inventory-item-search">Предмет из каталога</label>
+            <div class="inventory-search-control">
+              <input id="inventory-item-search" type="search" placeholder="Начните вводить название…" autocomplete="off" role="combobox" aria-autocomplete="list" aria-controls="inventory-search-results" aria-expanded="false" aria-describedby="inventory-search-help" required>
+              <div id="inventory-search-results" class="inventory-search-results" role="listbox" aria-label="Найденные предметы" hidden></div>
+            </div>
+            <span id="inventory-search-help" class="sr-only" role="status" aria-live="polite"></span>
+          </div>
           <label class="field">Количество<input id="inventory-quantity" type="number" min="0.1" step="0.1" value="1" required></label>
           <label class="field">Вес за шт., кг<input id="inventory-unit-weight" type="number" min="0" step="0.1" placeholder="из каталога"></label>
           <button class="button primary add-button" type="submit">Добавить</button>

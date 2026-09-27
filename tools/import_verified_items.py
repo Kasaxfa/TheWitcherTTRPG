@@ -26,6 +26,13 @@ DEFINITIONS = {
     "armor_slots": ("Усиления брони", "number", None),
     "encumbrance": ("Скованность движений", "number", None),
     "armor_region": ("Защищаемая часть тела", "text", None),
+    "equipment_category": ("Категория снаряжения", "text", None),
+    "capacity": ("Вместимость", "text", None),
+    "capacity_kg": ("Грузовместимость", "number", "кг"),
+    "athletics_dex": ("Атлетика + Лвк", "number", None),
+    "control_modifier": ("Модификатор управления", "number", None),
+    "speed": ("Скорость", "text", None),
+    "hit_points": ("Пункты здоровья", "number", None),
 }
 DETAIL_FIELDS = {
     "ingredient": ("where_found", "availability", "acquisition_method", "alchemy_group", "notes"),
@@ -47,6 +54,14 @@ def import_facts(connection: sqlite3.Connection) -> int:
             seen.add(item_id)
             if type(page) is not int or page < 1:
                 raise ValueError(f"Invalid source page for {item_id}")
+            field_pages = entry.get("field_pages", {})
+            attribute_pages = entry.get("attribute_pages", {})
+            effects_page = entry.get("effects_page", page)
+            if not isinstance(field_pages, dict) or not isinstance(attribute_pages, dict):
+                raise ValueError(f"Invalid field source pages for {item_id}")
+            source_pages = [page, effects_page, *field_pages.values(), *attribute_pages.values()]
+            if any(type(source_page) is not int or source_page < 1 for source_page in source_pages):
+                raise ValueError(f"Invalid source page for {item_id}")
             existing = connection.execute("SELECT name, item_type FROM items WHERE item_id = ?", (item_id,)).fetchone()
             if existing is None and entry.get("new") is True:
                 connection.execute("INSERT INTO items (item_id, name, item_type) VALUES (?, ?, ?)",
@@ -58,7 +73,7 @@ def import_facts(connection: sqlite3.Connection) -> int:
                 existing = (entry["name"], entry["type"])
             if existing is None or (existing[0], existing[1]) != (entry["name"], entry["type"]):
                 raise ValueError(f"Wrong identity for {item_id}: {existing}")
-            if entry["type"] not in ("weapon", "armor", "material", "ingredient", "alchemical"):
+            if entry["type"] not in ("weapon", "armor", "material", "ingredient", "alchemical", "equipment", "transport"):
                 raise ValueError(f"Unexpected item type: {entry['type']}")
             for field in ("weight_kg", "cost_crowns", "description"):
                 if field not in entry:
@@ -69,7 +84,7 @@ def import_facts(connection: sqlite3.Connection) -> int:
                 connection.execute(f"UPDATE items SET {field} = ? WHERE item_id = ?", (value, item_id))
                 connection.execute("""INSERT OR IGNORE INTO item_field_sources
                     (item_id, field_name, source_id, page_number) VALUES (?, ?, ?, ?)""",
-                    (item_id, field, SOURCE_ID, page))
+                    (item_id, field, SOURCE_ID, field_pages.get(field, page)))
             for field in DETAIL_FIELDS.get(entry["type"], ()):
                 if field not in entry:
                     continue
@@ -96,16 +111,17 @@ def import_facts(connection: sqlite3.Connection) -> int:
                     ON CONFLICT(item_id, attribute_code, ordinal) DO UPDATE SET
                     text_value=excluded.text_value, numeric_value=excluded.numeric_value,
                     source_id=excluded.source_id, source_page=excluded.source_page""",
-                    (item_id, code, text_value, numeric_value, SOURCE_ID, page))
+                    (item_id, code, text_value, numeric_value, SOURCE_ID, attribute_pages.get(code, page)))
             if "effects" in entry:
                 connection.execute("DELETE FROM item_effects WHERE item_id = ?", (item_id,))
                 for order, effect in enumerate(entry["effects"], 1):
                     connection.execute("""INSERT INTO item_effects
                         (item_id, effect_order, effect_text, source_id, source_page)
-                        VALUES (?, ?, ?, ?, ?)""", (item_id, order, effect, SOURCE_ID, page))
-            connection.execute("""INSERT OR IGNORE INTO item_sources
-                (item_id, source_id, page_number, source_role)
-                VALUES (?, ?, ?, 'item_description')""", (item_id, SOURCE_ID, page))
+                        VALUES (?, ?, ?, ?, ?)""", (item_id, order, effect, SOURCE_ID, effects_page))
+            for source_page in set(source_pages):
+                connection.execute("""INSERT OR IGNORE INTO item_sources
+                    (item_id, source_id, page_number, source_role)
+                    VALUES (?, ?, ?, 'item_description')""", (item_id, SOURCE_ID, source_page))
         validate_catalog(connection)
     return len(seen)
 
