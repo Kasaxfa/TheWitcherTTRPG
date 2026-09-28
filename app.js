@@ -10,6 +10,8 @@
   const normalize = value => String(value ?? "").toLocaleLowerCase("ru-RU").replaceAll("ё", "е");
   const numberText = value => new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(value);
   let activePage = "recipes";
+  let characterViewMode = "library";
+  let renameTargetCharacterId = null;
 
   function formula(ingredients) {
     const relevant = ingredients.filter(ingredient => alchemySymbols[ingredient.itemId]);
@@ -352,17 +354,135 @@
     SPD: "Скорость", EMP: "Эмпатия", CRA: "Ремесло", WILL: "Воля", LUCK: "Удача",
   };
 
-  function renderCharacterSelector() {
-    const select = $("#character-select");
-    select.innerHTML = characterStore.characters.map((character, index) => {
-      const name = character.personal.name.trim() || `Персонаж ${index + 1}`;
-      const suffix = [character.personal.race, character.personal.profession].filter(Boolean).join(" · ");
-      return `<option value="${escapeHtml(character.characterId)}">${escapeHtml(name)}${suffix ? ` — ${escapeHtml(suffix)}` : ""}</option>`;
+  function characterName(character, index = 0) {
+    return character.personal.name.trim() || `Персонаж ${index + 1}`;
+  }
+
+  function uniqueCharacterName(proposed) {
+    const used = new Set(characterStore.characters.map(character => normalize(character.personal.name.trim())).filter(Boolean));
+    const base = proposed.trim() || "Новый персонаж";
+    if (!used.has(normalize(base))) return base;
+    let suffix = 2;
+    while (used.has(normalize(`${base} ${suffix}`))) suffix++;
+    return `${base} ${suffix}`;
+  }
+
+  function formatCharacterDate(value) {
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? "дата не указана" : new Intl.DateTimeFormat("ru-RU", { dateStyle: "medium", timeStyle: "short" }).format(date);
+  }
+
+  function renderCharacterLibrary() {
+    const list = $("#character-list");
+    const query = normalize($("#character-search").value.trim());
+    const terms = query.split(/\s+/).filter(Boolean);
+    const characters = persistenceReady ? characterStore.characters : [];
+    const visible = characters.map((character, index) => ({ character, index })).filter(({ character }) => {
+      const searchable = normalize([
+        character.personal.name, character.personal.player, character.personal.race,
+        character.personal.profession, character.personal.homeland, character.personal.location,
+      ].join(" "));
+      return terms.every(term => searchable.includes(term));
+    });
+    list.innerHTML = visible.map(({ character, index }) => {
+      const name = characterName(character, index);
+      const description = [character.personal.race || "Раса не указана", character.personal.profession || "Профессия не указана"].join(" · ");
+      const active = character.characterId === characterStore.activeCharacterId;
+      const deleteDisabled = characterStore.characters.length <= 1 || !persistenceReady;
+      return `<article class="character-card" data-character-card-id="${escapeHtml(character.characterId)}">
+        <div class="character-card-top"><span class="character-card-profession">${escapeHtml(character.personal.profession || "Персонаж")}</span>${active ? `<span class="character-card-active">Последний открыт</span>` : ""}</div>
+        <h2>${escapeHtml(name)}</h2>
+        <p class="character-card-description">${escapeHtml(description)}</p>
+        <p class="character-card-player">${character.personal.player ? `Игрок: ${escapeHtml(character.personal.player)}` : "Игрок не указан"}</p>
+        <p class="character-card-updated">Изменён ${escapeHtml(formatCharacterDate(character.updatedAt))}</p>
+        <div class="character-card-actions">
+          <button class="button primary" type="button" data-character-action="open" data-character-id="${escapeHtml(character.characterId)}">Открыть</button>
+          <details class="character-card-menu"><summary aria-label="Действия с персонажем ${escapeHtml(name)}">•••</summary>
+            <div class="character-card-menu-items">
+              <button type="button" data-character-action="copy" data-character-id="${escapeHtml(character.characterId)}">Копировать</button>
+              <button type="button" data-character-action="rename" data-character-id="${escapeHtml(character.characterId)}">Переименовать</button>
+              <button type="button" data-character-action="export" data-character-id="${escapeHtml(character.characterId)}">Экспорт JSON</button>
+              <button type="button" class="danger" data-character-action="delete" data-character-id="${escapeHtml(character.characterId)}"${deleteDisabled ? ` disabled title="В списке должен остаться хотя бы один персонаж"` : ""}>Удалить</button>
+            </div>
+          </details>
+        </div>
+      </article>`;
     }).join("");
-    select.value = characterStore.activeCharacterId;
-    $("#delete-character").disabled = characterStore.characters.length <= 1 || !persistenceReady;
+    $("#character-empty").hidden = persistenceReady && characters.length > 0;
+    $("#character-search-empty").hidden = !persistenceReady || characters.length === 0 || visible.length > 0;
+    if (!persistenceReady) {
+      $("#character-empty").hidden = false;
+      $("#character-empty h2").textContent = "Не удалось загрузить персонажей";
+      $("#character-empty p").textContent = "Загрузите проверенный JSON-файл; исходное сохранение не изменено.";
+    } else {
+      $("#character-empty h2").textContent = "Персонажей пока нет";
+      $("#character-empty p").textContent = "Создайте персонажа или загрузите JSON-файл.";
+    }
     $("#new-character").disabled = !persistenceReady;
-    $("#inventory-character-name").textContent = activeCharacter().personal.name.trim() || "Без имени";
+    $("#export-characters").disabled = !persistenceReady;
+  }
+
+  function showCharacterLibrary() {
+    if (persistenceReady) persistStore("", true);
+    characterViewMode = "library";
+    $("#character-library").hidden = false;
+    $("#character-editor").hidden = true;
+    renderCharacterLibrary();
+  }
+
+  function openCharacter(characterId) {
+    if (!persistenceReady) return;
+    const character = characterStore.characters.find(value => value.characterId === characterId);
+    if (!character) return;
+    persistStore("", true);
+    characterStore.activeCharacterId = characterId;
+    inventory = character.equipment;
+    characterViewMode = "editor";
+    $("#character-library").hidden = true;
+    $("#character-editor").hidden = false;
+    renderCharacterEditor();
+    renderInventory();
+    persistStore(`Открыт персонаж «${characterName(character)}».`);
+  }
+
+  function duplicateCharacter(characterId) {
+    if (!persistenceReady) return;
+    const source = characterStore.characters.find(character => character.characterId === characterId);
+    if (!source) return;
+    const copy = window.CharacterStore.copyCharacter(source, uniqueCharacterName(`${source.personal.name.trim() || "Персонаж"} (копия)`));
+    characterStore.characters.push(copy);
+    openCharacter(copy.characterId);
+    persistStore(`Создана копия «${characterName(copy)}».`);
+  }
+
+  function beginRenameCharacter(characterId) {
+    if (!persistenceReady) return;
+    const character = characterStore.characters.find(value => value.characterId === characterId);
+    if (!character) return;
+    renameTargetCharacterId = characterId;
+    const input = $("#rename-character-input");
+    input.value = character.personal.name;
+    input.setCustomValidity("");
+    $("#rename-character-dialog").showModal();
+    input.focus();
+    input.select();
+  }
+
+  function deleteCharacter(characterId) {
+    if (!persistenceReady || characterStore.characters.length <= 1) return;
+    const character = characterStore.characters.find(value => value.characterId === characterId);
+    if (!character) return;
+    const name = characterName(character);
+    if (!window.confirm(`Удалить «${name}» вместе с его листом и инвентарём?`)) return;
+    characterStore.characters = characterStore.characters.filter(value => value.characterId !== characterId);
+    if (characterStore.activeCharacterId === characterId) {
+      characterStore.activeCharacterId = characterStore.characters[0].characterId;
+      inventory = activeCharacter().equipment;
+      renderCharacterEditor();
+      renderInventory();
+    }
+    renderCharacterLibrary();
+    persistStore(`Персонаж «${name}» удалён.`);
   }
 
   function renderSkillRows() {
@@ -412,6 +532,8 @@
 
   function renderCharacterEditor() {
     const character = activeCharacter();
+    $("#character-editor-name").textContent = characterName(character);
+    $("#inventory-character-name").textContent = character.personal.name.trim() || "Без имени";
     document.querySelectorAll("[data-character-path]").forEach(input => {
       const path = input.dataset.characterPath.split(".");
       input.value = path.length === 1 ? character[path[0]] ?? "" : character[path[0]]?.[path[1]] ?? "";
@@ -426,7 +548,6 @@
       input.value = path.reduce((value, part) => value?.[part], character)?.join("\n") || "";
     });
     $("#character-conditions").value = character.state.conditions.join("\n");
-    renderCharacterSelector();
     renderSkillRows();
     renderAbilityRows();
     renderLifePathOutcomes();
@@ -439,10 +560,14 @@
   }
 
   function addNewCharacter() {
-    const character = window.CharacterStore.createCharacter(`Персонаж ${characterStore.characters.length + 1}`);
+    if (!persistenceReady) return;
+    const character = window.CharacterStore.createCharacter(uniqueCharacterName(`Персонаж ${characterStore.characters.length + 1}`));
     characterStore.characters.push(character);
     characterStore.activeCharacterId = character.characterId;
     inventory = character.equipment;
+    characterViewMode = "editor";
+    $("#character-library").hidden = true;
+    $("#character-editor").hidden = false;
     renderCharacterEditor();
     renderInventory();
     persistStore("Создан новый персонаж.");
@@ -458,7 +583,11 @@
     window.setTimeout(() => URL.revokeObjectURL(url), 1000);
   }
 
-  function exportCharacterData() {
+  function safeFilename(value) {
+    return String(value || "character").replace(/[\\/:*?"<>|]+/g, "-").replace(/\s+/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "").slice(0, 80) || "character";
+  }
+
+  function exportCharacterData(character = null) {
     try {
       if (!persistenceReady) {
         const raw = localStorage.getItem(window.CharacterStore.STORAGE_KEY) ?? localStorage.getItem(window.CharacterStore.LEGACY_INVENTORY_KEY);
@@ -474,8 +603,14 @@
           return;
         }
       }
-      downloadJson(window.CharacterStore.createBackup(characterStore), "witcher-characters.json");
-      setSaveMessage("Резервная копия персонажей скачана.");
+      const payload = character
+        ? { ...characterStore, activeCharacterId: character.characterId, characters: [character] }
+        : characterStore;
+      const backup = window.CharacterStore.createBackup(payload);
+      if (character) delete backup.legacyInventoryBackup;
+      const filename = character ? `witcher-${safeFilename(character.personal.name)}.json` : "witcher-characters.json";
+      downloadJson(backup, filename);
+      setSaveMessage(character ? `JSON персонажа «${characterName(character)}» скачан.` : "Резервная копия списка персонажей скачана.");
     } catch (error) {
       setSaveMessage(`Не удалось создать резервную копию: ${error.message || "ошибка"}`, true);
     }
@@ -520,7 +655,7 @@
 
   function lockEditingForInvalidSave() {
     if (persistenceReady) return;
-    document.querySelectorAll("#character-form input, #character-form select, #character-form textarea, #character-form button, #character-select, #new-character, #delete-character, #inventory-page input, #inventory-page button")
+    document.querySelectorAll("#character-form input, #character-form select, #character-form textarea, #character-form button, #new-character, #character-editor button, #inventory-page input, #inventory-page button")
       .forEach(control => { control.disabled = true; });
     $("#export-characters").disabled = false;
     $("#import-characters").disabled = false;
@@ -531,6 +666,7 @@
   function showPage(page) {
     if (!sections[page]) return;
     activePage = page;
+    if (page === "characters" && characterViewMode === "library") renderCharacterLibrary();
     document.querySelectorAll(".page-view").forEach(view => { view.hidden = view.id !== `${page}-page`; });
     document.querySelectorAll(".nav-item").forEach(button => {
       const active = button.dataset.page === page;
@@ -549,7 +685,10 @@
     const linesControl = event.target.closest("[data-character-lines]");
     if (textControl) {
       updateCharacterPath(textControl.dataset.characterPath, textControl.value);
-      if (textControl.dataset.characterPath.startsWith("personal.")) renderCharacterSelector();
+      if (textControl.dataset.characterPath === "personal.name") {
+        $("#character-editor-name").textContent = textControl.value.trim() || "Без имени";
+        $("#inventory-character-name").textContent = textControl.value.trim() || "Без имени";
+      }
     } else if (numberControl) {
       const value = numberControl.value === "" ? null : Number(numberControl.value);
       if (value !== null && (!Number.isFinite(value) || value < 0 || value > 100000)) return;
@@ -566,6 +705,45 @@
 
   $("#character-form").addEventListener("input", updateCharacterFromForm);
   $("#character-form").addEventListener("change", updateCharacterFromForm);
+  $("#character-search").addEventListener("input", renderCharacterLibrary);
+  $("#character-list").addEventListener("click", event => {
+    const button = event.target.closest("[data-character-action]");
+    if (!button) return;
+    const characterId = button.dataset.characterId;
+    const action = button.dataset.characterAction;
+    button.closest("details")?.removeAttribute("open");
+    if (action === "open") openCharacter(characterId);
+    else if (action === "copy") duplicateCharacter(characterId);
+    else if (action === "rename") beginRenameCharacter(characterId);
+    else if (action === "export") {
+      const character = characterStore.characters.find(value => value.characterId === characterId);
+      if (character) exportCharacterData(character);
+    } else if (action === "delete") deleteCharacter(characterId);
+  });
+  $("#new-character").addEventListener("click", addNewCharacter);
+  $("#export-characters").addEventListener("click", () => exportCharacterData());
+  $("#import-characters").addEventListener("click", () => $("#character-file").click());
+  $("#character-list-back").addEventListener("click", showCharacterLibrary);
+  $("#rename-character-input").addEventListener("input", event => event.target.setCustomValidity(""));
+  $("#rename-character-dialog").addEventListener("close", () => { renameTargetCharacterId = null; });
+  $("#rename-character-form").addEventListener("submit", event => {
+    if (event.submitter?.value === "cancel") return;
+    event.preventDefault();
+    const character = characterStore.characters.find(value => value.characterId === renameTargetCharacterId);
+    const name = $("#rename-character-input").value.trim();
+    if (!character || !name) {
+      $("#rename-character-input").setCustomValidity("Введите имя персонажа.");
+      $("#rename-character-input").reportValidity();
+      return;
+    }
+    character.personal.name = name;
+    character.updatedAt = new Date().toISOString();
+    $("#character-editor-name").textContent = name;
+    $("#inventory-character-name").textContent = name;
+    renderCharacterLibrary();
+    persistStore(`Персонаж переименован в «${name}».`);
+    $("#rename-character-dialog").close();
+  });
   $("#add-life-path-outcome").addEventListener("click", () => {
     activeCharacter().lifePath.outcomes.push({ id: createEntryId(), type: "Событие", description: "", source: "" });
     renderLifePathOutcomes();
@@ -580,28 +758,6 @@
     activeCharacter().lifePath.outcomes = activeCharacter().lifePath.outcomes.filter(outcome => outcome.id !== button.dataset.removeLifePathOutcome);
     renderLifePathOutcomes();
     persistStore("Последствие жизненного пути удалено.");
-  });
-  $("#character-select").addEventListener("change", event => {
-    if (!characterStore.characters.some(character => character.characterId === event.target.value)) return;
-    persistStore("", true);
-    characterStore.activeCharacterId = event.target.value;
-    inventory = activeCharacter().equipment;
-    renderCharacterEditor();
-    renderInventory();
-    persistStore("Выбран другой персонаж.");
-  });
-  $("#new-character").addEventListener("click", addNewCharacter);
-  $("#delete-character").addEventListener("click", () => {
-    if (characterStore.characters.length <= 1) return;
-    const character = activeCharacter();
-    const name = character.personal.name.trim() || "Без имени";
-    if (!window.confirm(`Удалить персонажа «${name}» и его инвентарь?`)) return;
-    characterStore.characters = characterStore.characters.filter(value => value.characterId !== character.characterId);
-    characterStore.activeCharacterId = characterStore.characters[0].characterId;
-    inventory = activeCharacter().equipment;
-    renderCharacterEditor();
-    renderInventory();
-    persistStore("Персонаж удалён.");
   });
   $("#add-character-skill").addEventListener("click", () => {
     activeCharacter().skills.push({ id: createEntryId(), name: "", attribute: null, rank: null });
@@ -633,8 +789,6 @@
     renderAbilityRows();
     persistStore("Способность удалена.");
   });
-  $("#export-characters").addEventListener("click", exportCharacterData);
-  $("#import-characters").addEventListener("click", () => $("#character-file").click());
   $("#character-file").addEventListener("change", async event => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -643,30 +797,50 @@
       const payload = JSON.parse(await file.text());
       const imported = window.CharacterStore.parseImport(payload, { cleanLegacyEntry: cleanEntry });
       let candidate;
+      let resultMessage = "Резервная копия персонажей загружена.";
       if (imported.kind === "characters" && persistenceReady) {
-        if (!window.confirm("Заменить текущий список персонажей этим файлом? Сначала скачайте JSON-резервную копию.")) return;
-        const currentRaw = localStorage.getItem(window.CharacterStore.STORAGE_KEY);
-        if (currentRaw !== null) localStorage.setItem(`${window.CharacterStore.STORAGE_KEY}.pre-import-backup`, currentRaw);
-        candidate = imported.store;
+        if (imported.store.characters.length === 1) {
+          const incoming = imported.store.characters[0];
+          if (!window.confirm(`Добавить персонажа «${characterName(incoming)}» в список?`)) return;
+          candidate = JSON.parse(JSON.stringify(characterStore));
+          const added = candidate.characters.some(character => character.characterId === incoming.characterId)
+            ? window.CharacterStore.copyCharacter(incoming, uniqueCharacterName(`${incoming.personal.name.trim() || "Персонаж"} (копия)`))
+            : incoming;
+          candidate.characters.push(added);
+          candidate.activeCharacterId = added.characterId;
+          resultMessage = `Персонаж «${characterName(added)}» добавлен из JSON.`;
+        } else {
+          if (!window.confirm("Заменить текущий список персонажей этим файлом? Перед заменой текущие данные сохранятся в браузере.")) return;
+          const currentRaw = localStorage.getItem(window.CharacterStore.STORAGE_KEY);
+          if (currentRaw !== null) localStorage.setItem(`${window.CharacterStore.STORAGE_KEY}.pre-import-backup`, currentRaw);
+          candidate = imported.store;
+          resultMessage = "Список персонажей восстановлен из JSON.";
+        }
       } else if (imported.kind === "legacy-inventory" && persistenceReady) {
         candidate = JSON.parse(JSON.stringify(characterStore));
         const newCharacter = imported.store.characters[0];
-        newCharacter.personal.name = `Персонаж ${candidate.characters.length + 1}`;
+        newCharacter.personal.name = uniqueCharacterName(`Персонаж ${candidate.characters.length + 1}`);
         candidate.characters.push(newCharacter);
         candidate.activeCharacterId = newCharacter.characterId;
+        resultMessage = "Старый инвентарь добавлен отдельным персонажем.";
       } else {
         const currentRaw = localStorage.getItem(window.CharacterStore.STORAGE_KEY);
         if (currentRaw !== null) localStorage.setItem(`${window.CharacterStore.STORAGE_KEY}.recovery-backup`, currentRaw);
         candidate = imported.store;
+        resultMessage = imported.kind === "legacy-inventory" ? "Старый инвентарь восстановлен как первый персонаж." : "Список персонажей восстановлен из JSON.";
       }
       characterStore = window.CharacterStore.save(localStorage, candidate);
       persistenceReady = true;
       persistenceError = "";
       inventory = activeCharacter().equipment;
+      characterViewMode = "library";
+      $("#character-library").hidden = false;
+      $("#character-editor").hidden = true;
+      renderCharacterLibrary();
       renderCharacterEditor();
       renderInventory();
       lockEditingForInvalidSave();
-      setSaveMessage(imported.kind === "legacy-inventory" ? "Старый инвентарь добавлен отдельным персонажем." : "Резервная копия персонажей загружена.");
+      setSaveMessage(resultMessage);
     } catch (error) {
       setSaveMessage(`Не удалось загрузить JSON: ${error.message || "ошибка формата"}`, true);
     } finally { event.target.value = ""; }
@@ -705,12 +879,13 @@
   document.addEventListener("keydown", event => {
     if (event.key === "/" && !["INPUT", "SELECT", "TEXTAREA"].includes(document.activeElement.tagName)) {
       event.preventDefault();
-      (activePage === "items" ? $("#item-search") : $("#search")).focus();
+      (activePage === "items" ? $("#item-search") : activePage === "characters" && characterViewMode === "library" ? $("#character-search") : $("#search")).focus();
     }
     if (event.key === "Escape" && document.activeElement.matches("input[type=search]")) {
       document.activeElement.value = "";
       renderRecipes();
       renderItems();
+      if (document.activeElement.id === "character-search") renderCharacterLibrary();
       document.activeElement.blur();
     }
   });
@@ -833,6 +1008,7 @@
   updateItemFilters();
   renderRecipes();
   renderItems();
+  renderCharacterLibrary();
   renderCharacterEditor();
   renderInventory();
   if (migrationNotice) setSaveMessage(migrationNotice);
