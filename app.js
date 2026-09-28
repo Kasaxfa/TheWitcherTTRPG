@@ -399,12 +399,15 @@
       return;
     }
     const types = ["Событие", "Союзник", "Враг", "Отношения", "Долг", "Прочее"];
-    list.innerHTML = activeCharacter().lifePath.outcomes.map(outcome => `<div class="character-entry life-path-outcome" data-life-path-outcome-id="${escapeHtml(outcome.id)}">
-      <select data-life-path-outcome-field="type" aria-label="Тип последствия">${types.map(type => `<option value="${type}"${outcome.type === type ? " selected" : ""}>${type}</option>`).join("")}</select>
+    list.innerHTML = activeCharacter().lifePath.outcomes.map(outcome => {
+      const outcomeTypes = types.includes(outcome.type) ? types : [outcome.type, ...types];
+      return `<div class="character-entry life-path-outcome" data-life-path-outcome-id="${escapeHtml(outcome.id)}">
+      <select data-life-path-outcome-field="type" aria-label="Тип последствия">${outcomeTypes.map(type => `<option value="${escapeHtml(type)}"${outcome.type === type ? " selected" : ""}>${escapeHtml(type)}</option>`).join("")}</select>
       <textarea data-life-path-outcome-field="description" maxlength="20000" rows="2" placeholder="Описание последствия" aria-label="Описание последствия">${escapeHtml(outcome.description)}</textarea>
       <input data-life-path-outcome-field="source" maxlength="2000" value="${escapeHtml(outcome.source)}" placeholder="Источник или заметка" aria-label="Источник или заметка">
       <button class="character-remove" type="button" data-remove-life-path-outcome="${escapeHtml(outcome.id)}" aria-label="Удалить последствие">×</button>
-    </div>`).join("");
+    </div>`;
+    }).join("");
   }
 
   function renderCharacterEditor() {
