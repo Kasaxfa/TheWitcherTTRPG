@@ -147,6 +147,15 @@ test("backup JSON validates and rejects ambiguous character IDs", () => {
   const danglingActiveId = structuredClone(backup);
   danglingActiveId.activeCharacterId = "missing-character";
   assert.throws(() => CharacterStore.parseImport(danglingActiveId), /ID активного персонажа/);
+  const invalidLifePath = structuredClone(backup);
+  invalidLifePath.characters[0].lifePath.allies = "не массив";
+  assert.throws(() => CharacterStore.parseImport(invalidLifePath), /должен быть списком/);
+  const duplicateOutcomeId = structuredClone(backup);
+  duplicateOutcomeId.characters[0].lifePath.outcomes = [
+    { id: "same", type: "Событие", description: "Первое", source: "" },
+    { id: "same", type: "Событие", description: "Второе", source: "" },
+  ];
+  assert.throws(() => CharacterStore.parseImport(duplicateOutcomeId), /Повторяется ID последствия/);
   assert.throws(() => CharacterStore.parseImport({ format: CharacterStore.FORMAT, schemaVersion: 999, characters: [] }), /новее поддерживаемого/);
 });
 
