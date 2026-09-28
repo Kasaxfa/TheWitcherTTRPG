@@ -527,6 +527,9 @@
   function renderCreationWizard() {
     if (!characterCreationDraft) return;
     const draft = characterCreationDraft;
+    const openSkillGroups = draft.step === "skills"
+      ? new Set([...$("#character-create-content").querySelectorAll("details[data-creation-skill-group][open]")].map(group => group.dataset.creationSkillGroup))
+      : new Set();
     const index = creationSteps.findIndex(([id]) => id === draft.step);
     const stepIndex = Math.max(0, index);
     const stepTitle = creationSteps[stepIndex][1];
@@ -583,13 +586,16 @@
       const professionalHtml = professional.length === 11 ? professional.map(skill => creationSkillRow(skill, "profession")).join("") : `<p class="character-empty">Сначала выберите обязательные профессиональные навыки выше.</p>`;
       const generalHtml = window.CharacterStore.ATTRIBUTES.filter(code => !["SPD", "LUCK"].includes(code)).map(code => {
         const skills = general.filter(skill => skill.attribute === code);
-        return skills.length ? `<details class="creation-skill-group"><summary>${escapeHtml(attributeLabels[code])} · ${shortAttribute(code)} <span>${skills.length} навыков</span></summary><div>${skills.map(skill => creationSkillRow(skill, "general")).join("")}</div></details>` : "";
+        return skills.length ? `<details class="creation-skill-group" data-creation-skill-group="${code}"><summary>${escapeHtml(attributeLabels[code])} · ${shortAttribute(code)} <span>${skills.length} навыков</span></summary><div>${skills.map(skill => creationSkillRow(skill, "general")).join("")}</div></details>` : "";
       }).join("");
       body = `${professionChoiceHtml}<div class="creation-skill-section"><div class="creation-budget-readout"><span>Профессиональные навыки · рейтинг не ниже 1, максимум 6 на создании</span><strong>${profSpent} / 44</strong></div><div class="creation-profession-skill-list">${professionalHtml}</div></div>
         <div class="creation-skill-section"><div class="creation-budget-readout"><span>Общие навыки · бюджет Инт + Реа</span><strong>${generalSpent} / ${generalBudget}</strong></div><p class="creation-rule-note">Остаток общего бюджета можно не тратить. Сложные навыки с пометкой ×2 стоят 2 очка за ранг.</p>${generalHtml}</div>`;
     }
 
     $("#character-create-content").innerHTML = `${header}<div class="creation-step-content">${body}</div>`;
+    for (const group of $("#character-create-content").querySelectorAll("details[data-creation-skill-group]")) {
+      group.open = openSkillGroups.has(group.dataset.creationSkillGroup);
+    }
     const actions = [];
     actions.push(`<button type="button" class="button secondary" data-creation-action="cancel">Отмена</button>`);
     if (stepIndex > 0) actions.push(`<button type="button" class="button secondary" data-creation-action="back">← Назад</button>`);
