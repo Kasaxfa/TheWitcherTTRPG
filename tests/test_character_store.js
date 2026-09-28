@@ -48,10 +48,154 @@ test("version 1 characters migrate without losing sheet data and keep a raw back
   assert.equal(migrated.characterId, original.characters[0].characterId);
   assert.equal(migrated.personal.name, "Геральт");
   assert.equal(migrated.attributes.REF, 9);
+  assert.deepEqual(migrated.attributeModifiers.REF, { permanent: 0, temporary: 0 });
   assert.equal(migrated.equipment.items[0].name, "Медальон");
   assert.deepEqual(migrated.lifePath.outcomes, []);
   assert.equal(storage.getItem(`${CharacterStore.STORAGE_KEY}.backup-v1`), raw);
   assert.equal(CharacterStore.load(storage).migratedSchemaVersion, false);
+});
+
+test("version 2 characters gain separate modifiers without losing ratings or source values", () => {
+  const storage = new MemoryStorage();
+  const original = CharacterStore.createStore("Сохранение версии 2");
+  original.schemaVersion = 2;
+  const character = original.characters[0];
+  character.schemaVersion = 2;
+  character.attributes.BODY = 6;
+  character.skills.push({ id: "old-skill", name: "Ближний бой", attribute: "REF", rank: 5 });
+  delete character.attributeModifiers;
+  const raw = JSON.stringify(original);
+  storage.setItem(CharacterStore.STORAGE_KEY, raw);
+
+  const result = CharacterStore.load(storage);
+  const migrated = result.store.characters[0];
+  assert.equal(result.migratedSchemaVersion, true);
+  assert.equal(result.store.schemaVersion, 7);
+  assert.equal(migrated.attributes.BODY, 6);
+  assert.deepEqual(migrated.attributeModifiers.BODY, { permanent: 0, temporary: 0 });
+  assert.equal(migrated.skills[0].rank, 5);
+  assert.equal(migrated.skills[0].permanentModifier, 0);
+  assert.equal(migrated.skills[0].temporaryModifier, 0);
+  assert.equal(storage.getItem(`${CharacterStore.STORAGE_KEY}.backup-v2`), raw);
+});
+
+test("version 3 characters migrate profession identity and choice storage without losing skills", () => {
+  const storage = new MemoryStorage();
+  const original = CharacterStore.createStore("Версия 3");
+  original.schemaVersion = 3;
+  const character = original.characters[0];
+  character.schemaVersion = 3;
+  character.personal.profession = "Бард";
+  character.attributes.INT = 7;
+  character.skills.push({ id: "old-skill", name: "Харизма", attribute: "EMP", rank: 4, permanentModifier: 1, temporaryModifier: 0 });
+  const raw = JSON.stringify(original);
+  storage.setItem(CharacterStore.STORAGE_KEY, raw);
+
+  const result = CharacterStore.load(storage);
+  const migrated = result.store.characters[0];
+  assert.equal(result.store.schemaVersion, 7);
+  assert.equal(migrated.schemaVersion, 7);
+  assert.equal(migrated.personal.profession, "Бард");
+  assert.equal(migrated.personal.professionId, "");
+  assert.deepEqual(migrated.professionSkillChoices, {});
+  assert.equal(migrated.attributes.INT, 7);
+  assert.equal(migrated.skills[0].rank, 4);
+  assert.equal(migrated.skills[0].permanentModifier, 1);
+  assert.equal(storage.getItem(`${CharacterStore.STORAGE_KEY}.backup-v3`), raw);
+});
+
+test("version 4 migration adds creation, generated life path, profession-tree storage, and development without losing data", () => {
+  const original = CharacterStore.createStore("Версия 4");
+  original.schemaVersion = 4;
+  const character = original.characters[0];
+  character.schemaVersion = 4;
+  character.personal.race = "Человек";
+  character.attributes.INT = 8;
+  character.skills.push({ id: "stable-skill", name: "Дедукция", attribute: "INT", rank: 3 });
+  delete character.creation;
+  delete character.professionTrees;
+  delete character.development;
+  delete character.lifePath.generated;
+  const migrated = CharacterStore.migrateStore(original).characters[0];
+  assert.equal(migrated.schemaVersion, 7);
+  assert.equal(migrated.personal.race, "Человек");
+  assert.equal(migrated.attributes.INT, 8);
+  assert.equal(migrated.skills[0].id, "stable-skill");
+  assert.deepEqual(migrated.creation, {});
+  assert.deepEqual(migrated.professionTrees, {});
+  assert.deepEqual(migrated.development, { earnedPoints: 0, availablePoints: 0, draft: { attributes: {}, skills: {}, professionAbilities: {} } });
+  assert.equal(migrated.lifePath.generated, null);
+});
+
+test("version 5 migration adds an empty improvement-point ledger and preserves the character", () => {
+  const original = CharacterStore.createStore("Версия 5");
+  original.schemaVersion = 5;
+  const character = original.characters[0];
+  character.schemaVersion = 5;
+  character.personal.name = "Цири";
+  character.attributes.INT = 8;
+  character.skills.push({ id: "stable-skill", name: "Дедукция", attribute: "INT", rank: 4 });
+  delete character.development;
+  const migrated = CharacterStore.migrateStore(original);
+  assert.equal(migrated.schemaVersion, 7);
+  assert.equal(migrated.characters[0].schemaVersion, 7);
+  assert.equal(migrated.characters[0].personal.name, "Цири");
+  assert.equal(migrated.characters[0].attributes.INT, 8);
+  assert.equal(migrated.characters[0].skills[0].id, "stable-skill");
+  assert.deepEqual(migrated.characters[0].development, { earnedPoints: 0, availablePoints: 0, draft: { attributes: {}, skills: {}, professionAbilities: {} } });
+});
+
+test("version 6 migration adds a draft ledger and preserves available improvement points", () => {
+  const original = CharacterStore.createStore("Версия 6");
+  original.schemaVersion = 6;
+  const character = original.characters[0];
+  character.schemaVersion = 6;
+  character.development = { earnedPoints: 25, availablePoints: 9 };
+  const migrated = CharacterStore.migrateStore(original);
+  assert.equal(migrated.schemaVersion, 7);
+  assert.equal(migrated.characters[0].schemaVersion, 7);
+  assert.deepEqual(migrated.characters[0].development, { earnedPoints: 25, availablePoints: 9, draft: { attributes: {}, skills: {}, professionAbilities: {} } });
+});
+
+test("pending advancement survives normalization and rejects missing skill links", () => {
+  const store = CharacterStore.createStore("Черновик");
+  const character = store.characters[0];
+  character.attributes.INT = 5;
+  character.skills.push({ id: "stable-skill", name: "Внимание", attribute: "INT", rank: 1 });
+  character.development = {
+    earnedPoints: 60,
+    availablePoints: 7,
+    draft: { attributes: { INT: 1 }, skills: { "stable-skill": 2 }, professionAbilities: {} },
+  };
+  const normalized = CharacterStore.migrateStore(store).characters[0];
+  assert.deepEqual(normalized.development.draft, character.development.draft);
+  normalized.development.draft.skills.missing = 1;
+  assert.throws(() => CharacterStore.migrateStore({ ...store, characters: [normalized] }), /недопустимое улучшение навыка/);
+});
+
+test("reserved draft points cannot exceed the earned balance", () => {
+  const store = CharacterStore.createStore("Баланс О.У.");
+  const character = store.characters[0];
+  character.attributes.INT = 5;
+  character.development = { earnedPoints: 40, availablePoints: 0, draft: { attributes: { INT: 1 }, skills: {}, professionAbilities: {} } };
+  assert.throws(() => CharacterStore.migrateStore(store), /не хватает на сохранённый черновик/);
+});
+
+test("improvement-point balances must be integers and available points cannot exceed earned points", () => {
+  const store = CharacterStore.createStore();
+  store.characters[0].development = { earnedPoints: 2, availablePoints: 3 };
+  assert.throws(() => CharacterStore.migrateStore(store), /Баланс очков улучшения/);
+  store.characters[0].development = { earnedPoints: 2.5, availablePoints: 1 };
+  assert.throws(() => CharacterStore.migrateStore(store), /Баланс очков улучшения/);
+});
+
+test("generated life-path event links must point to a stored relative", () => {
+  const store = CharacterStore.createStore();
+  store.characters[0].lifePath.generated = {
+    kind: "standard", rolls: [], effects: [], relatives: [],
+    decadeEvents: [{ id: "event-1", title: "Событие", description: "", personId: "missing-relative" }],
+  };
+  assert.throws(() => CharacterStore.migrateStore(store), /ссылается на отсутствующего родственника/);
 });
 
 test("legacy inventory migrates to the first character and remains available as a backup", () => {
@@ -82,7 +226,8 @@ test("characters keep independent sheets and inventories after save and reload",
   const first = store.characters[0];
   first.personal.name = "Геральт";
   first.attributes.REF = 9;
-  first.skills.push({ id: "skill-1", name: "Ближний бой", attribute: "REF", rank: 6 });
+  first.attributeModifiers.REF = { permanent: 1, temporary: -2 };
+  first.skills.push({ id: "skill-1", name: "Ближний бой", attribute: "REF", rank: 6, permanentModifier: 2, temporaryModifier: -1 });
   first.state.currentHp = 28;
   first.abilities.push({ id: "ability-1", name: "Знак Квен", description: "Защитный знак" });
   first.equipment.items.push(inventoryItem("entry-1", "Медальон", 1, 0.2));
@@ -98,7 +243,10 @@ test("characters keep independent sheets and inventories after save and reload",
   assert.equal(reloaded.activeCharacterId, second.characterId);
   assert.equal(restoredFirst.personal.name, "Геральт");
   assert.equal(restoredFirst.attributes.REF, 9);
+  assert.deepEqual(restoredFirst.attributeModifiers.REF, { permanent: 1, temporary: -2 });
   assert.equal(restoredFirst.skills[0].rank, 6);
+  assert.equal(restoredFirst.skills[0].permanentModifier, 2);
+  assert.equal(restoredFirst.skills[0].temporaryModifier, -1);
   assert.equal(restoredFirst.state.currentHp, 28);
   assert.equal(restoredFirst.abilities[0].name, "Знак Квен");
   assert.equal(restoredFirst.equipment.items[0].name, "Медальон");

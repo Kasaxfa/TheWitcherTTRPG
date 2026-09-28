@@ -18,6 +18,11 @@
   <script src="./theme.js" defer></script>
   <script src="./data.js" defer></script>
   <script src="./character-store.js" defer></script>
+  <script src="./character-rules.js" defer></script>
+  <script src="./character-skills.js" defer></script>
+  <script src="./character-profession-trees.js" defer></script>
+  <script src="./character-advancement.js" defer></script>
+  <script src="./character-creation.js" defer></script>
   <script src="./app.js" defer></script>
 </head>
 <body>
@@ -38,7 +43,6 @@
       <nav class="section-nav" aria-label="Разделы">
         <button class="nav-item active" data-page="recipes" aria-current="page"><span class="nav-icon">⌕</span>Рецепты</button>
         <button class="nav-item" data-page="items"><span class="nav-icon">◇</span>Предметы</button>
-        <button class="nav-item" data-page="inventory"><span class="nav-icon">▤</span>Инвентарь</button>
         <button class="nav-item" data-page="characters"><span class="nav-icon">♙</span>Персонажи</button>
       </nav>
     </aside>
@@ -89,6 +93,7 @@
           <div class="character-library-toolbar">
             <label class="searchbox"><span aria-hidden="true">⌕</span><input id="character-search" type="search" placeholder="Имя, игрок, раса или профессия…" autocomplete="off" aria-label="Поиск персонажей"><kbd>/</kbd></label>
             <button class="button primary" id="new-character" type="button">＋ Создать персонажа</button>
+            <button class="button secondary" id="recover-character-data" type="button" hidden>Создать новый лист</button>
             <button class="button secondary" id="export-characters" type="button">Экспорт списка</button>
             <button class="button secondary" id="import-characters" type="button">Импорт JSON</button>
             <input id="character-file" type="file" accept="application/json,.json" hidden>
@@ -100,25 +105,77 @@
         <div id="character-editor" hidden>
           <div class="character-editor-header">
             <button class="button secondary" id="character-list-back" type="button">← К списку</button>
-            <div><div class="eyebrow">Лист персонажа</div><h2 id="character-editor-name"></h2></div>
+            <div class="character-editor-heading">
+              <div class="eyebrow">Интерактивный лист</div>
+              <h2 id="character-editor-name"></h2>
+              <div class="character-identity-summary"><span id="character-sheet-race">Раса не указана</span><span id="character-sheet-profession">Профессия не указана</span></div>
+            </div>
           </div>
+          <nav class="character-tabs" role="tablist" aria-label="Разделы листа персонажа">
+            <button id="character-tab-sheet" class="character-tab active" type="button" role="tab" aria-selected="true" aria-controls="character-sheet-panel" tabindex="0" data-character-tab="sheet">Лист</button>
+            <button id="character-tab-inventory" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-inventory-panel" tabindex="-1" data-character-tab="inventory">Инвентарь</button>
+            <button id="character-tab-background" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-background-panel" tabindex="-1" data-character-tab="background">Предыстория</button>
+            <button id="character-tab-abilities" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-abilities-panel" tabindex="-1" data-character-tab="abilities">Способности</button>
+            <button id="character-tab-development" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-development-panel" tabindex="-1" data-character-tab="development">Развитие</button>
+            <button id="character-tab-notes" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-notes-panel" tabindex="-1" data-character-tab="notes">Заметки</button>
+          </nav>
           <form id="character-form" class="character-form" autocomplete="off">
+            <section id="character-sheet-panel" class="character-tab-panel" role="tabpanel" aria-labelledby="character-tab-sheet" data-character-tab-panel="sheet">
+          <section class="character-status-summary" aria-label="Текущее состояние персонажа">
+            <div><span>ПЗ</span><strong id="character-summary-hp">—</strong></div>
+            <div><span>Выносливость</span><strong id="character-summary-sta">—</strong></div>
+            <div><span>Удача</span><strong id="character-summary-luck">—</strong></div>
+            <div class="character-summary-conditions"><span>Состояния</span><strong id="character-summary-conditions">Не отмечены</strong></div>
+          </section>
+          <details class="character-value-help"><summary>Как читаются значения</summary>
+              <div class="character-value-legend" aria-label="Обозначения значений">
+            <span><i class="value-dot manual"></i>Ручной ввод</span>
+            <span><i class="value-dot calculated"></i>Расчёт по правилам</span>
+          </div>
+          </details>
+
+
+              <div class="character-sheet-metrics">
+          <fieldset class="character-panel">
+            <legend>Текущее состояние</legend>
+            <div class="character-field-grid state-field-grid">
+              <label class="field">Текущие ПЗ · ввод<input data-character-number="state.currentHp" type="number" min="0" step="1"></label>
+              <label class="field">Текущая Выносливость · ввод<input data-character-number="state.currentSta" type="number" min="0" step="1"></label>
+              <label class="field">Текущая Удача · ввод<input data-character-number="state.currentLuck" type="number" min="0" step="1"></label>
+            </div>
+            <label class="field block-field">Состояния и ранения<textarea id="character-conditions" rows="3" placeholder="Каждое состояние — с новой строки"></textarea></label>
+          </fieldset>          <fieldset class="character-panel">
+            <legend>Производные показатели</legend>
+            <p class="character-panel-hint">Расчёт по правилам; непроверенные диапазоны остаются неизвестными.</p>
+            <div id="character-derived-values" class="character-derived-grid" aria-live="polite"></div>
+            <p id="character-derived-note" class="character-derived-note" hidden></p>
+          </fieldset>
+              </div>
+          <fieldset class="character-panel">
+            <legend>Навыки</legend>
+            <p class="character-panel-hint">Все навыки показаны сразу. Нажмите на название навыка или характеристику, чтобы открыть настройки; ранги повышаются во вкладке «Развитие».</p>
+            <p id="character-profession-skill-note" class="character-panel-hint"></p>
+            <div id="character-profession-choice-fields" class="profession-choice-fields"></div>
+            <div id="character-skills" class="character-entry-list"></div>
+            <button class="button secondary" id="add-character-skill" type="button">Добавить собственный навык</button>
+            
+          </fieldset>
+            </section>
+            <section id="character-background-panel" class="character-tab-panel" role="tabpanel" aria-labelledby="character-tab-background" data-character-tab-panel="background" hidden>
           <fieldset class="character-panel">
             <legend>Личные данные</legend>
             <div class="character-field-grid">
               <label class="field">Имя персонажа<input data-character-path="personal.name" maxlength="120"></label>
               <label class="field">Игрок<input data-character-path="personal.player" maxlength="120"></label>
-              <label class="field">Раса<input data-character-path="personal.race" maxlength="80"></label>
-              <label class="field">Пол<input data-character-path="personal.gender" maxlength="80"></label>
+              <label class="field">Раса<select data-character-select="race" aria-label="Раса персонажа"></select></label>
+              <label class="field">Пол<select data-character-select="gender" aria-label="Пол персонажа"></select></label>
               <label class="field">Возраст<input data-character-path="personal.age" maxlength="80"></label>
               <label class="field">Родина<input data-character-path="personal.homeland" maxlength="120"></label>
               <label class="field">Местоположение<input data-character-path="personal.location" maxlength="120"></label>
-              <label class="field">Профессия<input data-character-path="personal.profession" maxlength="120"></label>
+              <label class="field">Профессия<select data-character-select="profession" aria-label="Профессия персонажа"></select></label>
               <label class="field">Версия правил<input data-character-path="rulesVersion" maxlength="120"></label>
             </div>
-          </fieldset>
-
-          <fieldset class="character-panel">
+          </fieldset>          <fieldset class="character-panel">
             <legend>Жизненный путь</legend>
             <div class="character-field-grid">
               <label class="field">История семьи<input data-character-path="lifePath.familyHistory" maxlength="2000"></label>
@@ -135,69 +192,60 @@
               <label class="field">Враги<textarea data-character-lines="lifePath.enemies" rows="3" placeholder="Каждый враг — с новой строки"></textarea></label>
               <label class="field">Отношения<textarea data-character-lines="lifePath.relationships" rows="3" placeholder="Каждая связь — с новой строки"></textarea></label>
             </div>
+            <div id="character-life-path-generated" class="generated-life-path" aria-live="polite"></div>
             <div class="list-heading"><span>Игровые последствия</span></div>
             <div id="character-life-path-outcomes" class="character-entry-list"></div>
             <button class="button secondary" id="add-life-path-outcome" type="button">Добавить последствие</button>
           </fieldset>
-
-          <fieldset class="character-panel">
-            <legend>Характеристики</legend>
-            <div class="attribute-input-grid">
-              <label class="field">Интеллект · INT<input data-character-number="attributes.INT" type="number" min="0" max="1000" step="1"></label>
-              <label class="field">Реакция · REF<input data-character-number="attributes.REF" type="number" min="0" max="1000" step="1"></label>
-              <label class="field">Ловкость · DEX<input data-character-number="attributes.DEX" type="number" min="0" max="1000" step="1"></label>
-              <label class="field">Телосложение · BODY<input data-character-number="attributes.BODY" type="number" min="0" max="1000" step="1"></label>
-              <label class="field">Скорость · SPD<input data-character-number="attributes.SPD" type="number" min="0" max="1000" step="1"></label>
-              <label class="field">Эмпатия · EMP<input data-character-number="attributes.EMP" type="number" min="0" max="1000" step="1"></label>
-              <label class="field">Ремесло · CRA<input data-character-number="attributes.CRA" type="number" min="0" max="1000" step="1"></label>
-              <label class="field">Воля · WILL<input data-character-number="attributes.WILL" type="number" min="0" max="1000" step="1"></label>
-              <label class="field">Удача · LUCK<input data-character-number="attributes.LUCK" type="number" min="0" max="1000" step="1"></label>
-            </div>
-          </fieldset>
-
-          <fieldset class="character-panel">
-            <legend>Навыки</legend>
-            <div id="character-skills" class="character-entry-list"></div>
-            <button class="button secondary" id="add-character-skill" type="button">Добавить навык</button>
-          </fieldset>
-
-          <fieldset class="character-panel">
-            <legend>Текущее состояние</legend>
-            <div class="character-field-grid state-field-grid">
-              <label class="field">Текущие ПЗ<input data-character-number="state.currentHp" type="number" min="0" step="1"></label>
-              <label class="field">Текущая Выносливость<input data-character-number="state.currentSta" type="number" min="0" step="1"></label>
-              <label class="field">Текущая Удача<input data-character-number="state.currentLuck" type="number" min="0" step="1"></label>
-            </div>
-            <label class="field block-field">Состояния и ранения<textarea id="character-conditions" rows="3" placeholder="Каждое состояние — с новой строки"></textarea></label>
-          </fieldset>
-
+            </section>
+            <section id="character-abilities-panel" class="character-tab-panel" role="tabpanel" aria-labelledby="character-tab-abilities" data-character-tab-panel="abilities" hidden>
+              <fieldset class="character-panel">
+                <legend>Особенности расы</legend>
+                <div id="character-race-traits" class="race-trait-list" aria-live="polite"></div>
+              </fieldset>
+              <fieldset class="character-panel">
+                <legend>Дерево профессии</legend>
+                <div id="character-profession-tree" class="profession-tree-list" aria-live="polite"></div>
+              </fieldset>
           <fieldset class="character-panel">
             <legend>Способности</legend>
             <div id="character-abilities" class="character-entry-list"></div>
             <button class="button secondary" id="add-character-ability" type="button">Добавить способность</button>
           </fieldset>
-
+            </section>
+            <section id="character-development-panel" class="character-tab-panel" role="tabpanel" aria-labelledby="character-tab-development" data-character-tab-panel="development" hidden>
+              <fieldset class="character-panel">
+                <legend>Очки улучшения</legend>
+                <p class="character-panel-hint">Начисляйте О.У. после сессии. Улучшения остаются черновыми, пока вы не примените их; до этого ранги можно уменьшать. После применения потраченные О.У. нельзя перераспределить.</p>
+                <div class="improvement-points-summary" id="character-improvement-summary"></div>
+                <div class="improvement-award-row">
+                  <label class="field">Начислить очки<input id="improvement-points-input" type="number" min="1" max="100000" step="1" value="1" inputmode="numeric"></label>
+                  <button class="button primary" id="award-improvement-points" type="button">Начислить</button>
+                </div>
+              </fieldset>
+              <fieldset class="character-panel">
+                <legend>Покупка улучшений</legend>
+                <p class="character-panel-hint">Обычный навык: цена равна текущему рангу, первый ранг стоит 1; сложный навык стоит вдвое дороже. Характеристика: текущее исходное значение × 10. Обычный предел характеристики — 10. О.У. распределяются между черновыми улучшениями, а не переносятся из уже применённых.</p>
+                <div class="advancement-commit-bar">
+                  <span id="character-advancement-draft-note" class="character-panel-hint">Нет неподтверждённых улучшений.</span>
+                  <div><button class="button secondary" id="cancel-character-improvements" type="button" disabled>Отменить черновик</button><button class="button primary" id="apply-character-improvements" type="button" disabled>Применить прокачку</button></div>
+                </div>
+                <div id="character-advancement-list" class="character-advancement-list" aria-live="polite"></div>
+              </fieldset>
+            </section>
+            <section id="character-notes-panel" class="character-tab-panel" role="tabpanel" aria-labelledby="character-tab-notes" data-character-tab-panel="notes" hidden>
           <fieldset class="character-panel">
             <legend>Заметки</legend>
             <label class="field block-field">Личные заметки<textarea data-character-path="notes" rows="6" maxlength="100000" placeholder="История, цели, заметки игровой сессии…"></textarea></label>
           </fieldset>
+            </section>
           </form>
-        </div>
-        <dialog id="rename-character-dialog" class="rename-character-dialog" aria-labelledby="rename-character-title">
-          <form id="rename-character-form" method="dialog">
-            <h2 id="rename-character-title">Переименовать персонажа</h2>
-            <label class="field">Имя персонажа<input id="rename-character-input" maxlength="120" required></label>
-            <div class="rename-dialog-actions"><button class="button secondary" value="cancel">Отмена</button><button class="button primary" id="save-character-name" value="save">Сохранить</button></div>
-          </form>
-        </dialog>
-      </section>
-
-      <section id="inventory-page" class="page-view" aria-labelledby="inventory-title" hidden>
+      <section id="character-inventory-panel" class="character-tab-panel inventory-tab-panel" role="tabpanel" aria-labelledby="character-tab-inventory" data-character-tab-panel="inventory" hidden>
         <div class="workspace-head">
           <div><div class="eyebrow"><span class="eyebrow-line"></span>Лист персонажа</div><h1 id="inventory-title">Инвентарь</h1><p class="intro">Снаряжение персонажа: <strong id="inventory-character-name">Персонаж 1</strong>.</p></div>
         </div>
         <div class="inventory-summary">
-          <label class="capacity-field">Грузоподъёмность <span><input id="capacity-input" type="number" min="0" step="0.1" inputmode="decimal"> кг</span></label>
+          <label class="capacity-field">Грузоподъёмность, ручной предел <span><input id="capacity-input" type="number" min="0" step="0.1" inputmode="decimal" placeholder="по Тел" aria-label="Ручной предел грузоподъёмности в килограммах"> кг</span></label>
           <div class="weight-readout"><strong id="weight-total">0 кг</strong><span id="weight-caption">из 0 кг</span></div>
           <div class="weight-track" role="progressbar" aria-label="Загрузка грузоподъёмности" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="weight-progress"></span></div>
           <p id="weight-warning" class="inline-warning" hidden></p>
@@ -230,6 +278,63 @@
         <p id="inventory-message" class="status-message" role="status" aria-live="polite"></p>
         <p class="privacy-note">Данные хранятся в этом браузере. JSON-файл можно перенести на другое устройство или использовать как резервную копию.</p>
       </section>
+        </div>
+        <dialog id="rename-character-dialog" class="rename-character-dialog" aria-labelledby="rename-character-title">
+          <form id="rename-character-form" method="dialog">
+            <h2 id="rename-character-title">Переименовать персонажа</h2>
+            <label class="field">Имя персонажа<input id="rename-character-input" maxlength="120" required></label>
+            <div class="rename-dialog-actions"><button class="button secondary" value="cancel">Отмена</button><button class="button primary" id="save-character-name" value="save">Сохранить</button></div>
+          </form>
+        </dialog>
+        <dialog id="character-create-dialog" class="creation-dialog" aria-labelledby="character-create-title">
+          <div class="creation-dialog-inner">
+            <div id="character-create-content"></div>
+            <p id="character-create-error" class="creation-error" role="alert" hidden></p>
+            <div class="creation-dialog-actions" id="character-create-actions"></div>
+          </div>
+        </dialog>
+        <dialog id="character-attribute-dialog" class="character-info-dialog" aria-labelledby="character-attribute-dialog-title">
+          <div class="character-info-dialog-content">
+            <h2 id="character-attribute-dialog-title">Характеристика</h2>
+            <p id="character-attribute-dialog-note" class="character-panel-hint"></p>
+            <div class="character-field-grid">
+              <label class="field">Исходное значение<input id="character-attribute-base" data-attribute-setting="base" type="number" min="0" max="1000" step="1"></label>
+              <label class="field">Постоянное изменение<input id="character-attribute-permanent" data-attribute-setting="permanent" type="number" min="-1000" max="1000" step="1"></label>
+              <label class="field">Временное изменение<input id="character-attribute-temporary" data-attribute-setting="temporary" type="number" min="-1000" max="1000" step="1"></label>
+            </div>
+            <div class="character-info-dialog-total"><span>Итог с расой и предысторией</span><strong id="character-attribute-dialog-total">—</strong></div>
+            <div class="rename-dialog-actions"><button class="button secondary" id="close-character-attribute-dialog" type="button">Готово</button></div>
+          </div>
+        </dialog>
+        <dialog id="character-skill-dialog" class="character-info-dialog" aria-labelledby="character-skill-dialog-title">
+          <div class="character-info-dialog-content">
+            <h2 id="character-skill-dialog-title">Навык</h2>
+            <p id="character-skill-dialog-meta" class="character-panel-hint"></p>
+            <div class="character-field-grid">
+              <label class="field">Постоянное изменение<input id="character-skill-permanent" data-skill-setting="permanentModifier" type="number" min="-1000" max="1000" step="1"></label>
+              <label class="field">Временное изменение<input id="character-skill-temporary" data-skill-setting="temporaryModifier" type="number" min="-1000" max="1000" step="1"></label>
+            </div>
+            <div class="character-info-dialog-total"><span>Текущий ранг · меняется во вкладке «Развитие»</span><strong id="character-skill-dialog-rank">0</strong></div>
+            <div class="character-info-dialog-total"><span>Итог навыка</span><strong id="character-skill-dialog-total">—</strong></div>
+            <div class="rename-dialog-actions"><button class="button secondary" id="close-character-skill-dialog" type="button">Готово</button><button class="button primary" id="open-character-skill-development" type="button">Открыть развитие</button></div>
+          </div>
+        </dialog>
+        <dialog id="profession-skill-dialog" class="character-info-dialog" aria-labelledby="profession-skill-dialog-title">
+          <div class="character-info-dialog-content">
+            <div class="profession-skill-dialog-kicker">Умение дерева профессии</div>
+            <h2 id="profession-skill-dialog-title">Умение</h2>
+            <p id="profession-skill-dialog-meta" class="profession-skill-dialog-meta"></p>
+            <p id="profession-skill-dialog-description" class="profession-skill-dialog-description"></p>
+            <p id="profession-skill-dialog-status" class="profession-skill-dialog-status"></p>
+            <div class="rename-dialog-actions">
+              <button class="button secondary" id="close-profession-skill-dialog" type="button">Закрыть</button>
+              <button class="button primary" id="open-profession-skill-development" type="button">Открыть развитие</button>
+            </div>
+          </div>
+        </dialog>
+      </section>
+
+
     </div>
   </main>
 </body>
