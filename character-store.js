@@ -1,0 +1,341 @@
+(function (root, factory) {
+  const store = factory();
+  if (typeof module !== "undefined" && module.exports) module.exports = store;
+  if (root) root.CharacterStore = store;
+})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+  "use strict";
+
+  const FORMAT = "witcher-workshop-characters";
+  const SCHEMA_VERSION = 2;
+  const STORAGE_KEY = "witcher-workshop-characters-v1";
+  const LEGACY_INVENTORY_KEY = "witcher-workshop-inventory-v1";
+  const RULES_VERSION = "witcher-core-russian-errata-v4";
+  const ATTRIBUTES = ["INT", "REF", "DEX", "BODY", "SPD", "EMP", "CRA", "WILL", "LUCK"];
+  const ATTRIBUTE_SET = new Set(ATTRIBUTES);
+
+  function makeId() {
+    return globalThis.crypto?.randomUUID?.() || `character-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  }
+
+  function clone(value) {
+    return JSON.parse(JSON.stringify(value));
+  }
+
+  function isObject(value) {
+    return value !== null && typeof value === "object" && !Array.isArray(value);
+  }
+
+  function boundedString(value, label, max = 20000, allowEmpty = true) {
+    if (typeof value !== "string") throw new Error(`${label}: ожидалась строка.`);
+    if (value.length > max) throw new Error(`${label}: превышена допустимая длина.`);
+    if (!allowEmpty && !value.trim()) throw new Error(`${label}: поле не может быть пустым.`);
+    return value;
+  }
+
+  function optionalNumber(value, label, { min = 0, max = 100000 } = {}) {
+    if (value === null || value === "") return null;
+    const number = Number(value);
+    if (!Number.isFinite(number) || number < min || number > max) throw new Error(`${label}: недопустимое число.`);
+    return number;
+  }
+
+  function createCharacter(name = "Новый персонаж") {
+    const now = new Date().toISOString();
+    return {
+      characterId: makeId(),
+      schemaVersion: SCHEMA_VERSION,
+      rulesVersion: RULES_VERSION,
+      createdAt: now,
+      updatedAt: now,
+      personal: {
+        name,
+        player: "",
+        race: "",
+        gender: "",
+        age: "",
+        homeland: "",
+        location: "",
+        profession: "",
+      },
+      lifePath: {
+        familyHistory: "",
+        familyStation: "",
+        parents: "",
+        siblings: "",
+        decadeEvents: [],
+        allies: [],
+        enemies: [],
+        relationships: [],
+        addictionTrauma: "",
+        style: "",
+        values: "",
+        outcomes: [],
+      },
+      attributes: Object.fromEntries(ATTRIBUTES.map(attribute => [attribute, null])),
+      skills: [],
+      state: {
+        currentHp: null,
+        currentSta: null,
+        currentLuck: null,
+        conditions: [],
+      },
+      abilities: [],
+      equipment: {
+        capacityKg: null,
+        items: [],
+      },
+      notes: "",
+    };
+  }
+
+  function createStore(name = "Персонаж 1") {
+    const character = createCharacter(name);
+    return {
+      format: FORMAT,
+      schemaVersion: SCHEMA_VERSION,
+      activeCharacterId: character.characterId,
+      characters: [character],
+    };
+  }
+
+  function normalizeEquipmentEntry(raw, index) {
+    if (!isObject(raw)) throw new Error(`Снаряжение ${index + 1}: ожидался объект.`);
+    const id = boundedString(String(raw.id || makeId()), `Снаряжение ${index + 1}, ID`, 120, false);
+    const itemId = raw.itemId === null || raw.itemId === undefined || raw.itemId === ""
+      ? null
+      : boundedString(String(raw.itemId), `Снаряжение ${index + 1}, ID каталога`, 160, false);
+    const name = boundedString(String(raw.name || ""), `Снаряжение ${index + 1}, название`, 200, false).trim();
+    const quantity = optionalNumber(raw.quantity, `Снаряжение «${name}», количество`, { min: Number.MIN_VALUE });
+    if (quantity === null) throw new Error(`Снаряжение «${name}»: не указано количество.`);
+    const unitWeightKg = optionalNumber(raw.unitWeightKg, `Снаряжение «${name}», вес`, { min: 0 });
+    return { ...raw, id, itemId, name, quantity, unitWeightKg, custom: itemId === null };
+  }
+
+  function normalizeCharacter(raw, index) {
+    if (!isObject(raw)) throw new Error(`Персонаж ${index + 1}: ожидался объект.`);
+    if (Number(raw.schemaVersion ?? SCHEMA_VERSION) !== SCHEMA_VERSION) {
+      throw new Error(`Персонаж ${index + 1}: неподдерживаемая версия формата.`);
+    }
+    const characterId = boundedString(String(raw.characterId || ""), `Персонаж ${index + 1}, characterId`, 160, false).trim();
+    const defaults = createCharacter("Новый персонаж");
+    const personalRaw = raw.personal ?? {};
+    const lifePathRaw = raw.lifePath ?? {};
+    const attributesRaw = raw.attributes ?? {};
+    const stateRaw = raw.state ?? {};
+    const equipmentRaw = raw.equipment ?? {};
+    if (!isObject(personalRaw) || !isObject(lifePathRaw) || !isObject(attributesRaw) || !isObject(stateRaw) || !isObject(equipmentRaw)) {
+      throw new Error(`Персонаж ${index + 1}: личные данные, характеристики, состояние и снаряжение должны быть объектами.`);
+    }
+
+    const personal = { ...defaults.personal, ...personalRaw };
+    for (const [key, value] of Object.entries(personal)) boundedString(value, `Личные данные «${key}»`, 2000);
+
+    const lifePath = { ...defaults.lifePath, ...lifePathRaw };
+    for (const key of ["familyHistory", "familyStation", "parents", "siblings", "addictionTrauma", "style", "values"]) {
+      lifePath[key] = boundedString(lifePath[key], `Жизненный путь «${key}»`, 20000);
+    }
+    for (const key of ["decadeEvents", "allies", "enemies", "relationships"]) {
+      if (!Array.isArray(lifePath[key])) throw new Error(`Жизненный путь «${key}» должен быть списком.`);
+      lifePath[key] = lifePath[key].map((entry, entryIndex) => boundedString(entry, `Жизненный путь «${key}», запись ${entryIndex + 1}`, 2000, false).trim());
+    }
+    if (!Array.isArray(lifePath.outcomes)) throw new Error("Последствия жизненного пути должны быть списком.");
+    lifePath.outcomes = lifePath.outcomes.map((outcome, outcomeIndex) => {
+      if (!isObject(outcome)) throw new Error(`Последствие жизненного пути ${outcomeIndex + 1}: ожидался объект.`);
+      const type = boundedString(String(outcome.type || "Прочее"), `Последствие ${outcomeIndex + 1}, тип`, 100, false).trim();
+      const description = boundedString(String(outcome.description ?? ""), `Последствие ${outcomeIndex + 1}, описание`, 20000);
+      const source = boundedString(String(outcome.source ?? ""), `Последствие ${outcomeIndex + 1}, источник`, 2000);
+      const id = boundedString(String(outcome.id || makeId()), `Последствие ${outcomeIndex + 1}, ID`, 160, false);
+      return { ...outcome, id, type, description, source };
+    });
+    ensureUnique(lifePath.outcomes, outcome => outcome.id, "ID последствия жизненного пути");
+
+    const attributes = { ...defaults.attributes, ...attributesRaw };
+    for (const attribute of ATTRIBUTES) attributes[attribute] = optionalNumber(attributes[attribute], `Характеристика ${attribute}`, { min: 0, max: 1000 });
+
+    if (!Array.isArray(raw.skills ?? [])) throw new Error(`Персонаж ${index + 1}: навыки должны быть массивом.`);
+    const skills = (raw.skills ?? []).map((skill, skillIndex) => {
+      if (!isObject(skill)) throw new Error(`Навык ${skillIndex + 1}: ожидался объект.`);
+      const name = boundedString(String(skill.name || ""), `Навык ${skillIndex + 1}, название`, 200).trim();
+      const attribute = skill.attribute === null || skill.attribute === undefined || skill.attribute === ""
+        ? null
+        : boundedString(String(skill.attribute), `Навык «${name}», характеристика`, 20, false);
+      if (attribute !== null && !ATTRIBUTE_SET.has(attribute)) throw new Error(`Навык «${name}»: неизвестная характеристика ${attribute}.`);
+      const rank = optionalNumber(skill.rank, `Навык «${name}», значение`, { min: 0, max: 1000 });
+      return { ...skill, id: boundedString(String(skill.id || makeId()), `Навык «${name}», ID`, 160, false), name, attribute, rank };
+    });
+    ensureUnique(skills, item => item.id, "ID навыка");
+
+    const state = { ...defaults.state, ...stateRaw };
+    for (const key of ["currentHp", "currentSta", "currentLuck"]) state[key] = optionalNumber(state[key], `Состояние «${key}»`, { min: 0, max: 100000 });
+    if (!Array.isArray(state.conditions)) throw new Error(`Персонаж ${index + 1}: состояния должны быть массивом.`);
+    state.conditions = state.conditions.map((condition, conditionIndex) => boundedString(condition, `Состояние ${conditionIndex + 1}`, 2000, false).trim());
+
+    if (!Array.isArray(raw.abilities ?? [])) throw new Error(`Персонаж ${index + 1}: способности должны быть массивом.`);
+    const abilities = (raw.abilities ?? []).map((ability, abilityIndex) => {
+      if (!isObject(ability)) throw new Error(`Способность ${abilityIndex + 1}: ожидался объект.`);
+      const name = boundedString(String(ability.name || ""), `Способность ${abilityIndex + 1}, название`, 200).trim();
+      const description = boundedString(String(ability.description ?? ""), `Способность «${name}», описание`, 20000);
+      return { ...ability, id: boundedString(String(ability.id || makeId()), `Способность «${name}», ID`, 160, false), name, description };
+    });
+    ensureUnique(abilities, item => item.id, "ID способности");
+
+    const capacityKg = optionalNumber(equipmentRaw.capacityKg, "Грузоподъёмность", { min: 0 });
+    if (!Array.isArray(equipmentRaw.items ?? [])) throw new Error(`Персонаж ${index + 1}: снаряжение должно быть массивом.`);
+    const equipment = { ...equipmentRaw, capacityKg, items: (equipmentRaw.items ?? []).map(normalizeEquipmentEntry) };
+    ensureUnique(equipment.items, item => item.id, "ID предмета инвентаря");
+
+    const name = boundedString(String(personal.name ?? ""), "Имя персонажа", 2000);
+    const rulesVersion = boundedString(String(raw.rulesVersion ?? RULES_VERSION), "Версия правил", 200);
+    const notes = boundedString(String(raw.notes ?? ""), "Заметки", 100000);
+    const createdAt = boundedString(String(raw.createdAt ?? defaults.createdAt), "Дата создания", 100);
+    const updatedAt = boundedString(String(raw.updatedAt ?? defaults.updatedAt), "Дата изменения", 100);
+    return {
+      ...defaults,
+      ...raw,
+      characterId,
+      schemaVersion: SCHEMA_VERSION,
+      rulesVersion,
+      createdAt,
+      updatedAt,
+      personal: { ...personal, name },
+      lifePath,
+      attributes,
+      skills,
+      state,
+      abilities,
+      equipment,
+      notes,
+    };
+  }
+
+  function ensureUnique(list, keySelector, label) {
+    const values = new Set();
+    for (const value of list) {
+      const key = keySelector(value);
+      if (values.has(key)) throw new Error(`Повторяется ${label}: ${key}.`);
+      values.add(key);
+    }
+  }
+
+  const STORE_MIGRATIONS = Object.freeze({
+    1: raw => ({
+      ...raw,
+      schemaVersion: 2,
+      characters: raw.characters.map(character => ({ ...character, schemaVersion: 2 })),
+    }),
+  });
+
+  function migrateStore(raw) {
+    if (!isObject(raw)) throw new Error("Файл персонажей должен содержать JSON-объект.");
+    const sourceVersion = Number(raw.schemaVersion ?? raw.version);
+    if (!Number.isInteger(sourceVersion) || sourceVersion < 1) throw new Error("В файле не указана поддерживаемая версия формата.");
+    if (sourceVersion > SCHEMA_VERSION) throw new Error(`Формат ${sourceVersion} новее поддерживаемого (${SCHEMA_VERSION}); данные не изменены.`);
+    let value = clone(raw);
+    let version = sourceVersion;
+    while (version < SCHEMA_VERSION) {
+      const migration = STORE_MIGRATIONS[version];
+      if (!migration) throw new Error(`Нет миграции формата ${version} → ${version + 1}; данные не изменены.`);
+      const previousVersion = version;
+      value = migration(value);
+      version = Number(value.schemaVersion);
+      if (!Number.isInteger(version) || version !== previousVersion + 1) throw new Error("Миграция не обновила версию формата последовательно.");
+    }
+    if (value.format !== FORMAT) throw new Error("Формат файла персонажей не распознан.");
+    if (!Array.isArray(value.characters) || value.characters.length === 0) throw new Error("В файле должен быть хотя бы один персонаж.");
+    const characters = value.characters.map(normalizeCharacter);
+    ensureUnique(characters, character => character.characterId, "characterId");
+    if (!characters.some(character => character.characterId === value.activeCharacterId)) {
+      throw new Error("ID активного персонажа отсутствует в списке; файл не импортирован.");
+    }
+    const activeCharacterId = value.activeCharacterId;
+    return { ...value, format: FORMAT, schemaVersion: SCHEMA_VERSION, activeCharacterId, characters };
+  }
+
+  function normalizeLegacyInventory(raw, cleanEntry = normalizeEquipmentEntry) {
+    if (!isObject(raw) || Number(raw.version) !== 1 || !Array.isArray(raw.items)) {
+      throw new Error("Старый инвентарь не соответствует формату версии 1.");
+    }
+    const capacityKg = optionalNumber(raw.capacityKg, "Грузоподъёмность", { min: 0 });
+    const items = raw.items.map((item, index) => {
+      let result;
+      try { result = cleanEntry(item, index); }
+      catch { throw new Error(`Старый инвентарь содержит некорректную запись №${index + 1}; исходный файл оставлен без изменений.`); }
+      if (!result) throw new Error(`Старый инвентарь содержит некорректную запись №${index + 1}; исходный файл оставлен без изменений.`);
+      return normalizeEquipmentEntry(result, index);
+    });
+    ensureUnique(items, item => item.id, "ID предмета инвентаря");
+    return { capacityKg, items };
+  }
+
+  function load(storage, { cleanLegacyEntry = normalizeEquipmentEntry } = {}) {
+    const existingRaw = storage.getItem(STORAGE_KEY);
+    if (existingRaw !== null) {
+      let parsed;
+      try { parsed = JSON.parse(existingRaw); }
+      catch { throw new Error("Сохранение персонажей повреждено. Исходные данные оставлены на месте; импортируйте резервную копию."); }
+      const parsedVersion = Number(parsed?.schemaVersion ?? parsed?.version);
+      const normalized = migrateStore(parsed);
+      if (parsedVersion < SCHEMA_VERSION) storage.setItem(`${STORAGE_KEY}.backup-v${parsedVersion}`, existingRaw);
+      const normalizedRaw = JSON.stringify(normalized);
+      if (normalizedRaw !== existingRaw) storage.setItem(STORAGE_KEY, normalizedRaw);
+      return { store: normalized, migratedLegacyInventory: false, migratedSchemaVersion: parsedVersion < SCHEMA_VERSION, legacyBackup: null };
+    }
+
+    const legacyRaw = storage.getItem(LEGACY_INVENTORY_KEY);
+    if (legacyRaw !== null) {
+      let legacy;
+      try { legacy = JSON.parse(legacyRaw); }
+      catch { throw new Error("Старый инвентарь не читается как JSON. Исходные данные оставлены на месте."); }
+      const equipment = normalizeLegacyInventory(legacy, cleanLegacyEntry);
+      const store = createStore("Персонаж 1");
+      store.characters[0].equipment = equipment;
+      store.legacyInventoryBackup = clone(legacy);
+      storage.setItem(STORAGE_KEY, JSON.stringify(store));
+      return { store, migratedLegacyInventory: true, migratedSchemaVersion: false, legacyBackup: clone(legacy) };
+    }
+
+    const store = createStore();
+    storage.setItem(STORAGE_KEY, JSON.stringify(store));
+    return { store, migratedLegacyInventory: false, migratedSchemaVersion: false, legacyBackup: null };
+  }
+
+  function save(storage, store) {
+    const normalized = migrateStore(store);
+    const serialized = JSON.stringify(normalized);
+    storage.setItem(STORAGE_KEY, serialized);
+    return normalized;
+  }
+
+  function createBackup(store) {
+    return { ...clone(migrateStore(store)), exportedAt: new Date().toISOString() };
+  }
+
+  function parseImport(payload, { cleanLegacyEntry = normalizeEquipmentEntry } = {}) {
+    if (!isObject(payload)) throw new Error("JSON должен содержать объект.");
+    if (payload.format === FORMAT) return { kind: "characters", store: migrateStore(payload) };
+    if (payload.format === "witcher-workshop-inventory" && Number(payload.version) === 1) {
+      const equipment = normalizeLegacyInventory(payload, cleanLegacyEntry);
+      const store = createStore("Персонаж из резервной копии");
+      store.characters[0].equipment = equipment;
+      return { kind: "legacy-inventory", store };
+    }
+    throw new Error("Формат JSON не распознан.");
+  }
+
+  return {
+    FORMAT,
+    SCHEMA_VERSION,
+    STORAGE_KEY,
+    LEGACY_INVENTORY_KEY,
+    ATTRIBUTES,
+    RULES_VERSION,
+    createCharacter,
+    createStore,
+    migrateStore,
+    normalizeLegacyInventory,
+    load,
+    save,
+    createBackup,
+    parseImport,
+  };
+});

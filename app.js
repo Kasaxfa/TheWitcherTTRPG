@@ -4,8 +4,7 @@
   const alchemySymbols = window.ALCHEMY_SYMBOLS || {};
   const itemAliases = window.ITEM_ID_ALIASES || {};
   const itemById = new Map(items.map(item => [item.id, item]));
-  const storageKey = "witcher-workshop-inventory-v1";
-  const sections = { recipes: "Рецепты", items: "Предметы", inventory: "Инвентарь" };
+  const sections = { recipes: "Рецепты", items: "Предметы", inventory: "Инвентарь", characters: "Персонажи" };
   const $ = selector => document.querySelector(selector);
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
   const normalize = value => String(value ?? "").toLocaleLowerCase("ru-RU").replaceAll("ё", "е");
@@ -176,31 +175,74 @@
     const itemId = raw.itemId ? resolveItemId(String(raw.itemId)) : null;
     const catalogItem = itemId ? itemById.get(itemId) : null;
     const name = String(raw.name || catalogItem?.name || "").trim().slice(0, 120);
-    if (!name || (itemId && !catalogItem)) return null;
+    if (!name) return null;
     return { id: String(raw.id || createEntryId()).slice(0, 120), itemId, name, quantity, unitWeightKg: unitWeight, custom: !itemId };
   }
 
-  function readInventory() {
-    const initial = { version: 1, capacityKg: null, items: [] };
-    try {
-      const stored = JSON.parse(localStorage.getItem(storageKey) || "null");
-      if (!stored || stored.version !== 1 || !Array.isArray(stored.items)) return initial;
-      const capacity = stored.capacityKg === null || stored.capacityKg === "" ? null : Number(stored.capacityKg);
-      initial.capacityKg = Number.isFinite(capacity) && capacity >= 0 && capacity <= 100000 ? capacity : null;
-      initial.items = stored.items.map(cleanEntry).filter(Boolean);
-      return initial;
-    } catch { return initial; }
+  let persistenceReady = true;
+  let persistenceError = "";
+  let migrationNotice = "";
+  let characterStore;
+  try {
+    const loaded = window.CharacterStore.load(localStorage, { cleanLegacyEntry: cleanEntry });
+    characterStore = loaded.store;
+    if (loaded.migratedLegacyInventory) migrationNotice = "Старый инвентарь перенесён в «Персонаж 1». Исходный JSON сохранён для восстановления.";
+    if (loaded.migratedSchemaVersion) migrationNotice = "Формат листа обновлён; исходная версия сохранена в резервной копии браузера.";
+  } catch (error) {
+    persistenceReady = false;
+    persistenceError = error.message || "Не удалось проверить сохранение.";
+    characterStore = window.CharacterStore.createStore("Данные не загружены");
   }
 
-  let inventory = readInventory();
+  function activeCharacter() {
+    return characterStore.characters.find(character => character.characterId === characterStore.activeCharacterId) || characterStore.characters[0];
+  }
 
-  function saveInventory(message = "") {
-    try {
-      localStorage.setItem(storageKey, JSON.stringify(inventory));
-      $("#inventory-message").textContent = message;
-    } catch {
-      $("#inventory-message").textContent = "Браузер не смог сохранить данные. Скачайте JSON-файл как резервную копию.";
+  let inventory = activeCharacter().equipment;
+  let saveTimer = null;
+
+  function setSaveMessage(message, isError = false) {
+    const characterMessage = $("#character-message");
+    if (characterMessage) {
+      characterMessage.textContent = message;
+      characterMessage.classList.toggle("is-error", isError);
     }
+    const inventoryMessage = $("#inventory-message");
+    if (inventoryMessage) {
+      inventoryMessage.textContent = message;
+      inventoryMessage.classList.toggle("is-error", isError);
+    }
+  }
+
+  function persistStore(message = "", immediate = true) {
+    if (!persistenceReady) {
+      setSaveMessage(`Сохранение заблокировано: ${persistenceError} Загрузите проверенный JSON-файл.`, true);
+      return false;
+    }
+    if (saveTimer) window.clearTimeout(saveTimer);
+    const write = () => {
+      saveTimer = null;
+      try {
+        activeCharacter().updatedAt = new Date().toISOString();
+        characterStore = window.CharacterStore.save(localStorage, characterStore);
+        inventory = activeCharacter().equipment;
+        const time = new Intl.DateTimeFormat("ru-RU", { hour: "2-digit", minute: "2-digit" }).format(new Date());
+        setSaveMessage(`${message ? `${message} ` : ""}Сохранено локально в ${time}.`);
+      } catch (error) {
+        setSaveMessage(`Не удалось сохранить. Скачайте JSON-резервную копию. ${error.message || ""}`.trim(), true);
+      }
+    };
+    if (immediate) write();
+    else {
+      setSaveMessage("Сохраняю изменения…");
+      saveTimer = window.setTimeout(write, 300);
+    }
+    return true;
+  }
+
+  function saveInventory(message = "Изменения инвентаря сохранены.") {
+    activeCharacter().equipment = inventory;
+    persistStore(message, true);
     renderInventory();
   }
 
@@ -265,6 +307,7 @@
   }
 
   function renderInventory() {
+    $("#inventory-character-name").textContent = activeCharacter().personal.name.trim() || "Без имени";
     const knownWeight = inventory.items.reduce((sum, entry) => sum + (entry.unitWeightKg === null ? 0 : entry.unitWeightKg * entry.quantity), 0);
     const unknownCount = inventory.items.filter(entry => entry.unitWeightKg === null).length;
     const capacity = inventory.capacityKg;
@@ -304,6 +347,187 @@
     saveInventory("Инвентарь сохранён в этом браузере.");
   }
 
+  const attributeLabels = {
+    INT: "Интеллект", REF: "Реакция", DEX: "Ловкость", BODY: "Телосложение",
+    SPD: "Скорость", EMP: "Эмпатия", CRA: "Ремесло", WILL: "Воля", LUCK: "Удача",
+  };
+
+  function renderCharacterSelector() {
+    const select = $("#character-select");
+    select.innerHTML = characterStore.characters.map((character, index) => {
+      const name = character.personal.name.trim() || `Персонаж ${index + 1}`;
+      const suffix = [character.personal.race, character.personal.profession].filter(Boolean).join(" · ");
+      return `<option value="${escapeHtml(character.characterId)}">${escapeHtml(name)}${suffix ? ` — ${escapeHtml(suffix)}` : ""}</option>`;
+    }).join("");
+    select.value = characterStore.activeCharacterId;
+    $("#delete-character").disabled = characterStore.characters.length <= 1 || !persistenceReady;
+    $("#new-character").disabled = !persistenceReady;
+    $("#inventory-character-name").textContent = activeCharacter().personal.name.trim() || "Без имени";
+  }
+
+  function renderSkillRows() {
+    const list = $("#character-skills");
+    if (!activeCharacter().skills.length) {
+      list.innerHTML = `<p class="character-empty">Навыки пока не добавлены.</p>`;
+      return;
+    }
+    list.innerHTML = activeCharacter().skills.map(skill => `<div class="character-entry skill-entry" data-skill-id="${escapeHtml(skill.id)}">
+      <input data-skill-field="name" maxlength="120" value="${escapeHtml(skill.name)}" aria-label="Название навыка">
+      <select data-skill-field="attribute" aria-label="Ведущая характеристика"><option value="">Не указана</option>${window.CharacterStore.ATTRIBUTES.map(attribute => `<option value="${attribute}"${skill.attribute === attribute ? " selected" : ""}>${attribute} · ${attributeLabels[attribute]}</option>`).join("")}</select>
+      <input data-skill-field="rank" type="number" min="0" max="1000" step="1" value="${skill.rank === null ? "" : escapeHtml(skill.rank)}" aria-label="Рейтинг навыка">
+      <button class="character-remove" type="button" data-remove-skill="${escapeHtml(skill.id)}" aria-label="Удалить навык">×</button>
+    </div>`).join("");
+  }
+
+  function renderAbilityRows() {
+    const list = $("#character-abilities");
+    if (!activeCharacter().abilities.length) {
+      list.innerHTML = `<p class="character-empty">Способности пока не добавлены.</p>`;
+      return;
+    }
+    list.innerHTML = activeCharacter().abilities.map(ability => `<div class="character-entry ability-entry" data-ability-id="${escapeHtml(ability.id)}">
+      <input data-ability-field="name" maxlength="120" value="${escapeHtml(ability.name)}" aria-label="Название способности">
+      <textarea data-ability-field="description" maxlength="20000" rows="2" placeholder="Описание или заметка" aria-label="Описание способности">${escapeHtml(ability.description)}</textarea>
+      <button class="character-remove" type="button" data-remove-ability="${escapeHtml(ability.id)}" aria-label="Удалить способность">×</button>
+    </div>`).join("");
+  }
+
+  function renderLifePathOutcomes() {
+    const list = $("#character-life-path-outcomes");
+    if (!activeCharacter().lifePath.outcomes.length) {
+      list.innerHTML = `<p class="character-empty">Последствия пока не добавлены.</p>`;
+      return;
+    }
+    const types = ["Событие", "Союзник", "Враг", "Отношения", "Долг", "Прочее"];
+    list.innerHTML = activeCharacter().lifePath.outcomes.map(outcome => {
+      const outcomeTypes = types.includes(outcome.type) ? types : [outcome.type, ...types];
+      return `<div class="character-entry life-path-outcome" data-life-path-outcome-id="${escapeHtml(outcome.id)}">
+      <select data-life-path-outcome-field="type" aria-label="Тип последствия">${outcomeTypes.map(type => `<option value="${escapeHtml(type)}"${outcome.type === type ? " selected" : ""}>${escapeHtml(type)}</option>`).join("")}</select>
+      <textarea data-life-path-outcome-field="description" maxlength="20000" rows="2" placeholder="Описание последствия" aria-label="Описание последствия">${escapeHtml(outcome.description)}</textarea>
+      <input data-life-path-outcome-field="source" maxlength="2000" value="${escapeHtml(outcome.source)}" placeholder="Источник или заметка" aria-label="Источник или заметка">
+      <button class="character-remove" type="button" data-remove-life-path-outcome="${escapeHtml(outcome.id)}" aria-label="Удалить последствие">×</button>
+    </div>`;
+    }).join("");
+  }
+
+  function renderCharacterEditor() {
+    const character = activeCharacter();
+    document.querySelectorAll("[data-character-path]").forEach(input => {
+      const path = input.dataset.characterPath.split(".");
+      input.value = path.length === 1 ? character[path[0]] ?? "" : character[path[0]]?.[path[1]] ?? "";
+    });
+    document.querySelectorAll("[data-character-number]").forEach(input => {
+      const [section, key] = input.dataset.characterNumber.split(".");
+      const value = character[section]?.[key];
+      input.value = value === null || value === undefined ? "" : String(value);
+    });
+    document.querySelectorAll("[data-character-lines]").forEach(input => {
+      const path = input.dataset.characterLines.split(".");
+      input.value = path.reduce((value, part) => value?.[part], character)?.join("\n") || "";
+    });
+    $("#character-conditions").value = character.state.conditions.join("\n");
+    renderCharacterSelector();
+    renderSkillRows();
+    renderAbilityRows();
+    renderLifePathOutcomes();
+  }
+
+  function updateCharacterPath(path, value) {
+    const parts = path.split(".");
+    if (parts.length === 1) activeCharacter()[parts[0]] = value;
+    else activeCharacter()[parts[0]][parts[1]] = value;
+  }
+
+  function addNewCharacter() {
+    const character = window.CharacterStore.createCharacter(`Персонаж ${characterStore.characters.length + 1}`);
+    characterStore.characters.push(character);
+    characterStore.activeCharacterId = character.characterId;
+    inventory = character.equipment;
+    renderCharacterEditor();
+    renderInventory();
+    persistStore("Создан новый персонаж.");
+  }
+
+  function downloadJson(payload, filename) {
+    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = filename;
+    anchor.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function exportCharacterData() {
+    try {
+      if (!persistenceReady) {
+        const raw = localStorage.getItem(window.CharacterStore.STORAGE_KEY) ?? localStorage.getItem(window.CharacterStore.LEGACY_INVENTORY_KEY);
+        if (raw !== null) {
+          const blob = new Blob([raw], { type: "application/json" });
+          const url = URL.createObjectURL(blob);
+          const anchor = document.createElement("a");
+          anchor.href = url;
+          anchor.download = "witcher-characters-recovery.json";
+          anchor.click();
+          window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+          setSaveMessage("Исходное сохранение выгружено без изменений.");
+          return;
+        }
+      }
+      downloadJson(window.CharacterStore.createBackup(characterStore), "witcher-characters.json");
+      setSaveMessage("Резервная копия персонажей скачана.");
+    } catch (error) {
+      setSaveMessage(`Не удалось создать резервную копию: ${error.message || "ошибка"}`, true);
+    }
+  }
+
+  function updateSkillFromControl(event) {
+    const control = event.target.closest("[data-skill-field]");
+    if (!control) return false;
+    const row = control.closest("[data-skill-id]");
+    const skill = activeCharacter().skills.find(value => value.id === row?.dataset.skillId);
+    if (!skill) return true;
+    if (control.dataset.skillField === "rank") {
+      const value = control.value === "" ? null : Number(control.value);
+      if (value !== null && (!Number.isFinite(value) || value < 0 || value > 1000)) return true;
+      skill.rank = value;
+    } else skill[control.dataset.skillField] = control.value;
+    persistStore("Навыки обновлены.", event.type === "change");
+    return true;
+  }
+
+  function updateAbilityFromControl(event) {
+    const control = event.target.closest("[data-ability-field]");
+    if (!control) return false;
+    const row = control.closest("[data-ability-id]");
+    const ability = activeCharacter().abilities.find(value => value.id === row?.dataset.abilityId);
+    if (!ability) return true;
+    ability[control.dataset.abilityField] = control.value;
+    persistStore("Способности обновлены.", event.type === "change");
+    return true;
+  }
+
+  function updateLifePathOutcomeFromControl(event) {
+    const control = event.target.closest("[data-life-path-outcome-field]");
+    if (!control) return false;
+    const row = control.closest("[data-life-path-outcome-id]");
+    const outcome = activeCharacter().lifePath.outcomes.find(value => value.id === row?.dataset.lifePathOutcomeId);
+    if (!outcome) return true;
+    outcome[control.dataset.lifePathOutcomeField] = control.value;
+    persistStore("Жизненный путь обновлён.", event.type === "change");
+    return true;
+  }
+
+  function lockEditingForInvalidSave() {
+    if (persistenceReady) return;
+    document.querySelectorAll("#character-form input, #character-form select, #character-form textarea, #character-form button, #character-select, #new-character, #delete-character, #inventory-page input, #inventory-page button")
+      .forEach(control => { control.disabled = true; });
+    $("#export-characters").disabled = false;
+    $("#import-characters").disabled = false;
+    $("#character-message").textContent = `${persistenceError} Данные в браузере оставлены без изменений; загрузите резервную копию.`;
+    $("#character-message").classList.add("is-error");
+  }
+
   function showPage(page) {
     if (!sections[page]) return;
     activePage = page;
@@ -318,6 +542,136 @@
   }
 
   document.querySelectorAll(".nav-item").forEach(button => button.addEventListener("click", () => showPage(button.dataset.page)));
+
+  function updateCharacterFromForm(event) {
+    const textControl = event.target.closest("[data-character-path]");
+    const numberControl = event.target.closest("[data-character-number]");
+    const linesControl = event.target.closest("[data-character-lines]");
+    if (textControl) {
+      updateCharacterPath(textControl.dataset.characterPath, textControl.value);
+      if (textControl.dataset.characterPath.startsWith("personal.")) renderCharacterSelector();
+    } else if (numberControl) {
+      const value = numberControl.value === "" ? null : Number(numberControl.value);
+      if (value !== null && (!Number.isFinite(value) || value < 0 || value > 100000)) return;
+      const [section, key] = numberControl.dataset.characterNumber.split(".");
+      activeCharacter()[section][key] = value;
+    } else if (linesControl) {
+      const [section, key] = linesControl.dataset.characterLines.split(".");
+      activeCharacter()[section][key] = linesControl.value.split(/\r?\n/).map(value => value.trim()).filter(Boolean);
+    } else if (event.target.id === "character-conditions") {
+      activeCharacter().state.conditions = event.target.value.split(/\r?\n/).map(value => value.trim()).filter(Boolean);
+    } else return;
+    persistStore("Лист персонажа обновлён.", event.type === "change");
+  }
+
+  $("#character-form").addEventListener("input", updateCharacterFromForm);
+  $("#character-form").addEventListener("change", updateCharacterFromForm);
+  $("#add-life-path-outcome").addEventListener("click", () => {
+    activeCharacter().lifePath.outcomes.push({ id: createEntryId(), type: "Событие", description: "", source: "" });
+    renderLifePathOutcomes();
+    persistStore("Добавлено последствие жизненного пути.");
+    [...$("#character-life-path-outcomes").querySelectorAll('[data-life-path-outcome-field="description"]')].at(-1)?.focus();
+  });
+  $("#character-life-path-outcomes").addEventListener("input", updateLifePathOutcomeFromControl);
+  $("#character-life-path-outcomes").addEventListener("change", updateLifePathOutcomeFromControl);
+  $("#character-life-path-outcomes").addEventListener("click", event => {
+    const button = event.target.closest("[data-remove-life-path-outcome]");
+    if (!button) return;
+    activeCharacter().lifePath.outcomes = activeCharacter().lifePath.outcomes.filter(outcome => outcome.id !== button.dataset.removeLifePathOutcome);
+    renderLifePathOutcomes();
+    persistStore("Последствие жизненного пути удалено.");
+  });
+  $("#character-select").addEventListener("change", event => {
+    if (!characterStore.characters.some(character => character.characterId === event.target.value)) return;
+    persistStore("", true);
+    characterStore.activeCharacterId = event.target.value;
+    inventory = activeCharacter().equipment;
+    renderCharacterEditor();
+    renderInventory();
+    persistStore("Выбран другой персонаж.");
+  });
+  $("#new-character").addEventListener("click", addNewCharacter);
+  $("#delete-character").addEventListener("click", () => {
+    if (characterStore.characters.length <= 1) return;
+    const character = activeCharacter();
+    const name = character.personal.name.trim() || "Без имени";
+    if (!window.confirm(`Удалить персонажа «${name}» и его инвентарь?`)) return;
+    characterStore.characters = characterStore.characters.filter(value => value.characterId !== character.characterId);
+    characterStore.activeCharacterId = characterStore.characters[0].characterId;
+    inventory = activeCharacter().equipment;
+    renderCharacterEditor();
+    renderInventory();
+    persistStore("Персонаж удалён.");
+  });
+  $("#add-character-skill").addEventListener("click", () => {
+    activeCharacter().skills.push({ id: createEntryId(), name: "", attribute: null, rank: null });
+    renderSkillRows();
+    persistStore("Добавлен навык.");
+    [...$("#character-skills").querySelectorAll('[data-skill-field="name"]')].at(-1)?.focus();
+  });
+  $("#character-skills").addEventListener("input", updateSkillFromControl);
+  $("#character-skills").addEventListener("change", updateSkillFromControl);
+  $("#character-skills").addEventListener("click", event => {
+    const button = event.target.closest("[data-remove-skill]");
+    if (!button) return;
+    activeCharacter().skills = activeCharacter().skills.filter(skill => skill.id !== button.dataset.removeSkill);
+    renderSkillRows();
+    persistStore("Навык удалён.");
+  });
+  $("#add-character-ability").addEventListener("click", () => {
+    activeCharacter().abilities.push({ id: createEntryId(), name: "", description: "" });
+    renderAbilityRows();
+    persistStore("Добавлена способность.");
+    [...$("#character-abilities").querySelectorAll('[data-ability-field="name"]')].at(-1)?.focus();
+  });
+  $("#character-abilities").addEventListener("input", updateAbilityFromControl);
+  $("#character-abilities").addEventListener("change", updateAbilityFromControl);
+  $("#character-abilities").addEventListener("click", event => {
+    const button = event.target.closest("[data-remove-ability]");
+    if (!button) return;
+    activeCharacter().abilities = activeCharacter().abilities.filter(ability => ability.id !== button.dataset.removeAbility);
+    renderAbilityRows();
+    persistStore("Способность удалена.");
+  });
+  $("#export-characters").addEventListener("click", exportCharacterData);
+  $("#import-characters").addEventListener("click", () => $("#character-file").click());
+  $("#character-file").addEventListener("change", async event => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      if (file.size > 20 * 1024 * 1024) throw new Error("Файл больше 20 МБ.");
+      const payload = JSON.parse(await file.text());
+      const imported = window.CharacterStore.parseImport(payload, { cleanLegacyEntry: cleanEntry });
+      let candidate;
+      if (imported.kind === "characters" && persistenceReady) {
+        if (!window.confirm("Заменить текущий список персонажей этим файлом? Сначала скачайте JSON-резервную копию.")) return;
+        const currentRaw = localStorage.getItem(window.CharacterStore.STORAGE_KEY);
+        if (currentRaw !== null) localStorage.setItem(`${window.CharacterStore.STORAGE_KEY}.pre-import-backup`, currentRaw);
+        candidate = imported.store;
+      } else if (imported.kind === "legacy-inventory" && persistenceReady) {
+        candidate = JSON.parse(JSON.stringify(characterStore));
+        const newCharacter = imported.store.characters[0];
+        newCharacter.personal.name = `Персонаж ${candidate.characters.length + 1}`;
+        candidate.characters.push(newCharacter);
+        candidate.activeCharacterId = newCharacter.characterId;
+      } else {
+        const currentRaw = localStorage.getItem(window.CharacterStore.STORAGE_KEY);
+        if (currentRaw !== null) localStorage.setItem(`${window.CharacterStore.STORAGE_KEY}.recovery-backup`, currentRaw);
+        candidate = imported.store;
+      }
+      characterStore = window.CharacterStore.save(localStorage, candidate);
+      persistenceReady = true;
+      persistenceError = "";
+      inventory = activeCharacter().equipment;
+      renderCharacterEditor();
+      renderInventory();
+      lockEditingForInvalidSave();
+      setSaveMessage(imported.kind === "legacy-inventory" ? "Старый инвентарь добавлен отдельным персонажем." : "Резервная копия персонажей загружена.");
+    } catch (error) {
+      setSaveMessage(`Не удалось загрузить JSON: ${error.message || "ошибка формата"}`, true);
+    } finally { event.target.value = ""; }
+  });
+
   $("#search").addEventListener("input", renderRecipes);
   $("#recipe-domain").addEventListener("change", () => {
     $("#craft-type-filter").value = "";
@@ -475,41 +829,17 @@
     inventory.items = [];
     saveInventory("Инвентарь очищен.");
   });
-  $("#export-inventory").addEventListener("click", () => {
-    const payload = { format: "witcher-workshop-inventory", version: 1, exportedAt: new Date().toISOString(), capacityKg: inventory.capacityKg, items: inventory.items };
-    const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = "witcher-inventory.json";
-    anchor.click();
-    URL.revokeObjectURL(url);
-    $("#inventory-message").textContent = "JSON-файл инвентаря скачан.";
-  });
-  $("#import-inventory").addEventListener("click", () => $("#inventory-file").click());
-  $("#inventory-file").addEventListener("change", async event => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-    try {
-      if (file.size > 5 * 1024 * 1024) throw new Error("Файл больше 5 МБ.");
-      const payload = JSON.parse(await file.text());
-      if (payload.version !== 1 || !Array.isArray(payload.items)) throw new Error("Формат JSON не распознан.");
-      const imported = payload.items.map(cleanEntry);
-      if (imported.some(entry => !entry)) throw new Error("В файле есть предметы с некорректными данными.");
-      const capacity = payload.capacityKg === null || payload.capacityKg === "" ? null : Number(payload.capacityKg);
-      if (capacity !== null && (!Number.isFinite(capacity) || capacity < 0 || capacity > 100000)) throw new Error("Некорректная грузоподъёмность.");
-      inventory = { version: 1, capacityKg: capacity, items: imported };
-      saveInventory(`Загружено предметов: ${imported.length}.`);
-    } catch (error) {
-      $("#inventory-message").textContent = `Не удалось загрузить файл: ${error.message || "ошибка формата"}`;
-    } finally { event.target.value = ""; }
-  });
-
   updateRecipeFilters();
   updateItemFilters();
   renderRecipes();
   renderItems();
+  renderCharacterEditor();
   renderInventory();
+  if (migrationNotice) setSaveMessage(migrationNotice);
+  if (!persistenceReady) lockEditingForInvalidSave();
+  window.addEventListener("pagehide", () => {
+    if (saveTimer) persistStore("Лист персонажа обновлён.", true);
+  });
   const initialPage = location.hash.slice(1);
   if (sections[initialPage]) showPage(initialPage);
 })();

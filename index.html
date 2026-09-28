@@ -17,6 +17,7 @@
   <link rel="stylesheet" href="./styles.css">
   <script src="./theme.js" defer></script>
   <script src="./data.js" defer></script>
+  <script src="./character-store.js" defer></script>
   <script src="./app.js" defer></script>
 </head>
 <body>
@@ -38,6 +39,7 @@
         <button class="nav-item active" data-page="recipes" aria-current="page"><span class="nav-icon">⌕</span>Рецепты</button>
         <button class="nav-item" data-page="items"><span class="nav-icon">◇</span>Предметы</button>
         <button class="nav-item" data-page="inventory"><span class="nav-icon">▤</span>Инвентарь</button>
+        <button class="nav-item" data-page="characters"><span class="nav-icon">♙</span>Персонажи</button>
       </nav>
     </aside>
 
@@ -78,10 +80,104 @@
         <div id="item-empty" class="empty-state" hidden><div class="empty-glyph">⌕</div><h2>Предметы не найдены</h2><p>Попробуйте изменить запрос или тип.</p></div>
       </section>
 
+      <section id="characters-page" class="page-view" aria-labelledby="characters-title" hidden>
+        <div class="workspace-head">
+          <div><div class="eyebrow"><span class="eyebrow-line"></span>Локальные сохранения</div><h1 id="characters-title">Персонажи</h1><p class="intro">Листы хранятся отдельно в этом браузере. Изменения сохраняются автоматически.</p></div>
+        </div>
+        <div class="character-toolbar">
+          <label class="field grow">Выбранный персонаж<select id="character-select" aria-label="Выбранный персонаж"></select></label>
+          <button class="button primary" id="new-character" type="button">Новый персонаж</button>
+          <button class="button secondary" id="delete-character" type="button">Удалить</button>
+          <button class="button secondary" id="export-characters" type="button">Сохранить JSON</button>
+          <button class="button secondary" id="import-characters" type="button">Загрузить JSON</button>
+          <input id="character-file" type="file" accept="application/json,.json" hidden>
+        </div>
+        <p id="character-message" class="status-message" role="status" aria-live="polite"></p>
+        <form id="character-form" class="character-form" autocomplete="off">
+          <fieldset class="character-panel">
+            <legend>Личные данные</legend>
+            <div class="character-field-grid">
+              <label class="field">Имя персонажа<input data-character-path="personal.name" maxlength="120"></label>
+              <label class="field">Игрок<input data-character-path="personal.player" maxlength="120"></label>
+              <label class="field">Раса<input data-character-path="personal.race" maxlength="80"></label>
+              <label class="field">Пол<input data-character-path="personal.gender" maxlength="80"></label>
+              <label class="field">Возраст<input data-character-path="personal.age" maxlength="80"></label>
+              <label class="field">Родина<input data-character-path="personal.homeland" maxlength="120"></label>
+              <label class="field">Местоположение<input data-character-path="personal.location" maxlength="120"></label>
+              <label class="field">Профессия<input data-character-path="personal.profession" maxlength="120"></label>
+              <label class="field">Версия правил<input data-character-path="rulesVersion" maxlength="120"></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="character-panel">
+            <legend>Жизненный путь</legend>
+            <div class="character-field-grid">
+              <label class="field">История семьи<input data-character-path="lifePath.familyHistory" maxlength="2000"></label>
+              <label class="field">Положение семьи<input data-character-path="lifePath.familyStation" maxlength="2000"></label>
+              <label class="field">Родители<input data-character-path="lifePath.parents" maxlength="2000"></label>
+              <label class="field">Братья и сёстры<input data-character-path="lifePath.siblings" maxlength="2000"></label>
+              <label class="field">Зависимость и травмы<input data-character-path="lifePath.addictionTrauma" maxlength="2000"></label>
+              <label class="field">Стиль<input data-character-path="lifePath.style" maxlength="2000"></label>
+              <label class="field">Ценности<input data-character-path="lifePath.values" maxlength="2000"></label>
+            </div>
+            <div class="character-field-grid life-path-lists">
+              <label class="field">Важные события<textarea data-character-lines="lifePath.decadeEvents" rows="3" placeholder="Каждое событие — с новой строки"></textarea></label>
+              <label class="field">Союзники<textarea data-character-lines="lifePath.allies" rows="3" placeholder="Каждый союзник — с новой строки"></textarea></label>
+              <label class="field">Враги<textarea data-character-lines="lifePath.enemies" rows="3" placeholder="Каждый враг — с новой строки"></textarea></label>
+              <label class="field">Отношения<textarea data-character-lines="lifePath.relationships" rows="3" placeholder="Каждая связь — с новой строки"></textarea></label>
+            </div>
+            <div class="list-heading"><span>Игровые последствия</span></div>
+            <div id="character-life-path-outcomes" class="character-entry-list"></div>
+            <button class="button secondary" id="add-life-path-outcome" type="button">Добавить последствие</button>
+          </fieldset>
+
+          <fieldset class="character-panel">
+            <legend>Характеристики</legend>
+            <div class="attribute-input-grid">
+              <label class="field">Интеллект · INT<input data-character-number="attributes.INT" type="number" min="0" max="1000" step="1"></label>
+              <label class="field">Реакция · REF<input data-character-number="attributes.REF" type="number" min="0" max="1000" step="1"></label>
+              <label class="field">Ловкость · DEX<input data-character-number="attributes.DEX" type="number" min="0" max="1000" step="1"></label>
+              <label class="field">Телосложение · BODY<input data-character-number="attributes.BODY" type="number" min="0" max="1000" step="1"></label>
+              <label class="field">Скорость · SPD<input data-character-number="attributes.SPD" type="number" min="0" max="1000" step="1"></label>
+              <label class="field">Эмпатия · EMP<input data-character-number="attributes.EMP" type="number" min="0" max="1000" step="1"></label>
+              <label class="field">Ремесло · CRA<input data-character-number="attributes.CRA" type="number" min="0" max="1000" step="1"></label>
+              <label class="field">Воля · WILL<input data-character-number="attributes.WILL" type="number" min="0" max="1000" step="1"></label>
+              <label class="field">Удача · LUCK<input data-character-number="attributes.LUCK" type="number" min="0" max="1000" step="1"></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="character-panel">
+            <legend>Навыки</legend>
+            <div id="character-skills" class="character-entry-list"></div>
+            <button class="button secondary" id="add-character-skill" type="button">Добавить навык</button>
+          </fieldset>
+
+          <fieldset class="character-panel">
+            <legend>Текущее состояние</legend>
+            <div class="character-field-grid state-field-grid">
+              <label class="field">Текущие ПЗ<input data-character-number="state.currentHp" type="number" min="0" step="1"></label>
+              <label class="field">Текущая Выносливость<input data-character-number="state.currentSta" type="number" min="0" step="1"></label>
+              <label class="field">Текущая Удача<input data-character-number="state.currentLuck" type="number" min="0" step="1"></label>
+            </div>
+            <label class="field block-field">Состояния и ранения<textarea id="character-conditions" rows="3" placeholder="Каждое состояние — с новой строки"></textarea></label>
+          </fieldset>
+
+          <fieldset class="character-panel">
+            <legend>Способности</legend>
+            <div id="character-abilities" class="character-entry-list"></div>
+            <button class="button secondary" id="add-character-ability" type="button">Добавить способность</button>
+          </fieldset>
+
+          <fieldset class="character-panel">
+            <legend>Заметки</legend>
+            <label class="field block-field">Личные заметки<textarea data-character-path="notes" rows="6" maxlength="100000" placeholder="История, цели, заметки игровой сессии…"></textarea></label>
+          </fieldset>
+        </form>
+      </section>
+
       <section id="inventory-page" class="page-view" aria-labelledby="inventory-title" hidden>
         <div class="workspace-head">
-          <div><div class="eyebrow"><span class="eyebrow-line"></span>Лист персонажа</div><h1 id="inventory-title">Инвентарь</h1><p class="intro">Содержимое сумки и общий переносимый вес.</p></div>
-          <div class="inventory-actions"><button class="button secondary" id="import-inventory" type="button">Загрузить JSON</button><button class="button primary" id="export-inventory" type="button">Сохранить JSON</button><input id="inventory-file" type="file" accept="application/json,.json" hidden></div>
+          <div><div class="eyebrow"><span class="eyebrow-line"></span>Лист персонажа</div><h1 id="inventory-title">Инвентарь</h1><p class="intro">Снаряжение персонажа: <strong id="inventory-character-name">Персонаж 1</strong>.</p></div>
         </div>
         <div class="inventory-summary">
           <label class="capacity-field">Грузоподъёмность <span><input id="capacity-input" type="number" min="0" step="0.1" inputmode="decimal"> кг</span></label>
