@@ -28,6 +28,32 @@ test("first load creates a versioned character with a persistent ID", () => {
   assert.equal(CharacterStore.load(storage).store.characters[0].characterId, store.characters[0].characterId);
 });
 
+test("version 1 characters migrate without losing sheet data and keep a raw backup", () => {
+  const storage = new MemoryStorage();
+  const original = CharacterStore.createStore("Персонаж до обновления");
+  original.schemaVersion = 1;
+  original.characters[0].schemaVersion = 1;
+  original.characters[0].personal.name = "Геральт";
+  original.characters[0].attributes.REF = 9;
+  original.characters[0].equipment.items.push(inventoryItem("gear-migration", "Медальон", 1, 0.2));
+  delete original.characters[0].lifePath;
+  const raw = JSON.stringify(original);
+  storage.setItem(CharacterStore.STORAGE_KEY, raw);
+
+  const result = CharacterStore.load(storage);
+  const migrated = result.store.characters[0];
+  assert.equal(result.migratedSchemaVersion, true);
+  assert.equal(result.store.schemaVersion, CharacterStore.SCHEMA_VERSION);
+  assert.equal(migrated.schemaVersion, CharacterStore.SCHEMA_VERSION);
+  assert.equal(migrated.characterId, original.characters[0].characterId);
+  assert.equal(migrated.personal.name, "Геральт");
+  assert.equal(migrated.attributes.REF, 9);
+  assert.equal(migrated.equipment.items[0].name, "Медальон");
+  assert.deepEqual(migrated.lifePath.outcomes, []);
+  assert.equal(storage.getItem(`${CharacterStore.STORAGE_KEY}.backup-v1`), raw);
+  assert.equal(CharacterStore.load(storage).migratedSchemaVersion, false);
+});
+
 test("legacy inventory migrates to the first character and remains available as a backup", () => {
   const storage = new MemoryStorage();
   const legacy = {
@@ -90,6 +116,8 @@ test("a character export restores the same IDs and complete entered model", () =
   character.skills.push({ id: "skill-will", name: "Храбрость", attribute: "WILL", rank: 5 });
   character.state.conditions.push("Ранен");
   character.abilities.push({ id: "ability-quen", name: "Квен", description: "Знак ведьмака" });
+  character.lifePath.allies.push("Весемир");
+  character.lifePath.outcomes.push({ id: "outcome-1", type: "Событие", description: "Нашёл старую карту", source: "Каэр Морхен" });
   character.equipment.items.push(inventoryItem("gear-1", "Серебряный меч", 1, 1.6, "item-silver-sword"));
   character.notes = "Ищет работу в Новиграде";
   CharacterStore.save(source, store);
@@ -102,6 +130,8 @@ test("a character export restores the same IDs and complete entered model", () =
   assert.equal(restoredCharacter.skills[0].rank, 5);
   assert.deepEqual(restoredCharacter.state.conditions, ["Ранен"]);
   assert.equal(restoredCharacter.abilities[0].description, "Знак ведьмака");
+  assert.deepEqual(restoredCharacter.lifePath.allies, ["Весемир"]);
+  assert.deepEqual(restoredCharacter.lifePath.outcomes, [{ id: "outcome-1", type: "Событие", description: "Нашёл старую карту", source: "Каэр Морхен" }]);
   assert.equal(restoredCharacter.equipment.items[0].itemId, "item-silver-sword");
   assert.equal(restoredCharacter.notes, "Ищет работу в Новиграде");
 });
