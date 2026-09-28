@@ -106,6 +106,24 @@ test("characters keep independent sheets and inventories after save and reload",
   assert.equal(restoredSecond.equipment.capacityKg, 10);
 });
 
+test("copying a character preserves its data and assigns independent persistent IDs", () => {
+  const original = CharacterStore.createCharacter("Йеннифэр");
+  original.skills.push({ id: "skill-1", name: "Магические познания", attribute: "INT", rank: 8 });
+  original.abilities.push({ id: "ability-1", name: "Телепортация", description: "Способность" });
+  original.equipment.items.push(inventoryItem("gear-1", "Посох", 1, 1.2, "catalog-staff"));
+  original.lifePath.outcomes.push({ id: "outcome-1", type: "Событие", description: "Встреча", source: "Аретуза" });
+
+  const copy = CharacterStore.copyCharacter(original, "Йеннифэр (копия)");
+  assert.notEqual(copy.characterId, original.characterId);
+  assert.notEqual(copy.skills[0].id, original.skills[0].id);
+  assert.notEqual(copy.abilities[0].id, original.abilities[0].id);
+  assert.notEqual(copy.equipment.items[0].id, original.equipment.items[0].id);
+  assert.notEqual(copy.lifePath.outcomes[0].id, original.lifePath.outcomes[0].id);
+  assert.equal(copy.personal.name, "Йеннифэр (копия)");
+  assert.equal(copy.equipment.items[0].itemId, "catalog-staff");
+  assert.equal(copy.notes, original.notes);
+});
+
 test("a character export restores the same IDs and complete entered model", () => {
   const source = new MemoryStorage();
   const { store } = CharacterStore.load(source);

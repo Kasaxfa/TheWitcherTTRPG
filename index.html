@@ -84,16 +84,25 @@
         <div class="workspace-head">
           <div><div class="eyebrow"><span class="eyebrow-line"></span>Локальные сохранения</div><h1 id="characters-title">Персонажи</h1><p class="intro">Листы хранятся отдельно в этом браузере. Изменения сохраняются автоматически.</p></div>
         </div>
-        <div class="character-toolbar">
-          <label class="field grow">Выбранный персонаж<select id="character-select" aria-label="Выбранный персонаж"></select></label>
-          <button class="button primary" id="new-character" type="button">Новый персонаж</button>
-          <button class="button secondary" id="delete-character" type="button">Удалить</button>
-          <button class="button secondary" id="export-characters" type="button">Сохранить JSON</button>
-          <button class="button secondary" id="import-characters" type="button">Загрузить JSON</button>
-          <input id="character-file" type="file" accept="application/json,.json" hidden>
-        </div>
         <p id="character-message" class="status-message" role="status" aria-live="polite"></p>
-        <form id="character-form" class="character-form" autocomplete="off">
+        <div id="character-library" class="character-library">
+          <div class="character-library-toolbar">
+            <label class="searchbox"><span aria-hidden="true">⌕</span><input id="character-search" type="search" placeholder="Имя, игрок, раса или профессия…" autocomplete="off" aria-label="Поиск персонажей"><kbd>/</kbd></label>
+            <button class="button primary" id="new-character" type="button">＋ Создать персонажа</button>
+            <button class="button secondary" id="export-characters" type="button">Экспорт списка</button>
+            <button class="button secondary" id="import-characters" type="button">Импорт JSON</button>
+            <input id="character-file" type="file" accept="application/json,.json" hidden>
+          </div>
+          <div id="character-list" class="character-card-grid" aria-live="polite"></div>
+          <div id="character-empty" class="empty-state" hidden><div class="empty-glyph">♙</div><h2>Персонажей пока нет</h2><p>Создайте персонажа или загрузите JSON-файл.</p></div>
+          <div id="character-search-empty" class="empty-state" hidden><div class="empty-glyph">⌕</div><h2>Персонажи не найдены</h2><p>Попробуйте изменить поисковый запрос.</p></div>
+        </div>
+        <div id="character-editor" hidden>
+          <div class="character-editor-header">
+            <button class="button secondary" id="character-list-back" type="button">← К списку</button>
+            <div><div class="eyebrow">Лист персонажа</div><h2 id="character-editor-name"></h2></div>
+          </div>
+          <form id="character-form" class="character-form" autocomplete="off">
           <fieldset class="character-panel">
             <legend>Личные данные</legend>
             <div class="character-field-grid">
@@ -172,7 +181,15 @@
             <legend>Заметки</legend>
             <label class="field block-field">Личные заметки<textarea data-character-path="notes" rows="6" maxlength="100000" placeholder="История, цели, заметки игровой сессии…"></textarea></label>
           </fieldset>
-        </form>
+          </form>
+        </div>
+        <dialog id="rename-character-dialog" class="rename-character-dialog" aria-labelledby="rename-character-title">
+          <form id="rename-character-form" method="dialog">
+            <h2 id="rename-character-title">Переименовать персонажа</h2>
+            <label class="field">Имя персонажа<input id="rename-character-input" maxlength="120" required></label>
+            <div class="rename-dialog-actions"><button class="button secondary" value="cancel">Отмена</button><button class="button primary" id="save-character-name" value="save">Сохранить</button></div>
+          </form>
+        </dialog>
       </section>
 
       <section id="inventory-page" class="page-view" aria-labelledby="inventory-title" hidden>
