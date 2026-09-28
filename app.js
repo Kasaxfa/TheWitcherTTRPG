@@ -187,6 +187,7 @@
     const loaded = window.CharacterStore.load(localStorage, { cleanLegacyEntry: cleanEntry });
     characterStore = loaded.store;
     if (loaded.migratedLegacyInventory) migrationNotice = "Старый инвентарь перенесён в «Персонаж 1». Исходный JSON сохранён для восстановления.";
+    if (loaded.migratedSchemaVersion) migrationNotice = "Формат листа обновлён; исходная версия сохранена в резервной копии браузера.";
   } catch (error) {
     persistenceReady = false;
     persistenceError = error.message || "Не удалось проверить сохранение.";
@@ -391,6 +392,21 @@
     </div>`).join("");
   }
 
+  function renderLifePathOutcomes() {
+    const list = $("#character-life-path-outcomes");
+    if (!activeCharacter().lifePath.outcomes.length) {
+      list.innerHTML = `<p class="character-empty">Последствия пока не добавлены.</p>`;
+      return;
+    }
+    const types = ["Событие", "Союзник", "Враг", "Отношения", "Долг", "Прочее"];
+    list.innerHTML = activeCharacter().lifePath.outcomes.map(outcome => `<div class="character-entry life-path-outcome" data-life-path-outcome-id="${escapeHtml(outcome.id)}">
+      <select data-life-path-outcome-field="type" aria-label="Тип последствия">${types.map(type => `<option value="${type}"${outcome.type === type ? " selected" : ""}>${type}</option>`).join("")}</select>
+      <textarea data-life-path-outcome-field="description" maxlength="20000" rows="2" placeholder="Описание последствия" aria-label="Описание последствия">${escapeHtml(outcome.description)}</textarea>
+      <input data-life-path-outcome-field="source" maxlength="2000" value="${escapeHtml(outcome.source)}" placeholder="Источник или заметка" aria-label="Источник или заметка">
+      <button class="character-remove" type="button" data-remove-life-path-outcome="${escapeHtml(outcome.id)}" aria-label="Удалить последствие">×</button>
+    </div>`).join("");
+  }
+
   function renderCharacterEditor() {
     const character = activeCharacter();
     document.querySelectorAll("[data-character-path]").forEach(input => {
@@ -402,10 +418,15 @@
       const value = character[section]?.[key];
       input.value = value === null || value === undefined ? "" : String(value);
     });
+    document.querySelectorAll("[data-character-lines]").forEach(input => {
+      const path = input.dataset.characterLines.split(".");
+      input.value = path.reduce((value, part) => value?.[part], character)?.join("\n") || "";
+    });
     $("#character-conditions").value = character.state.conditions.join("\n");
     renderCharacterSelector();
     renderSkillRows();
     renderAbilityRows();
+    renderLifePathOutcomes();
   }
 
   function updateCharacterPath(path, value) {
@@ -483,6 +504,17 @@
     return true;
   }
 
+  function updateLifePathOutcomeFromControl(event) {
+    const control = event.target.closest("[data-life-path-outcome-field]");
+    if (!control) return false;
+    const row = control.closest("[data-life-path-outcome-id]");
+    const outcome = activeCharacter().lifePath.outcomes.find(value => value.id === row?.dataset.lifePathOutcomeId);
+    if (!outcome) return true;
+    outcome[control.dataset.lifePathOutcomeField] = control.value;
+    persistStore("Жизненный путь обновлён.", event.type === "change");
+    return true;
+  }
+
   function lockEditingForInvalidSave() {
     if (persistenceReady) return;
     document.querySelectorAll("#character-form input, #character-form select, #character-form textarea, #character-form button, #character-select, #new-character, #delete-character, #inventory-page input, #inventory-page button")
@@ -511,6 +543,7 @@
   function updateCharacterFromForm(event) {
     const textControl = event.target.closest("[data-character-path]");
     const numberControl = event.target.closest("[data-character-number]");
+    const linesControl = event.target.closest("[data-character-lines]");
     if (textControl) {
       updateCharacterPath(textControl.dataset.characterPath, textControl.value);
       if (textControl.dataset.characterPath.startsWith("personal.")) renderCharacterSelector();
@@ -519,6 +552,9 @@
       if (value !== null && (!Number.isFinite(value) || value < 0 || value > 100000)) return;
       const [section, key] = numberControl.dataset.characterNumber.split(".");
       activeCharacter()[section][key] = value;
+    } else if (linesControl) {
+      const [section, key] = linesControl.dataset.characterLines.split(".");
+      activeCharacter()[section][key] = linesControl.value.split(/\r?\n/).map(value => value.trim()).filter(Boolean);
     } else if (event.target.id === "character-conditions") {
       activeCharacter().state.conditions = event.target.value.split(/\r?\n/).map(value => value.trim()).filter(Boolean);
     } else return;
@@ -527,6 +563,21 @@
 
   $("#character-form").addEventListener("input", updateCharacterFromForm);
   $("#character-form").addEventListener("change", updateCharacterFromForm);
+  $("#add-life-path-outcome").addEventListener("click", () => {
+    activeCharacter().lifePath.outcomes.push({ id: createEntryId(), type: "Событие", description: "", source: "" });
+    renderLifePathOutcomes();
+    persistStore("Добавлено последствие жизненного пути.");
+    [...$("#character-life-path-outcomes").querySelectorAll('[data-life-path-outcome-field="description"]')].at(-1)?.focus();
+  });
+  $("#character-life-path-outcomes").addEventListener("input", updateLifePathOutcomeFromControl);
+  $("#character-life-path-outcomes").addEventListener("change", updateLifePathOutcomeFromControl);
+  $("#character-life-path-outcomes").addEventListener("click", event => {
+    const button = event.target.closest("[data-remove-life-path-outcome]");
+    if (!button) return;
+    activeCharacter().lifePath.outcomes = activeCharacter().lifePath.outcomes.filter(outcome => outcome.id !== button.dataset.removeLifePathOutcome);
+    renderLifePathOutcomes();
+    persistStore("Последствие жизненного пути удалено.");
+  });
   $("#character-select").addEventListener("change", event => {
     if (!characterStore.characters.some(character => character.characterId === event.target.value)) return;
     persistStore("", true);
