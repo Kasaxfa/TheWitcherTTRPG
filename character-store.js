@@ -217,6 +217,20 @@
     }
   }
 
+  function copyCharacter(raw, name) {
+    const copy = clone(normalizeCharacter(raw, 0));
+    const now = new Date().toISOString();
+    copy.characterId = makeId();
+    copy.personal.name = boundedString(name ?? `${copy.personal.name || "Персонаж"} (копия)`, "Имя копии", 2000, false).trim();
+    copy.createdAt = now;
+    copy.updatedAt = now;
+    for (const entry of copy.skills) entry.id = makeId();
+    for (const entry of copy.abilities) entry.id = makeId();
+    for (const entry of copy.equipment.items) entry.id = makeId();
+    for (const entry of copy.lifePath.outcomes) entry.id = makeId();
+    return normalizeCharacter(copy, 0);
+  }
+
   const STORE_MIGRATIONS = Object.freeze({
     1: raw => ({
       ...raw,
@@ -330,6 +344,7 @@
     ATTRIBUTES,
     RULES_VERSION,
     createCharacter,
+    copyCharacter,
     createStore,
     migrateStore,
     normalizeLegacyInventory,
