@@ -48,10 +48,35 @@ test("version 1 characters migrate without losing sheet data and keep a raw back
   assert.equal(migrated.characterId, original.characters[0].characterId);
   assert.equal(migrated.personal.name, "Геральт");
   assert.equal(migrated.attributes.REF, 9);
+  assert.deepEqual(migrated.attributeModifiers.REF, { permanent: 0, temporary: 0 });
   assert.equal(migrated.equipment.items[0].name, "Медальон");
   assert.deepEqual(migrated.lifePath.outcomes, []);
   assert.equal(storage.getItem(`${CharacterStore.STORAGE_KEY}.backup-v1`), raw);
   assert.equal(CharacterStore.load(storage).migratedSchemaVersion, false);
+});
+
+test("version 2 characters gain separate modifiers without losing ratings or source values", () => {
+  const storage = new MemoryStorage();
+  const original = CharacterStore.createStore("Сохранение версии 2");
+  original.schemaVersion = 2;
+  const character = original.characters[0];
+  character.schemaVersion = 2;
+  character.attributes.BODY = 6;
+  character.skills.push({ id: "old-skill", name: "Ближний бой", attribute: "REF", rank: 5 });
+  delete character.attributeModifiers;
+  const raw = JSON.stringify(original);
+  storage.setItem(CharacterStore.STORAGE_KEY, raw);
+
+  const result = CharacterStore.load(storage);
+  const migrated = result.store.characters[0];
+  assert.equal(result.migratedSchemaVersion, true);
+  assert.equal(result.store.schemaVersion, 3);
+  assert.equal(migrated.attributes.BODY, 6);
+  assert.deepEqual(migrated.attributeModifiers.BODY, { permanent: 0, temporary: 0 });
+  assert.equal(migrated.skills[0].rank, 5);
+  assert.equal(migrated.skills[0].permanentModifier, 0);
+  assert.equal(migrated.skills[0].temporaryModifier, 0);
+  assert.equal(storage.getItem(`${CharacterStore.STORAGE_KEY}.backup-v2`), raw);
 });
 
 test("legacy inventory migrates to the first character and remains available as a backup", () => {
@@ -82,7 +107,8 @@ test("characters keep independent sheets and inventories after save and reload",
   const first = store.characters[0];
   first.personal.name = "Геральт";
   first.attributes.REF = 9;
-  first.skills.push({ id: "skill-1", name: "Ближний бой", attribute: "REF", rank: 6 });
+  first.attributeModifiers.REF = { permanent: 1, temporary: -2 };
+  first.skills.push({ id: "skill-1", name: "Ближний бой", attribute: "REF", rank: 6, permanentModifier: 2, temporaryModifier: -1 });
   first.state.currentHp = 28;
   first.abilities.push({ id: "ability-1", name: "Знак Квен", description: "Защитный знак" });
   first.equipment.items.push(inventoryItem("entry-1", "Медальон", 1, 0.2));
@@ -98,7 +124,10 @@ test("characters keep independent sheets and inventories after save and reload",
   assert.equal(reloaded.activeCharacterId, second.characterId);
   assert.equal(restoredFirst.personal.name, "Геральт");
   assert.equal(restoredFirst.attributes.REF, 9);
+  assert.deepEqual(restoredFirst.attributeModifiers.REF, { permanent: 1, temporary: -2 });
   assert.equal(restoredFirst.skills[0].rank, 6);
+  assert.equal(restoredFirst.skills[0].permanentModifier, 2);
+  assert.equal(restoredFirst.skills[0].temporaryModifier, -1);
   assert.equal(restoredFirst.state.currentHp, 28);
   assert.equal(restoredFirst.abilities[0].name, "Знак Квен");
   assert.equal(restoredFirst.equipment.items[0].name, "Медальон");

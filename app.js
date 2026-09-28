@@ -248,6 +248,14 @@
     renderInventory();
   }
 
+  function inventoryWeight(character = activeCharacter()) {
+    const entries = character.equipment?.items || [];
+    return {
+      knownKg: entries.reduce((sum, entry) => sum + (entry.unitWeightKg === null ? 0 : entry.unitWeightKg * entry.quantity), 0),
+      unknownCount: entries.filter(entry => entry.unitWeightKg === null).length,
+    };
+  }
+
   const inventorySearchItems = items.filter(item => item.type !== "transport" && !alchemySymbols[item.id]);
   let selectedInventoryItemId = null;
   let inventoryMatches = [];
@@ -310,12 +318,14 @@
 
   function renderInventory() {
     $("#inventory-character-name").textContent = activeCharacter().personal.name.trim() || "Без имени";
-    const knownWeight = inventory.items.reduce((sum, entry) => sum + (entry.unitWeightKg === null ? 0 : entry.unitWeightKg * entry.quantity), 0);
-    const unknownCount = inventory.items.filter(entry => entry.unitWeightKg === null).length;
-    const capacity = inventory.capacityKg;
-    $("#capacity-input").value = capacity === null ? "" : String(capacity);
+    const { knownKg: knownWeight, unknownCount } = inventoryWeight();
+    const derived = window.CharacterRules.deriveCharacter(activeCharacter(), { carriedWeightKg: knownWeight, unknownWeightCount: unknownCount });
+    const capacity = inventory.capacityKg ?? derived.encumbranceKg;
+    $("#capacity-input").value = inventory.capacityKg === null ? "" : String(inventory.capacityKg);
     $("#weight-total").textContent = `${numberText(knownWeight)} кг${unknownCount ? " + ?" : ""}`;
-    $("#weight-caption").textContent = capacity === null ? "грузоподъёмность не задана" : `из ${numberText(capacity)} кг`;
+    $("#weight-caption").textContent = capacity === null
+      ? "грузоподъёмность не задана"
+      : `из ${numberText(capacity)} кг · ${inventory.capacityKg === null ? "ENC по BODY" : "задано вручную"}`;
     const progress = $("#weight-progress");
     const track = $(".weight-track");
     const percent = capacity > 0 ? Math.min(100, knownWeight / capacity * 100) : 0;
@@ -326,6 +336,7 @@
     const warnings = [];
     if (unknownCount) warnings.push(`У ${unknownCount} ${unknownCount === 1 ? "позиции" : "позиций"} не указан вес; общий вес показан без них.`);
     if (capacity !== null && knownWeight > capacity) warnings.push("Превышена заданная грузоподъёмность.");
+    if (derived.load.status === "over-lift-limit") warnings.push(`Вес превышает предел подъёма по BODY (${numberText(derived.liftLimitKg)} кг).`);
     $("#weight-warning").hidden = warnings.length === 0;
     $("#weight-warning").textContent = warnings.join(" ");
     $("#inventory-list").innerHTML = inventory.items.map(entry => {
@@ -338,6 +349,7 @@
         <span class="inventory-weight">${total}</span><button class="remove-item" type="button" data-remove="${escapeHtml(entry.id)}" aria-label="Удалить ${escapeHtml(entry.name)}">×</button></div>`;
     }).join("");
     $("#inventory-empty").hidden = inventory.items.length > 0;
+    renderCharacterDerived();
   }
 
   function addInventoryEntry(entry) {
@@ -353,6 +365,93 @@
     INT: "Интеллект", REF: "Реакция", DEX: "Ловкость", BODY: "Телосложение",
     SPD: "Скорость", EMP: "Эмпатия", CRA: "Ремесло", WILL: "Воля", LUCK: "Удача",
   };
+
+  const valueOrDash = value => value === null || value === undefined ? "—" : numberText(value);
+
+  function activeDerivedValues() {
+    const character = activeCharacter();
+    const weight = inventoryWeight(character);
+    return window.CharacterRules.deriveCharacter(character, {
+      carriedWeightKg: weight.knownKg,
+      unknownWeightCount: weight.unknownCount,
+    });
+  }
+
+  function renderAttributeRows() {
+    const character = activeCharacter();
+    const values = window.CharacterRules.calculateAttributes(character);
+    $("#character-attributes").innerHTML = window.CharacterStore.ATTRIBUTES.map(code => {
+      const value = values[code];
+      return `<div class="character-stat-row" data-attribute-row="${code}">
+        <strong class="character-stat-name">${escapeHtml(attributeLabels[code])}<span>${code}</span></strong>
+        <label class="field">Исходное<input data-attribute-input="${code}.base" type="number" min="0" max="1000" step="1" value="${value.base === null ? "" : escapeHtml(value.base)}" aria-label="Исходное значение: ${attributeLabels[code]}"></label>
+        <label class="field">Постоянное<input data-attribute-input="${code}.permanent" type="number" min="-1000" max="1000" step="1" value="${escapeHtml(value.permanent)}" aria-label="Постоянное изменение: ${attributeLabels[code]}"></label>
+        <label class="field">Временное<input data-attribute-input="${code}.temporary" type="number" min="-1000" max="1000" step="1" value="${escapeHtml(value.temporary)}" aria-label="Временное изменение: ${attributeLabels[code]}"></label>
+        <output class="character-stat-total" data-attribute-total="${code}" aria-label="Итог: ${attributeLabels[code]}">${valueOrDash(value.total)}</output>
+      </div>`;
+    }).join("");
+  }
+
+  function renderCharacterStatus(derived) {
+    const character = activeCharacter();
+    $("#character-sheet-race").textContent = character.personal.race.trim() || "Раса не указана";
+    $("#character-sheet-profession").textContent = character.personal.profession.trim() || "Профессия не указана";
+    const hp = character.state.currentHp;
+    const sta = character.state.currentSta;
+    const luck = character.state.currentLuck;
+    $("#character-summary-hp").textContent = `${valueOrDash(hp)} / ${valueOrDash(derived.maxHp)}`;
+    $("#character-summary-sta").textContent = `${valueOrDash(sta)} / ${valueOrDash(derived.maxSta)}`;
+    $("#character-summary-luck").textContent = valueOrDash(luck);
+    $("#character-summary-conditions").textContent = character.state.conditions.length
+      ? character.state.conditions.join(" · ")
+      : "Не отмечены";
+  }
+
+  function renderCharacterDerived() {
+    if (!$("#character-derived-values")) return;
+    const derived = activeDerivedValues();
+    renderCharacterStatus(derived);
+    renderSkillTotals(derived);
+    document.querySelectorAll("[data-attribute-total]").forEach(output => {
+      output.textContent = valueOrDash(derived.attributes[output.dataset.attributeTotal]?.total);
+    });
+    const entries = [
+      ["Физическая основа · B", valueOrDash(derived.physicalBasis)],
+      ["Максимум ПЗ", valueOrDash(derived.maxHp)],
+      ["Максимум Выносливости", valueOrDash(derived.maxSta)],
+      ["Восстановление · REC", valueOrDash(derived.recovery)],
+      ["Устойчивость · STUN", valueOrDash(derived.stun)],
+      ["Бег за ход · RUN", derived.runMeters === null ? "—" : `${numberText(derived.runMeters)} м`],
+      ["Прыжок · LEAP", derived.leapMeters === null ? "—" : `${numberText(derived.leapMeters)} м`],
+      ["Переносимый вес · ENC", derived.encumbranceKg === null ? "—" : `${numberText(derived.encumbranceKg)} кг`],
+      ["Предел подъёма", derived.liftLimitKg === null ? "—" : `${numberText(derived.liftLimitKg)} кг`],
+      ["Бонус ближнего боя", derived.meleeDamageBonus === null ? "—" : `${derived.meleeDamageBonus > 0 ? "+" : ""}${derived.meleeDamageBonus}`],
+      ["Удар рукой", derived.punchDamage || "—"],
+      ["Удар ногой", derived.kickDamage || "—"],
+    ];
+    const loadValue = derived.load.status === "within-capacity" ? "Штрафа нет"
+      : derived.load.status === "encumbered" ? `−${derived.load.penalty} к REF, DEX и SPD`
+        : derived.load.status === "over-lift-limit" ? "Выше предела подъёма"
+          : "Вес неизвестен";
+    const loadHint = derived.load.status === "unknown" && derived.load.unknownWeightCount
+      ? "Укажите вес всех предметов в инвентаре"
+      : derived.encumbranceKg === null ? "Введите BODY для расчёта переносимого веса"
+        : `Вес инвентаря: ${numberText(derived.load.carriedWeightKg)} кг`;
+    entries.push(["Штраф от нагрузки", loadValue, loadHint]);
+    $("#character-derived-values").innerHTML = entries.map(([label, value, hint]) => `<div class="character-derived-card">
+      <span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong>${hint ? `<small>${escapeHtml(hint)}</small>` : ""}
+    </div>`).join("");
+
+    const notes = [];
+    if (derived.attributes.BODY.total === null || derived.attributes.WILL.total === null) notes.push("Для расчёта физической основы, максимума ПЗ, Выносливости, REC и STUN укажите BODY и WILL.");
+    if (derived.attributes.SPD.total === null) notes.push("Для расчёта бега и прыжка укажите SPD.");
+    if (derived.attributes.BODY.total === null) notes.push("Для расчёта переносимого веса и урона укажите BODY.");
+    if (derived.physicalBasis !== null && !derived.physicalBasisSupported) notes.push(`Физическая основа B=${derived.physicalBasis}: в проверенной таблице нет строки для этого значения.`);
+    if (derived.meleeDamageBonus === null && derived.attributes.BODY.total !== null) notes.push(`BODY=${numberText(derived.attributes.BODY.total)}: значение урона отсутствует в проверенной таблице.`);
+    if (derived.load.status === "over-lift-limit") notes.push("Штрафы за перегруз здесь не вычисляются: вес выше предела подъёма, указанного для BODY.");
+    $("#character-derived-note").hidden = notes.length === 0;
+    $("#character-derived-note").textContent = notes.join(" ");
+  }
 
   function characterName(character, index = 0) {
     return character.personal.name.trim() || `Персонаж ${index + 1}`;
@@ -492,11 +591,24 @@
       return;
     }
     list.innerHTML = activeCharacter().skills.map(skill => `<div class="character-entry skill-entry" data-skill-id="${escapeHtml(skill.id)}">
-      <input data-skill-field="name" maxlength="120" value="${escapeHtml(skill.name)}" aria-label="Название навыка">
-      <select data-skill-field="attribute" aria-label="Ведущая характеристика"><option value="">Не указана</option>${window.CharacterStore.ATTRIBUTES.map(attribute => `<option value="${attribute}"${skill.attribute === attribute ? " selected" : ""}>${attribute} · ${attributeLabels[attribute]}</option>`).join("")}</select>
-      <input data-skill-field="rank" type="number" min="0" max="1000" step="1" value="${skill.rank === null ? "" : escapeHtml(skill.rank)}" aria-label="Рейтинг навыка">
+      <label class="field skill-name-field">Навык<input data-skill-field="name" maxlength="120" value="${escapeHtml(skill.name)}" aria-label="Название навыка"></label>
+      <label class="field skill-attribute-field">Ведущая характеристика<select data-skill-field="attribute" aria-label="Ведущая характеристика"><option value="">Не указана</option>${window.CharacterStore.ATTRIBUTES.map(attribute => `<option value="${attribute}"${skill.attribute === attribute ? " selected" : ""}>${attribute} · ${attributeLabels[attribute]}</option>`).join("")}</select></label>
+      <label class="field">Исходный рейтинг<input data-skill-field="rank" type="number" min="0" max="1000" step="1" value="${skill.rank === null ? "" : escapeHtml(skill.rank)}" aria-label="Исходный рейтинг навыка"></label>
+      <label class="field">Постоянное<input data-skill-field="permanentModifier" type="number" min="-1000" max="1000" step="1" value="${escapeHtml(skill.permanentModifier)}" aria-label="Постоянное изменение навыка"></label>
+      <label class="field">Временное<input data-skill-field="temporaryModifier" type="number" min="-1000" max="1000" step="1" value="${escapeHtml(skill.temporaryModifier)}" aria-label="Временное изменение навыка"></label>
+      <output class="skill-total" data-skill-total="${escapeHtml(skill.id)}"><span>Итог</span><strong>—</strong></output>
       <button class="character-remove" type="button" data-remove-skill="${escapeHtml(skill.id)}" aria-label="Удалить навык">×</button>
     </div>`).join("");
+    renderSkillTotals();
+  }
+
+  function renderSkillTotals(derived = activeDerivedValues()) {
+    const totals = new Map(derived.skills.map(skill => [skill.id, skill.total]));
+    document.querySelectorAll("[data-skill-total]").forEach(output => {
+      const total = totals.get(output.dataset.skillTotal);
+      const display = output.querySelector("strong");
+      if (display) display.textContent = valueOrDash(total);
+    });
   }
 
   function renderAbilityRows() {
@@ -548,9 +660,11 @@
       input.value = path.reduce((value, part) => value?.[part], character)?.join("\n") || "";
     });
     $("#character-conditions").value = character.state.conditions.join("\n");
+    renderAttributeRows();
     renderSkillRows();
     renderAbilityRows();
     renderLifePathOutcomes();
+    renderCharacterDerived();
   }
 
   function updateCharacterPath(path, value) {
@@ -626,7 +740,12 @@
       const value = control.value === "" ? null : Number(control.value);
       if (value !== null && (!Number.isFinite(value) || value < 0 || value > 1000)) return true;
       skill.rank = value;
+    } else if (control.dataset.skillField === "permanentModifier" || control.dataset.skillField === "temporaryModifier") {
+      const value = control.value === "" ? 0 : Number(control.value);
+      if (!Number.isInteger(value) || value < -1000 || value > 1000) return true;
+      skill[control.dataset.skillField] = value;
     } else skill[control.dataset.skillField] = control.value;
+    renderCharacterDerived();
     persistStore("Навыки обновлены.", event.type === "change");
     return true;
   }
@@ -683,7 +802,14 @@
     const textControl = event.target.closest("[data-character-path]");
     const numberControl = event.target.closest("[data-character-number]");
     const linesControl = event.target.closest("[data-character-lines]");
-    if (textControl) {
+    const attributeControl = event.target.closest("[data-attribute-input]");
+    if (attributeControl) {
+      const [code, part] = attributeControl.dataset.attributeInput.split(".");
+      const value = attributeControl.value === "" ? null : Number(attributeControl.value);
+      if (value !== null && (!Number.isInteger(value) || value < (part === "base" ? 0 : -1000) || value > 1000)) return;
+      if (part === "base") activeCharacter().attributes[code] = value;
+      else activeCharacter().attributeModifiers[code][part] = value ?? 0;
+    } else if (textControl) {
       updateCharacterPath(textControl.dataset.characterPath, textControl.value);
       if (textControl.dataset.characterPath === "personal.name") {
         $("#character-editor-name").textContent = textControl.value.trim() || "Без имени";
@@ -700,6 +826,7 @@
     } else if (event.target.id === "character-conditions") {
       activeCharacter().state.conditions = event.target.value.split(/\r?\n/).map(value => value.trim()).filter(Boolean);
     } else return;
+    renderCharacterDerived();
     persistStore("Лист персонажа обновлён.", event.type === "change");
   }
 
@@ -760,7 +887,7 @@
     persistStore("Последствие жизненного пути удалено.");
   });
   $("#add-character-skill").addEventListener("click", () => {
-    activeCharacter().skills.push({ id: createEntryId(), name: "", attribute: null, rank: null });
+    activeCharacter().skills.push({ id: createEntryId(), name: "", attribute: null, rank: null, permanentModifier: 0, temporaryModifier: 0 });
     renderSkillRows();
     persistStore("Добавлен навык.");
     [...$("#character-skills").querySelectorAll('[data-skill-field="name"]')].at(-1)?.focus();

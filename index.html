@@ -18,6 +18,7 @@
   <script src="./theme.js" defer></script>
   <script src="./data.js" defer></script>
   <script src="./character-store.js" defer></script>
+  <script src="./character-rules.js" defer></script>
   <script src="./app.js" defer></script>
 </head>
 <body>
@@ -100,7 +101,21 @@
         <div id="character-editor" hidden>
           <div class="character-editor-header">
             <button class="button secondary" id="character-list-back" type="button">← К списку</button>
-            <div><div class="eyebrow">Лист персонажа</div><h2 id="character-editor-name"></h2></div>
+            <div class="character-editor-heading">
+              <div class="eyebrow">Интерактивный лист</div>
+              <h2 id="character-editor-name"></h2>
+              <div class="character-identity-summary"><span id="character-sheet-race">Раса не указана</span><span id="character-sheet-profession">Профессия не указана</span></div>
+            </div>
+          </div>
+          <section class="character-status-summary" aria-label="Текущее состояние персонажа">
+            <div><span>ПЗ</span><strong id="character-summary-hp">—</strong></div>
+            <div><span>Выносливость</span><strong id="character-summary-sta">—</strong></div>
+            <div><span>Удача</span><strong id="character-summary-luck">—</strong></div>
+            <div class="character-summary-conditions"><span>Состояния</span><strong id="character-summary-conditions">Не отмечены</strong></div>
+          </section>
+          <div class="character-value-legend" aria-label="Обозначения значений">
+            <span><i class="value-dot manual"></i>Ручной ввод</span>
+            <span><i class="value-dot calculated"></i>Расчёт по правилам</span>
           </div>
           <form id="character-form" class="character-form" autocomplete="off">
           <fieldset class="character-panel">
@@ -142,31 +157,30 @@
 
           <fieldset class="character-panel">
             <legend>Характеристики</legend>
-            <div class="attribute-input-grid">
-              <label class="field">Интеллект · INT<input data-character-number="attributes.INT" type="number" min="0" max="1000" step="1"></label>
-              <label class="field">Реакция · REF<input data-character-number="attributes.REF" type="number" min="0" max="1000" step="1"></label>
-              <label class="field">Ловкость · DEX<input data-character-number="attributes.DEX" type="number" min="0" max="1000" step="1"></label>
-              <label class="field">Телосложение · BODY<input data-character-number="attributes.BODY" type="number" min="0" max="1000" step="1"></label>
-              <label class="field">Скорость · SPD<input data-character-number="attributes.SPD" type="number" min="0" max="1000" step="1"></label>
-              <label class="field">Эмпатия · EMP<input data-character-number="attributes.EMP" type="number" min="0" max="1000" step="1"></label>
-              <label class="field">Ремесло · CRA<input data-character-number="attributes.CRA" type="number" min="0" max="1000" step="1"></label>
-              <label class="field">Воля · WILL<input data-character-number="attributes.WILL" type="number" min="0" max="1000" step="1"></label>
-              <label class="field">Удача · LUCK<input data-character-number="attributes.LUCK" type="number" min="0" max="1000" step="1"></label>
-            </div>
+            <p class="character-panel-hint">Исходное значение и ручные модификаторы вводятся отдельно. Итог пересчитывается автоматически.</p>
+            <div id="character-attributes" class="character-attribute-list"></div>
           </fieldset>
 
           <fieldset class="character-panel">
             <legend>Навыки</legend>
+            <p class="character-panel-hint">Итог навыка = итог ведущей характеристики + рейтинг + постоянное и временное изменения.</p>
             <div id="character-skills" class="character-entry-list"></div>
             <button class="button secondary" id="add-character-skill" type="button">Добавить навык</button>
           </fieldset>
 
           <fieldset class="character-panel">
+            <legend>Производные показатели</legend>
+            <p class="character-panel-hint">Рассчитано отдельным модулем по подтверждённым формулам. Значения вне табличных диапазонов отмечаются как неизвестные.</p>
+            <div id="character-derived-values" class="character-derived-grid" aria-live="polite"></div>
+            <p id="character-derived-note" class="character-derived-note" hidden></p>
+          </fieldset>
+
+          <fieldset class="character-panel">
             <legend>Текущее состояние</legend>
             <div class="character-field-grid state-field-grid">
-              <label class="field">Текущие ПЗ<input data-character-number="state.currentHp" type="number" min="0" step="1"></label>
-              <label class="field">Текущая Выносливость<input data-character-number="state.currentSta" type="number" min="0" step="1"></label>
-              <label class="field">Текущая Удача<input data-character-number="state.currentLuck" type="number" min="0" step="1"></label>
+              <label class="field">Текущие ПЗ · ввод<input data-character-number="state.currentHp" type="number" min="0" step="1"></label>
+              <label class="field">Текущая Выносливость · ввод<input data-character-number="state.currentSta" type="number" min="0" step="1"></label>
+              <label class="field">Текущая Удача · ввод<input data-character-number="state.currentLuck" type="number" min="0" step="1"></label>
             </div>
             <label class="field block-field">Состояния и ранения<textarea id="character-conditions" rows="3" placeholder="Каждое состояние — с новой строки"></textarea></label>
           </fieldset>
@@ -197,7 +211,7 @@
           <div><div class="eyebrow"><span class="eyebrow-line"></span>Лист персонажа</div><h1 id="inventory-title">Инвентарь</h1><p class="intro">Снаряжение персонажа: <strong id="inventory-character-name">Персонаж 1</strong>.</p></div>
         </div>
         <div class="inventory-summary">
-          <label class="capacity-field">Грузоподъёмность <span><input id="capacity-input" type="number" min="0" step="0.1" inputmode="decimal"> кг</span></label>
+          <label class="capacity-field">Грузоподъёмность, ручной предел <span><input id="capacity-input" type="number" min="0" step="0.1" inputmode="decimal" placeholder="по BODY" aria-label="Ручной предел грузоподъёмности в килограммах"> кг</span></label>
           <div class="weight-readout"><strong id="weight-total">0 кг</strong><span id="weight-caption">из 0 кг</span></div>
           <div class="weight-track" role="progressbar" aria-label="Загрузка грузоподъёмности" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="weight-progress"></span></div>
           <p id="weight-warning" class="inline-warning" hidden></p>

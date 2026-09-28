@@ -6,12 +6,16 @@
   "use strict";
 
   const FORMAT = "witcher-workshop-characters";
-  const SCHEMA_VERSION = 2;
+  const SCHEMA_VERSION = 3;
   const STORAGE_KEY = "witcher-workshop-characters-v1";
   const LEGACY_INVENTORY_KEY = "witcher-workshop-inventory-v1";
   const RULES_VERSION = "witcher-core-russian-errata-v4";
   const ATTRIBUTES = ["INT", "REF", "DEX", "BODY", "SPD", "EMP", "CRA", "WILL", "LUCK"];
   const ATTRIBUTE_SET = new Set(ATTRIBUTES);
+
+  function createAttributeModifiers() {
+    return Object.fromEntries(ATTRIBUTES.map(attribute => [attribute, { permanent: 0, temporary: 0 }]));
+  }
 
   function makeId() {
     return globalThis.crypto?.randomUUID?.() || `character-${Date.now()}-${Math.random().toString(36).slice(2)}`;
@@ -72,6 +76,7 @@
         outcomes: [],
       },
       attributes: Object.fromEntries(ATTRIBUTES.map(attribute => [attribute, null])),
+      attributeModifiers: createAttributeModifiers(),
       skills: [],
       state: {
         currentHp: null,
@@ -121,9 +126,10 @@
     const personalRaw = raw.personal ?? {};
     const lifePathRaw = raw.lifePath ?? {};
     const attributesRaw = raw.attributes ?? {};
+    const attributeModifiersRaw = raw.attributeModifiers ?? {};
     const stateRaw = raw.state ?? {};
     const equipmentRaw = raw.equipment ?? {};
-    if (!isObject(personalRaw) || !isObject(lifePathRaw) || !isObject(attributesRaw) || !isObject(stateRaw) || !isObject(equipmentRaw)) {
+    if (!isObject(personalRaw) || !isObject(lifePathRaw) || !isObject(attributesRaw) || !isObject(attributeModifiersRaw) || !isObject(stateRaw) || !isObject(equipmentRaw)) {
       throw new Error(`Персонаж ${index + 1}: личные данные, характеристики, состояние и снаряжение должны быть объектами.`);
     }
 
@@ -152,6 +158,16 @@
     const attributes = { ...defaults.attributes, ...attributesRaw };
     for (const attribute of ATTRIBUTES) attributes[attribute] = optionalNumber(attributes[attribute], `Характеристика ${attribute}`, { min: 0, max: 1000 });
 
+    const attributeModifiers = createAttributeModifiers();
+    for (const attribute of ATTRIBUTES) {
+      const modifiers = attributeModifiersRaw[attribute] ?? {};
+      if (!isObject(modifiers)) throw new Error(`Модификаторы характеристики ${attribute} должны быть объектом.`);
+      attributeModifiers[attribute] = {
+        permanent: optionalNumber(modifiers.permanent, `Постоянное изменение ${attribute}`, { min: -1000, max: 1000 }) ?? 0,
+        temporary: optionalNumber(modifiers.temporary, `Временное изменение ${attribute}`, { min: -1000, max: 1000 }) ?? 0,
+      };
+    }
+
     if (!Array.isArray(raw.skills ?? [])) throw new Error(`Персонаж ${index + 1}: навыки должны быть массивом.`);
     const skills = (raw.skills ?? []).map((skill, skillIndex) => {
       if (!isObject(skill)) throw new Error(`Навык ${skillIndex + 1}: ожидался объект.`);
@@ -161,7 +177,9 @@
         : boundedString(String(skill.attribute), `Навык «${name}», характеристика`, 20, false);
       if (attribute !== null && !ATTRIBUTE_SET.has(attribute)) throw new Error(`Навык «${name}»: неизвестная характеристика ${attribute}.`);
       const rank = optionalNumber(skill.rank, `Навык «${name}», значение`, { min: 0, max: 1000 });
-      return { ...skill, id: boundedString(String(skill.id || makeId()), `Навык «${name}», ID`, 160, false), name, attribute, rank };
+      const permanentModifier = optionalNumber(skill.permanentModifier ?? 0, `Навык «${name}», постоянное изменение`, { min: -1000, max: 1000 }) ?? 0;
+      const temporaryModifier = optionalNumber(skill.temporaryModifier ?? 0, `Навык «${name}», временное изменение`, { min: -1000, max: 1000 }) ?? 0;
+      return { ...skill, id: boundedString(String(skill.id || makeId()), `Навык «${name}», ID`, 160, false), name, attribute, rank, permanentModifier, temporaryModifier };
     });
     ensureUnique(skills, item => item.id, "ID навыка");
 
@@ -200,6 +218,7 @@
       personal: { ...personal, name },
       lifePath,
       attributes,
+      attributeModifiers,
       skills,
       state,
       abilities,
@@ -236,6 +255,20 @@
       ...raw,
       schemaVersion: 2,
       characters: raw.characters.map(character => ({ ...character, schemaVersion: 2 })),
+    }),
+    2: raw => ({
+      ...raw,
+      schemaVersion: 3,
+      characters: raw.characters.map(character => ({
+        ...character,
+        schemaVersion: 3,
+        attributeModifiers: character.attributeModifiers ?? createAttributeModifiers(),
+        skills: (character.skills ?? []).map(skill => ({
+          ...skill,
+          permanentModifier: skill.permanentModifier ?? 0,
+          temporaryModifier: skill.temporaryModifier ?? 0,
+        })),
+      })),
     }),
   });
 
