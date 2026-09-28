@@ -287,7 +287,7 @@
           <div><div class="eyebrow"><span class="eyebrow-line"></span>Лист персонажа</div><h1 id="inventory-title">Инвентарь</h1><p class="intro">Снаряжение персонажа: <strong id="inventory-character-name">Персонаж 1</strong>.</p></div>
         </div>
         <div class="inventory-summary">
-          <label class="capacity-field">Грузоподъёмность, ручной предел <span><input id="capacity-input" type="number" min="0" step="0.1" inputmode="decimal" placeholder="по Тел" aria-label="Ручной предел грузоподъёмности в килограммах"> кг</span></label>
+          <label class="capacity-field">Грузоподъёмность по Тел <span><output id="capacity-readout" aria-label="Расчётная грузоподъёмность">—</output> кг</span></label>
           <div class="weight-readout"><strong id="weight-total">0 кг</strong><span id="weight-caption">из 0 кг</span></div>
           <div class="weight-track" role="progressbar" aria-label="Загрузка грузоподъёмности" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="weight-progress"></span></div>
           <p id="weight-warning" class="inline-warning" hidden></p>
@@ -302,7 +302,7 @@
             <span id="inventory-search-help" class="sr-only" role="status" aria-live="polite"></span>
           </div>
           <label class="field">Количество<input id="inventory-quantity" type="number" min="0.1" step="0.1" value="1" required></label>
-          <label class="field">Вес за шт., кг<input id="inventory-unit-weight" type="number" min="0" step="0.1" placeholder="из каталога"></label>
+          <label class="field">Вес за шт., кг<input id="inventory-unit-weight" type="number" min="0" step="0.01" placeholder="из каталога"></label>
           <label class="field inventory-separate-option"><span><input id="inventory-separate-entry" type="checkbox"> Отдельная запись</span></label>
           <button class="button primary add-button" type="submit">Добавить</button>
         </form>
@@ -312,7 +312,7 @@
             <label class="field grow">Название<input id="custom-item-name" maxlength="120" required></label>
             <label class="field">Тип<select id="custom-item-category"><option value="other">Другое</option><option value="weapon">Оружие</option><option value="armor">Броня</option><option value="shield">Щит</option></select></label>
             <label class="field">Количество<input id="custom-item-quantity" type="number" min="0.1" step="0.1" value="1" required></label>
-            <label class="field">Вес за шт., кг<input id="custom-item-weight" type="number" min="0" step="0.1" placeholder="неизвестен"></label>
+            <label class="field">Вес за шт., кг<input id="custom-item-weight" type="number" min="0" step="0.01" placeholder="неизвестен"></label>
             <button class="button secondary add-button" type="submit">Добавить</button>
           </form>
         </details>
