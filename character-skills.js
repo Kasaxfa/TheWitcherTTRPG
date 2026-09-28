@@ -18,7 +18,7 @@
     { id: "teaching", name: "Передача знаний", attribute: "INT" },
     { id: "tactics", name: "Тактика", attribute: "INT", doubleCost: true },
     { id: "trade", name: "Торговля", attribute: "INT" },
-    { id: "etiquette", name: "Этикет", attribute: "EMP" },
+    { id: "etiquette", name: "Этикет", attribute: "INT" },
     { id: "language", name: "Язык", attribute: "INT", doubleCost: true },
     { id: "melee", name: "Ближний бой", attribute: "REF" },
     { id: "brawling", name: "Борьба", attribute: "REF" },

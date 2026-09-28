@@ -12,6 +12,7 @@ test("new character receives every common skill with its leading attribute", () 
   assert.equal(general.length, CharacterSkills.SKILLS.length);
   assert.deepEqual(general.map(skill => skill.catalogId).sort(), CharacterSkills.SKILLS.map(skill => skill.id).sort());
   assert.ok(general.every(skill => skill.rank === 0 && skill.attribute));
+  assert.equal(CharacterSkills.SKILLS.find(skill => skill.id === "etiquette").attribute, "INT");
 });
 
 test("selecting a profession adds its defining skill and ten professional skills", () => {
