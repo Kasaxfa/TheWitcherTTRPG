@@ -12,6 +12,7 @@
   let activePage = "recipes";
   let characterViewMode = "library";
   let renameTargetCharacterId = null;
+  let characterCreationDraft = null;
 
   function formula(ingredients) {
     const relevant = ingredients.filter(ingredient => alchemySymbols[ingredient.itemId]);
@@ -325,7 +326,7 @@
     $("#weight-total").textContent = `${numberText(knownWeight)} кг${unknownCount ? " + ?" : ""}`;
     $("#weight-caption").textContent = capacity === null
       ? "грузоподъёмность не задана"
-      : `из ${numberText(capacity)} кг · ${inventory.capacityKg === null ? "ENC по BODY" : "задано вручную"}`;
+      : `из ${numberText(capacity)} кг · ${inventory.capacityKg === null ? "Вес по Тел" : "задано вручную"}`;
     const progress = $("#weight-progress");
     const track = $(".weight-track");
     const percent = capacity > 0 ? Math.min(100, knownWeight / capacity * 100) : 0;
@@ -336,7 +337,7 @@
     const warnings = [];
     if (unknownCount) warnings.push(`У ${unknownCount} ${unknownCount === 1 ? "позиции" : "позиций"} не указан вес; общий вес показан без них.`);
     if (capacity !== null && knownWeight > capacity) warnings.push("Превышена заданная грузоподъёмность.");
-    if (derived.load.status === "over-lift-limit") warnings.push(`Вес превышает предел подъёма по BODY (${numberText(derived.liftLimitKg)} кг).`);
+    if (derived.load.status === "over-lift-limit") warnings.push(`Вес превышает предел подъёма по Тел (${numberText(derived.liftLimitKg)} кг).`);
     $("#weight-warning").hidden = warnings.length === 0;
     $("#weight-warning").textContent = warnings.join(" ");
     $("#inventory-list").innerHTML = inventory.items.map(entry => {
@@ -365,6 +366,13 @@
     INT: "Интеллект", REF: "Реакция", DEX: "Ловкость", BODY: "Телосложение",
     SPD: "Скорость", EMP: "Эмпатия", CRA: "Ремесло", WILL: "Воля", LUCK: "Удача",
   };
+  const attributeAbbreviations = {
+    INT: "Инт", REF: "Реа", DEX: "Лвк", BODY: "Тел", SPD: "Скор",
+    EMP: "Эмп", CRA: "Рем", WILL: "Воля", LUCK: "Удача",
+  };
+  const derivedAbbreviations = { REC: "Отдых", STUN: "Уст", RUN: "Бег", LEAP: "Прж", STA: "Вын", ENC: "Вес" };
+  const shortAttribute = code => attributeAbbreviations[code] || code;
+  const signed = value => value > 0 ? `+${value}` : String(value);
 
   const valueOrDash = value => value === null || value === undefined ? "—" : numberText(value);
 
@@ -382,8 +390,11 @@
     const values = window.CharacterRules.calculateAttributes(character);
     $("#character-attributes").innerHTML = window.CharacterStore.ATTRIBUTES.map(code => {
       const value = values[code];
+      const statNotes = [shortAttribute(code)];
+      if (value.racial) statNotes.push(`раса ${signed(value.racial)}`);
+      if (value.background) statNotes.push(`предыстория ${signed(value.background)}`);
       return `<div class="character-stat-row" data-attribute-row="${code}">
-        <strong class="character-stat-name">${escapeHtml(attributeLabels[code])}<span>${code}</span></strong>
+        <strong class="character-stat-name">${escapeHtml(attributeLabels[code])}<span>${escapeHtml(statNotes.join(" · "))}</span></strong>
         <label class="field">Исходное<input data-attribute-input="${code}.base" type="number" min="0" max="1000" step="1" value="${value.base === null ? "" : escapeHtml(value.base)}" aria-label="Исходное значение: ${attributeLabels[code]}"></label>
         <label class="field">Постоянное<input data-attribute-input="${code}.permanent" type="number" min="-1000" max="1000" step="1" value="${escapeHtml(value.permanent)}" aria-label="Постоянное изменение: ${attributeLabels[code]}"></label>
         <label class="field">Временное<input data-attribute-input="${code}.temporary" type="number" min="-1000" max="1000" step="1" value="${escapeHtml(value.temporary)}" aria-label="Временное изменение: ${attributeLabels[code]}"></label>
@@ -416,26 +427,26 @@
       output.textContent = valueOrDash(derived.attributes[output.dataset.attributeTotal]?.total);
     });
     const entries = [
-      ["Физическая основа · B", valueOrDash(derived.physicalBasis)],
+      ["Физическая основа", valueOrDash(derived.physicalBasis)],
       ["Максимум ПЗ", valueOrDash(derived.maxHp)],
-      ["Максимум Выносливости", valueOrDash(derived.maxSta)],
-      ["Восстановление · REC", valueOrDash(derived.recovery)],
-      ["Устойчивость · STUN", valueOrDash(derived.stun)],
-      ["Бег за ход · RUN", derived.runMeters === null ? "—" : `${numberText(derived.runMeters)} м`],
-      ["Прыжок · LEAP", derived.leapMeters === null ? "—" : `${numberText(derived.leapMeters)} м`],
-      ["Переносимый вес · ENC", derived.encumbranceKg === null ? "—" : `${numberText(derived.encumbranceKg)} кг`],
+      [`Максимум Выносливости · ${derivedAbbreviations.STA}`, valueOrDash(derived.maxSta)],
+      [`Отдых · ${derivedAbbreviations.REC}`, valueOrDash(derived.recovery)],
+      [`Устойчивость · ${derivedAbbreviations.STUN}`, valueOrDash(derived.stun)],
+      [`Бег за ход · ${derivedAbbreviations.RUN}`, derived.runMeters === null ? "—" : `${numberText(derived.runMeters)} м`],
+      [`Прыжок · ${derivedAbbreviations.LEAP}`, derived.leapMeters === null ? "—" : `${numberText(derived.leapMeters)} м`],
+      [`Переносимый вес · ${derivedAbbreviations.ENC}`, derived.encumbranceKg === null ? "—" : `${numberText(derived.encumbranceKg)} кг`],
       ["Предел подъёма", derived.liftLimitKg === null ? "—" : `${numberText(derived.liftLimitKg)} кг`],
       ["Бонус ближнего боя", derived.meleeDamageBonus === null ? "—" : `${derived.meleeDamageBonus > 0 ? "+" : ""}${derived.meleeDamageBonus}`],
       ["Удар рукой", derived.punchDamage || "—"],
       ["Удар ногой", derived.kickDamage || "—"],
     ];
     const loadValue = derived.load.status === "within-capacity" ? "Штрафа нет"
-      : derived.load.status === "encumbered" ? `−${derived.load.penalty} к REF, DEX и SPD`
+      : derived.load.status === "encumbered" ? `−${derived.load.penalty} к Реа, Лвк и Скор`
         : derived.load.status === "over-lift-limit" ? "Выше предела подъёма"
           : "Вес неизвестен";
     const loadHint = derived.load.status === "unknown" && derived.load.unknownWeightCount
       ? "Укажите вес всех предметов в инвентаре"
-      : derived.encumbranceKg === null ? "Введите BODY для расчёта переносимого веса"
+      : derived.encumbranceKg === null ? "Введите Тел для расчёта переносимого веса"
         : `Вес инвентаря: ${numberText(derived.load.carriedWeightKg)} кг`;
     entries.push(["Штраф от нагрузки", loadValue, loadHint]);
     $("#character-derived-values").innerHTML = entries.map(([label, value, hint]) => `<div class="character-derived-card">
@@ -443,12 +454,12 @@
     </div>`).join("");
 
     const notes = [];
-    if (derived.attributes.BODY.total === null || derived.attributes.WILL.total === null) notes.push("Для расчёта физической основы, максимума ПЗ, Выносливости, REC и STUN укажите BODY и WILL.");
-    if (derived.attributes.SPD.total === null) notes.push("Для расчёта бега и прыжка укажите SPD.");
-    if (derived.attributes.BODY.total === null) notes.push("Для расчёта переносимого веса и урона укажите BODY.");
+    if (derived.attributes.BODY.total === null || derived.attributes.WILL.total === null) notes.push("Для расчёта физической основы, максимума ПЗ, Выносливости, Отдыха и Устойчивости укажите Тел и Волю.");
+    if (derived.attributes.SPD.total === null) notes.push("Для расчёта бега и прыжка укажите Скор.");
+    if (derived.attributes.BODY.total === null) notes.push("Для расчёта переносимого веса и урона укажите Тел.");
     if (derived.physicalBasis !== null && !derived.physicalBasisSupported) notes.push(`Физическая основа B=${derived.physicalBasis}: в проверенной таблице нет строки для этого значения.`);
-    if (derived.meleeDamageBonus === null && derived.attributes.BODY.total !== null) notes.push(`BODY=${numberText(derived.attributes.BODY.total)}: значение урона отсутствует в проверенной таблице.`);
-    if (derived.load.status === "over-lift-limit") notes.push("Штрафы за перегруз здесь не вычисляются: вес выше предела подъёма, указанного для BODY.");
+    if (derived.meleeDamageBonus === null && derived.attributes.BODY.total !== null) notes.push(`Тел=${numberText(derived.attributes.BODY.total)}: значение урона отсутствует в проверенной таблице.`);
+    if (derived.load.status === "over-lift-limit") notes.push("Штрафы за перегруз здесь не вычисляются: вес выше предела подъёма, указанного для Тел.");
     $("#character-derived-note").hidden = notes.length === 0;
     $("#character-derived-note").textContent = notes.join(" ");
   }
@@ -464,6 +475,157 @@
     let suffix = 2;
     while (used.has(normalize(`${base} ${suffix}`))) suffix++;
     return `${base} ${suffix}`;
+  }
+
+  const creationSteps = [
+    ["identity", "Раса, профессия и возраст"],
+    ["background", "Предыстория"],
+    ["attributes", "Характеристики"],
+    ["skills", "Навыки"],
+  ];
+
+  function professionSkillDescriptors(draft = characterCreationDraft) {
+    const profession = window.CharacterSkills.findProfession(draft?.professionId);
+    if (!profession) return [];
+    const result = [{
+      key: `defining-${profession.id}`, name: profession.defining.name, attribute: profession.defining.attribute,
+      catalogId: null, doubleCost: false, defining: true,
+    }];
+    for (const skillId of profession.skills) {
+      const definition = window.CharacterSkills.SKILLS.find(skill => skill.id === skillId);
+      if (definition) result.push({ key: definition.id, ...definition });
+    }
+    if (profession.languageChoices) {
+      const definition = window.CharacterSkills.SKILLS.find(skill => skill.id === "language");
+      if (definition) result.push({ key: `${profession.id}.language`, ...definition, name: `Язык (выберите ${profession.languageChoices})` });
+    }
+    for (const skillId of draft.professionChoices || []) {
+      const definition = window.CharacterSkills.SKILLS.find(skill => skill.id === skillId);
+      if (definition) result.push({ key: definition.id, ...definition });
+    }
+    return result.map(skill => ({ ...skill, rank: draft.professionRanks[skill.key] ?? 1 }));
+  }
+
+  function startingGeneralSkills(draft = characterCreationDraft) {
+    const professionalIds = new Set(professionSkillDescriptors(draft).map(skill => skill.catalogId).filter(Boolean));
+    return window.CharacterSkills.SKILLS.filter(skill => !professionalIds.has(skill.id))
+      .map(skill => ({ ...skill, key: skill.id, rank: draft.generalRanks[skill.id] ?? 0 }));
+  }
+
+  function startingSkillCost(skill) { return skill.doubleCost ? 2 : 1; }
+  function startingSkillSpent(skills) { return skills.reduce((sum, skill) => sum + skill.rank * startingSkillCost(skill), 0); }
+
+  function creationGeneralBudget(draft = characterCreationDraft) {
+    if (!draft.attributes) return 0;
+    const raceTraits = window.CharacterCreation.RACE_TRAITS[draft.race] || {};
+    const getValue = code => {
+      const base = Number(draft.attributes[code] || 0);
+      const racial = Number(raceTraits.attributeModifiers?.[code] || 0);
+      const minimum = raceTraits.minimumAttributes?.[code] || 0;
+      return Math.max(minimum, base + racial);
+    };
+    return getValue("INT") + getValue("REF");
+  }
+
+  function newCharacterCreationDraft() {
+    return {
+      step: "identity", race: "", professionId: "", age: "", name: "", backgroundMode: "", generatedLifePath: null,
+      witcherRisk: "medium", attributeMode: "", attributePool: 70, rolls: null, diceAssignments: {}, attributes: null,
+      professionChoices: [], professionRanks: {}, generalRanks: {},
+    };
+  }
+
+  function setCreationError(message = "") {
+    const element = $("#character-create-error");
+    element.textContent = message;
+    element.hidden = !message;
+  }
+
+  function renderCreationWizard() {
+    if (!characterCreationDraft) return;
+    const draft = characterCreationDraft;
+    const index = creationSteps.findIndex(([id]) => id === draft.step);
+    const stepIndex = Math.max(0, index);
+    const stepTitle = creationSteps[stepIndex][1];
+    const progress = Math.round(((stepIndex + 1) / creationSteps.length) * 100);
+    const header = `<div class="creation-progress-label"><span>Создание персонажа · шаг ${stepIndex + 1} из ${creationSteps.length}</span><strong>${progress}%</strong></div><div class="creation-progress"><span style="width:${progress}%"></span></div><h2 id="character-create-title">${escapeHtml(stepTitle)}</h2>`;
+    let body = "";
+
+    if (draft.step === "identity") {
+      const professionOptions = window.CharacterSkills.PROFESSIONS.map(profession => `<option value="${profession.id}"${draft.professionId === profession.id ? " selected" : ""}>${escapeHtml(profession.name)}</option>`).join("");
+      body = `<div class="creation-field-grid">
+        <label class="field">Раса<select data-creation-field="race"><option value="">Выберите расу</option>${window.CharacterSkills.RACES.map(race => `<option value="${escapeHtml(race)}"${draft.race === race ? " selected" : ""}>${escapeHtml(race)}</option>`).join("")}</select></label>
+        <label class="field">Профессия<select data-creation-field="profession"><option value="">Выберите профессию</option>${professionOptions}</select></label>
+        <label class="field">Возраст<input data-creation-field="age" type="number" min="${draft.race === "Ведьмак" ? "50" : "1"}" max="260" step="1" value="${escapeHtml(draft.age)}" placeholder="Лет"></label>
+        <label class="field">Имя персонажа <span class="field-optional">можно позже</span><input data-creation-field="name" maxlength="120" value="${escapeHtml(draft.name)}" placeholder="Персонаж ${characterStore.characters.length + 1}"></label>
+      </div><p class="creation-rule-note">Ведьмак должен быть ведьмаком по профессии; маги и жрецы бывают людьми или эльфами. Для ведьмака по книге задан возраст 50–260 лет.</p>`;
+    } else if (draft.step === "background") {
+      const randomPath = draft.generatedLifePath;
+      const generatedDetails = randomPath ? (randomPath.kind === "witcher"
+        ? `<p><strong>${escapeHtml(randomPath.school)}</strong> · странствия с ${escapeHtml(randomPath.travelAge)} лет · ${escapeHtml(randomPath.training)} · ${escapeHtml(randomPath.trial)}</p>`
+        : `<p><strong>Родина:</strong> ${escapeHtml(randomPath.homeland?.region || "—")} · <strong>Семья:</strong> ${escapeHtml(randomPath.familyFate || "—")}</p>`)
+        + `<p>Событий по десятилетиям: ${(randomPath.decadeEvents || []).length}. Связанных персонажей: ${(randomPath.relatives || []).length}. Имена можно будет вписать в лист позже.</p>`
+        + `<ol class="creation-preview-events">${(randomPath.decadeEvents || []).slice(0, 5).map(event => `<li><strong>${escapeHtml(event.title || event.type)}</strong>${event.decadeStart === undefined ? "" : ` · ${escapeHtml(event.decadeStart)}–${escapeHtml(event.decadeEnd)} лет`} — ${escapeHtml(event.description || "")}</li>`).join("")}</ol>`
+        : "";
+      body = `<div class="creation-choice-grid">
+        <button type="button" class="creation-choice${draft.backgroundMode === "manual" ? " selected" : ""}" data-creation-background="manual"><strong>Создать самому</strong><span>Оставить историю пустой и заполнить её в листе.</span></button>
+        <button type="button" class="creation-choice${draft.backgroundMode === "random" ? " selected" : ""}" data-creation-background="random"><strong>Сгенерировать случайно</strong><span>Броски по таблицам жизненного пути; имена близких оставим пустыми.</span></button>
+      </div>${draft.race === "Ведьмак" ? `<label class="field creation-risk-field">Риск пути ведьмака<select data-creation-field="witcherRisk"><option value="cautious"${draft.witcherRisk === "cautious" ? " selected" : ""}>Осторожный</option><option value="normal"${draft.witcherRisk === "normal" ? " selected" : ""}>Обычный</option><option value="medium"${draft.witcherRisk === "medium" ? " selected" : ""}>Средний</option><option value="risky"${draft.witcherRisk === "risky" ? " selected" : ""}>Рискованный</option></select></label>` : ""}
+        ${draft.backgroundMode === "random" ? `<div class="creation-generated-preview">${generatedDetails || `<button type="button" class="button secondary" data-creation-action="generate-life-path">Бросить события и показать результат</button>`}${randomPath ? `<button type="button" class="text-button" data-creation-action="generate-life-path">Сгенерировать заново</button>` : ""}</div>` : ""}`;
+    } else if (draft.step === "attributes") {
+      const modeChoices = `<div class="creation-choice-grid compact"><button type="button" class="creation-choice${draft.attributeMode === "dice" ? " selected" : ""}" data-attribute-mode="dice"><strong>Броски 9d10</strong><span>Каждый результат 1 или 2 перебрасывается.</span></button><button type="button" class="creation-choice${draft.attributeMode === "points" ? " selected" : ""}" data-attribute-mode="points"><strong>Распределить очки</strong><span>Выберите пул 60, 70 или 80.</span></button></div>`;
+      if (draft.attributeMode === "points") {
+        const attributes = draft.attributes || window.CharacterCreation.balancedAttributes(draft.attributePool);
+        const total = Object.values(attributes).reduce((sum, value) => sum + Number(value || 0), 0);
+        body = `${modeChoices}<label class="field creation-pool-field">Пул характеристик<select data-creation-field="attributePool">${window.CharacterCreation.POINT_BUY_POOLS.map(pool => `<option value="${pool}"${Number(draft.attributePool) === pool ? " selected" : ""}>${pool}</option>`).join("")}</select></label>
+          <div class="creation-budget-readout"><span>Распределено</span><strong id="creation-attribute-spent">${total} / ${draft.attributePool}</strong></div>
+          <div class="creation-stat-grid">${window.CharacterCreation.ATTRIBUTES.map(code => `<div class="creation-stat-row"><strong>${escapeHtml(attributeLabels[code])}<small>${shortAttribute(code)}</small></strong><button type="button" class="stepper-button" data-attribute-step="-1" data-attribute-code="${code}" aria-label="Уменьшить ${attributeLabels[code]}"${Number(attributes[code]) <= 1 ? " disabled" : ""}>−</button><input data-attribute-point="${code}" type="number" min="1" max="10" step="1" value="${escapeHtml(attributes[code])}" aria-label="${attributeLabels[code]}"><button type="button" class="stepper-button" data-attribute-step="1" data-attribute-code="${code}" aria-label="Увеличить ${attributeLabels[code]}"${Number(attributes[code]) >= 10 || total >= Number(draft.attributePool) ? " disabled" : ""}>＋</button></div>`).join("")}</div>
+          <p class="creation-rule-note">Базовое значение каждой характеристики должно быть 1–10. Расовые модификаторы учитываются отдельно в листе.</p>`;
+      } else if (draft.attributeMode === "dice") {
+        const rolls = draft.rolls || [];
+        const assigned = Object.values(draft.diceAssignments).map(Number);
+        body = `${modeChoices}<p class="creation-rule-note">Назначьте каждому параметру один из девяти результатов. Каждый бросок можно использовать только один раз.</p><div class="creation-dice-grid">${window.CharacterCreation.ATTRIBUTES.map(code => `<label class="field">${escapeHtml(attributeLabels[code])} · ${shortAttribute(code)}<select data-dice-attribute="${code}"><option value="">Выберите результат</option>${rolls.map((value, rollIndex) => `<option value="${rollIndex}"${Number(draft.diceAssignments[code]) === rollIndex ? " selected" : ""}${assigned.includes(rollIndex) && Number(draft.diceAssignments[code]) !== rollIndex ? " disabled" : ""}>Бросок ${rollIndex + 1}: ${value}</option>`).join("")}</select></label>`).join("")}</div><div class="creation-rolls" aria-label="Результаты бросков">${rolls.map((value, index) => `<span>${index + 1}: <strong>${value}</strong></span>`).join("")}</div>`;
+      } else body = `${modeChoices}<p class="creation-rule-note">Сначала выберите способ определения характеристик.</p>`;
+    } else if (draft.step === "skills") {
+      const professional = professionSkillDescriptors(draft);
+      const profession = window.CharacterSkills.findProfession(draft.professionId);
+      const profSpent = startingSkillSpent(professional);
+      const general = startingGeneralSkills(draft);
+      const generalSpent = startingSkillSpent(general);
+      const generalBudget = creationGeneralBudget(draft);
+      const professionChoiceHtml = profession?.choice ? `<fieldset class="creation-skill-choice"><legend>${escapeHtml(profession.choice.label)}</legend><p>Выберите ровно ${profession.choice.requiredCount} навыков, чтобы получить все профессиональные навыки.</p><div class="profession-choice-grid">${profession.choice.options.map(id => {
+        const skill = window.CharacterSkills.SKILLS.find(value => value.id === id);
+        return skill ? `<label class="profession-choice-option"><input type="checkbox" data-creation-profession-choice="${id}"${draft.professionChoices.includes(id) ? " checked" : ""}><span>${escapeHtml(skill.name)}</span><small>${shortAttribute(skill.attribute)} · ${escapeHtml(attributeLabels[skill.attribute])}</small></label>` : "";
+      }).join("")}</div></fieldset>` : "";
+      const professionalHtml = professional.length === 11 ? professional.map(skill => creationSkillRow(skill, "profession")).join("") : `<p class="character-empty">Сначала выберите обязательные профессиональные навыки выше.</p>`;
+      const generalHtml = window.CharacterStore.ATTRIBUTES.filter(code => !["SPD", "LUCK"].includes(code)).map(code => {
+        const skills = general.filter(skill => skill.attribute === code);
+        return skills.length ? `<details class="creation-skill-group"><summary>${escapeHtml(attributeLabels[code])} · ${shortAttribute(code)} <span>${skills.length} навыков</span></summary><div>${skills.map(skill => creationSkillRow(skill, "general")).join("")}</div></details>` : "";
+      }).join("");
+      body = `${professionChoiceHtml}<div class="creation-skill-section"><div class="creation-budget-readout"><span>Профессиональные навыки · рейтинг не ниже 1, максимум 6 на создании</span><strong>${profSpent} / 44</strong></div><div class="creation-profession-skill-list">${professionalHtml}</div></div>
+        <div class="creation-skill-section"><div class="creation-budget-readout"><span>Общие навыки · бюджет Инт + Реа</span><strong>${generalSpent} / ${generalBudget}</strong></div><p class="creation-rule-note">Остаток общего бюджета можно не тратить. Сложные навыки с пометкой ×2 стоят 2 очка за ранг.</p>${generalHtml}</div>`;
+    }
+
+    $("#character-create-content").innerHTML = `${header}<div class="creation-step-content">${body}</div>`;
+    const actions = [];
+    actions.push(`<button type="button" class="button secondary" data-creation-action="cancel">Отмена</button>`);
+    if (stepIndex > 0) actions.push(`<button type="button" class="button secondary" data-creation-action="back">← Назад</button>`);
+    actions.push(stepIndex === creationSteps.length - 1
+      ? `<button type="button" class="button primary" data-creation-action="finish">Создать персонажа</button>`
+      : `<button type="button" class="button primary" data-creation-action="next">Далее →</button>`);
+    $("#character-create-actions").innerHTML = actions.join("");
+  }
+
+  function creationSkillRow(skill, kind) {
+    const cost = startingSkillCost(skill);
+    const minimum = kind === "profession" ? 1 : 0;
+    return `<div class="creation-skill-row" data-creation-skill-row="${kind}.${escapeHtml(skill.key)}">
+      <div><strong>${escapeHtml(skill.name)}</strong><small>${shortAttribute(skill.attribute)} · ${escapeHtml(attributeLabels[skill.attribute])}${skill.doubleCost ? " · стоимость ×2" : ""}${skill.defining ? " · определяющий" : ""}</small></div>
+      <button type="button" class="stepper-button" data-skill-step="-1" data-skill-kind="${kind}" data-skill-key="${escapeHtml(skill.key)}"${skill.rank <= minimum ? " disabled" : ""}>−</button>
+      <input data-skill-rank="${kind}.${escapeHtml(skill.key)}" type="number" min="${minimum}" max="6" step="1" value="${skill.rank}" aria-label="Рейтинг: ${escapeHtml(skill.name)}">
+      <button type="button" class="stepper-button" data-skill-step="1" data-skill-kind="${kind}" data-skill-key="${escapeHtml(skill.key)}"${skill.rank >= 6 ? " disabled" : ""}>＋</button>
+      <span class="creation-skill-cost">${cost} оч. / ранг</span>
+    </div>`;
   }
 
   function formatCharacterDate(value) {
@@ -597,18 +759,18 @@
       const definition = catalog.SKILLS.find(entry => entry.id === skill.catalogId);
       const fixed = Boolean(definition || skill.professionSkillId);
       const sourceLabel = skill.source === "profession" ? "Профессия" : skill.source === "general" ? "Общий список" : "Дополнительный";
-      const attribute = attributeLabels[skill.attribute] ? `${skill.attribute} · ${attributeLabels[skill.attribute]}` : "Характеристика не указана";
+      const attribute = attributeLabels[skill.attribute] ? `${shortAttribute(skill.attribute)} · ${attributeLabels[skill.attribute]}` : "Характеристика не указана";
       const nameControl = fixed
         ? `<div class="skill-name-field"><strong>${escapeHtml(skill.name)}</strong><span class="skill-attribute-label">${escapeHtml(attribute)}</span>${definition?.doubleCost ? `<small>Повышение стоит вдвое дороже</small>` : ""}</div>`
         : `<label class="field skill-name-field">Навык<input data-skill-field="name" maxlength="120" value="${escapeHtml(skill.name)}" aria-label="Название навыка"></label>`;
-      const attributeControl = fixed ? "" : `<label class="field skill-attribute-field">Ведущая характеристика<select data-skill-field="attribute" aria-label="Ведущая характеристика"><option value="">Не указана</option>${window.CharacterStore.ATTRIBUTES.map(code => `<option value="${code}"${skill.attribute === code ? " selected" : ""}>${code} · ${attributeLabels[code]}</option>`).join("")}</select></label>`;
+      const attributeControl = fixed ? "" : `<label class="field skill-attribute-field">Ведущая характеристика<select data-skill-field="attribute" aria-label="Ведущая характеристика"><option value="">Не указана</option>${window.CharacterStore.ATTRIBUTES.map(code => `<option value="${code}"${skill.attribute === code ? " selected" : ""}>${shortAttribute(code)} · ${attributeLabels[code]}</option>`).join("")}</select></label>`;
       const removable = skill.source === "custom" || skill.source === "other";
       return `<div class="character-entry skill-entry${fixed ? " catalog-skill-entry" : ""}" data-skill-id="${escapeHtml(skill.id)}">
         ${nameControl}${attributeControl}
         <label class="field">Рейтинг<input data-skill-field="rank" type="number" min="${skill.source === "profession" ? "1" : "0"}" max="1000" step="1" value="${skill.rank === null ? "" : escapeHtml(skill.rank)}" aria-label="Рейтинг навыка ${escapeHtml(skill.name)}"></label>
         <label class="field">Постоянное<input data-skill-field="permanentModifier" type="number" min="-1000" max="1000" step="1" value="${escapeHtml(skill.permanentModifier)}" aria-label="Постоянное изменение навыка ${escapeHtml(skill.name)}"></label>
         <label class="field">Временное<input data-skill-field="temporaryModifier" type="number" min="-1000" max="1000" step="1" value="${escapeHtml(skill.temporaryModifier)}" aria-label="Временное изменение навыка ${escapeHtml(skill.name)}"></label>
-        <output class="skill-total" data-skill-total="${escapeHtml(skill.id)}"><span>Итог</span><strong>—</strong></output>
+        <output class="skill-total" data-skill-total="${escapeHtml(skill.id)}"><span>Итог</span><strong>—</strong><small data-skill-bonus></small></output>
         ${removable ? `<button class="character-remove" type="button" data-remove-skill="${escapeHtml(skill.id)}" aria-label="Удалить навык ${escapeHtml(skill.name)}">×</button>` : `<span class="skill-source-label">${sourceLabel}</span>`}
       </div>`;
     };
@@ -622,14 +784,14 @@
     const generalHtml = attributeOrder.map(attribute => {
       const skills = general.filter(skill => skill.attribute === attribute);
       if (!skills.length) return "";
-      return `<section class="skill-attribute-group"><h4>${escapeHtml(attributeLabels[attribute])} <span>${attribute}</span></h4>${skills.map(skillRow).join("")}</section>`;
+      return `<section class="skill-attribute-group"><h4>${escapeHtml(attributeLabels[attribute])} <span>${shortAttribute(attribute)}</span></h4>${skills.map(skillRow).join("")}</section>`;
     }).join("");
     list.innerHTML = `<section class="skill-group">${professionalHeading}${professionalHtml}</section>
       <section class="skill-group"><div class="skill-group-heading"><h3>Общие навыки</h3><span>${general.length} навыков</span></div>${generalHtml || `<p class="character-empty">Общие навыки не найдены.</p>`}</section>
       ${other.length ? `<section class="skill-group"><div class="skill-group-heading"><h3>Дополнительные навыки</h3><span>${other.length}</span></div>${other.map(skillRow).join("")}</section>` : ""}`;
     renderProfessionChoiceFields(profession, character);
     $("#character-profession-skill-note").textContent = profession
-      ? `Профиль ${profession.name}: определяющий навык и профессиональный набор. На создании у всех 11 профессиональных навыков должен быть рейтинг не ниже 1; общий список навыков остаётся доступен каждому.`
+      ? `Стартовый пакет ${profession.name}: определяющий навык и 10 профессиональных навыков. На создании у них должен быть рейтинг не ниже 1; карьерное дерево способностей профессии показано отдельно ниже.`
       : "Все навыки общего списка показаны ниже. После выбора профессии появятся её определяющий навык и профессиональный набор.";
     renderSkillTotals();
   }
@@ -645,17 +807,24 @@
       const skill = window.CharacterSkills.SKILLS.find(entry => entry.id === skillId);
       if (!skill) return "";
       const checked = selected.includes(skillId) ? " checked" : "";
-      return `<label class="profession-choice-option"><input type="checkbox" data-profession-choice="${escapeHtml(skillId)}"${checked}><span>${escapeHtml(skill.name)}</span><small>${skill.attribute} · ${escapeHtml(attributeLabels[skill.attribute])}</small></label>`;
+      return `<label class="profession-choice-option"><input type="checkbox" data-profession-choice="${escapeHtml(skillId)}"${checked}><span>${escapeHtml(skill.name)}</span><small>${shortAttribute(skill.attribute)} · ${escapeHtml(attributeLabels[skill.attribute])}</small></label>`;
     }).join("");
     container.innerHTML = `<fieldset class="profession-choice-box"><legend>${escapeHtml(profession.choice.label)}</legend><p>Выбрано ${selected.length} из ${profession.choice.requiredCount}. Отметьте любые навыки из списка.</p><div class="profession-choice-grid">${options}</div></fieldset>`;
   }
 
   function renderSkillTotals(derived = activeDerivedValues()) {
-    const totals = new Map(derived.skills.map(skill => [skill.id, skill.total]));
+    const totals = new Map(derived.skills.map(skill => [skill.id, skill]));
     document.querySelectorAll("[data-skill-total]").forEach(output => {
-      const total = totals.get(output.dataset.skillTotal);
+      const skill = totals.get(output.dataset.skillTotal);
       const display = output.querySelector("strong");
-      if (display) display.textContent = valueOrDash(total);
+      if (display) display.textContent = valueOrDash(skill?.total);
+      const bonus = output.querySelector("[data-skill-bonus]");
+      if (bonus) {
+        const parts = [];
+        if (skill?.racialBonus) parts.push(`раса ${signed(skill.racialBonus)}`);
+        if (skill?.originBonus) parts.push(`родина ${signed(skill.originBonus)}`);
+        bonus.textContent = parts.join(" · ");
+      }
     });
   }
 
@@ -690,6 +859,69 @@
     }).join("");
   }
 
+  function renderRaceTraits(character = activeCharacter()) {
+    const container = $("#character-race-traits");
+    const traits = window.CharacterCreation.RACE_TRAITS[character.personal.race];
+    if (!traits) {
+      container.innerHTML = `<p class="character-empty">Выберите расу, чтобы увидеть её особенности и автоматически учитываемые бонусы.</p>`;
+      return;
+    }
+    container.innerHTML = `<div class="race-trait-heading"><strong>Особенности расы · ${escapeHtml(character.personal.race)}</strong><span>Игровые эффекты</span></div>
+      <ul>${traits.features.map(feature => `<li>${escapeHtml(feature)}</li>`).join("")}</ul>`;
+  }
+
+  function renderGeneratedLifePath(character = activeCharacter()) {
+    const container = $("#character-life-path-generated");
+    const generated = character.lifePath.generated;
+    if (!generated) {
+      container.innerHTML = `<p class="character-empty">Сгенерированные события появятся здесь. Для ручного варианта заполните поля выше.</p>`;
+      return;
+    }
+    const details = generated.kind === "witcher"
+      ? [
+          ["Школа", generated.school], ["Возраст при поступлении", generated.ageAtSchool], ["Начало странствий", generated.travelAge ? `${generated.travelAge} лет` : ""], ["Событие обучения", generated.training],
+          ["Испытание травами", generated.trial], ["Главное событие", generated.importantEvent], ["Сейчас", generated.presentStatus],
+        ]
+      : [["Родина", generated.homeland?.region], ["Судьба семьи", generated.familyFate], ["Положение семьи", generated.familyStation], ["Родители", generated.parents]];
+    const summary = details.filter(([, value]) => value).map(([label, value]) => `<div class="generated-fact"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`).join("");
+    const events = (generated.decadeEvents || []).map(event => `<article class="generated-event">
+      <div><strong>${escapeHtml(event.title || event.type || "Событие")}</strong><span>${event.decadeStart === undefined ? "" : `${escapeHtml(event.decadeStart)}–${escapeHtml(event.decadeEnd)} лет`}</span></div>
+      <p>${escapeHtml(event.description || "")}</p>
+    </article>`).join("");
+    const relatives = (generated.relatives || []).map(relative => `<div class="generated-relative" data-relative-id="${escapeHtml(relative.id)}">
+      <div class="generated-relative-role"><strong>${escapeHtml(relative.role)}</strong><small>${escapeHtml(relative.status || "")}</small></div>
+      <label class="field">Имя<input data-generated-relative-name="${escapeHtml(relative.id)}" maxlength="200" value="${escapeHtml(relative.name || "")}" placeholder="Введите имя"></label>
+      <p>${escapeHtml(relative.details || "")}</p>
+    </div>`).join("");
+    container.innerHTML = `<div class="generated-path-heading"><strong>Случайная предыстория</strong><span>Броски сохранены в JSON</span></div>
+      <div class="generated-facts">${summary}</div>
+      ${events ? `<div class="generated-event-list"><h3>События по десятилетиям</h3>${events}</div>` : ""}
+      ${relatives ? `<div class="generated-relatives"><h3>Родственники и знакомые</h3><p>Добавьте имена персонам позже — генератор оставил их незаполненными.</p>${relatives}</div>` : ""}`;
+  }
+
+  function renderProfessionTree(character = activeCharacter()) {
+    const container = $("#character-profession-tree");
+    const profession = window.CharacterSkills.findCharacterProfession(character);
+    const tree = profession && window.CharacterProfessionTrees.TREES[profession.id];
+    if (!tree) {
+      container.innerHTML = `<p class="character-empty">Выберите профессию, чтобы открыть её дерево способностей.</p>`;
+      return;
+    }
+    window.CharacterProfessionTrees.ensureProgress(character, profession.id);
+    const branches = tree.branches.map(branch => `<section class="profession-tree-branch"><h4>${escapeHtml(branch.name)}</h4>
+      ${branch.nodes.map((node, index) => {
+        const state = window.CharacterProfessionTrees.getNodeState(character, profession.id, branch.id, index);
+        return `<div class="profession-tree-node${state.unlocked ? "" : " is-locked"}">
+          <div class="profession-tree-node-name"><span>${index + 1}</span><strong>${escapeHtml(node.name)}</strong>${node.attribute ? `<small>${shortAttribute(node.attribute)}</small>` : ""}</div>
+          <div class="profession-tree-rank"><button class="tree-rank-button" type="button" data-tree-step="-1" data-tree-profession="${profession.id}" data-tree-branch="${branch.id}" data-tree-index="${index}" aria-label="Уменьшить ранг способности ${escapeHtml(node.name)}"${!state.unlocked || state.rank <= 0 ? " disabled" : ""}>−</button>
+            <input data-tree-rank="${profession.id}.${branch.id}.${index}" type="number" min="0" max="10" step="1" value="${state.rank}" aria-label="Ранг способности ${escapeHtml(node.name)}"${!state.unlocked ? " disabled" : ""}>
+            <button class="tree-rank-button" type="button" data-tree-step="1" data-tree-profession="${profession.id}" data-tree-branch="${branch.id}" data-tree-index="${index}" aria-label="Увеличить ранг способности ${escapeHtml(node.name)}"${!state.unlocked || state.rank >= 10 ? " disabled" : ""}>＋</button></div>
+          <small class="profession-tree-unlock">${state.unlocked ? (index < 2 && state.rank < 5 ? `Следующая способность откроется на ранге ${state.nextUnlockAt}.` : "Доступно") : `Откроется при ранге 5 предыдущей способности.`}</small>
+        </div>`;
+      }).join("")}</section>`).join("");
+    container.innerHTML = `<div class="profession-tree-heading"><div><h3>Дерево профессии · ${escapeHtml(profession.name)}</h3><p>В каждой ветви сначала доступен первый узел с рангом 0. Следующий узел открывается при ранге 5 предыдущего.</p></div><span>0–10</span></div><div class="profession-tree-branches">${branches}</div>`;
+  }
+
   function renderCharacterEditor() {
     const character = activeCharacter();
     const catalogChanged = window.CharacterSkills.initializeCharacterSkills(character);
@@ -712,6 +944,9 @@
     $("#character-conditions").value = character.state.conditions.join("\n");
     renderAttributeRows();
     renderSkillRows();
+    renderRaceTraits(character);
+    renderGeneratedLifePath(character);
+    renderProfessionTree(character);
     renderAbilityRows();
     renderLifePathOutcomes();
     renderCharacterDerived();
@@ -744,19 +979,327 @@
     else activeCharacter()[parts[0]][parts[1]] = value;
   }
 
-  function addNewCharacter() {
+  function changeProfessionTreeRank(professionId, branchId, index, nextRank) {
+    const result = window.CharacterProfessionTrees.setRank(activeCharacter(), professionId, branchId, index, nextRank);
+    if (!result.ok) {
+      setSaveMessage(result.message, true);
+      renderProfessionTree();
+      return;
+    }
+    renderProfessionTree();
+    persistStore("Дерево профессии обновлено.");
+  }
+
+  function beginCharacterCreation() {
     if (!persistenceReady) return;
-    const character = window.CharacterStore.createCharacter(uniqueCharacterName(`Персонаж ${characterStore.characters.length + 1}`));
+    characterCreationDraft = newCharacterCreationDraft();
+    setCreationError("");
+    renderCreationWizard();
+    $("#character-create-dialog").showModal();
+  }
+
+  function closeCharacterCreation() {
+    $("#character-create-dialog").close();
+    characterCreationDraft = null;
+    setCreationError("");
+  }
+
+  function changeCreationSkill(kind, key, nextRank) {
+    const draft = characterCreationDraft;
+    if (!draft) return;
+    const skills = kind === "profession" ? professionSkillDescriptors(draft) : startingGeneralSkills(draft);
+    const skill = skills.find(entry => entry.key === key);
+    if (!skill) return;
+    const rank = Number(nextRank);
+    const minimum = kind === "profession" ? 1 : 0;
+    if (!Number.isInteger(rank) || rank < minimum || rank > 6) {
+      setCreationError(`Рейтинг «${skill.name}» должен быть от ${minimum} до 6.`);
+      renderCreationWizard();
+      return;
+    }
+    skill.rank = rank;
+    const used = startingSkillSpent(skills);
+    const budget = kind === "profession" ? 44 : creationGeneralBudget(draft);
+    if (used > budget) {
+      setCreationError(`Не хватает очков: распределено ${used}, доступно ${budget}.`);
+      renderCreationWizard();
+      return;
+    }
+    if (kind === "profession") draft.professionRanks[key] = rank;
+    else draft.generalRanks[key] = rank;
+    setCreationError("");
+    renderCreationWizard();
+  }
+
+  function validateCreationStep() {
+    const draft = characterCreationDraft;
+    if (draft.step === "identity") {
+      const age = Number(draft.age);
+      if (!draft.race || !draft.professionId) return "Выберите расу и профессию.";
+      if (!window.CharacterCreation.validRaceProfession(draft.race, draft.professionId)) return "Эта комбинация расы и профессии недопустима по правилам.";
+      if (!Number.isInteger(age) || age < (draft.race === "Ведьмак" ? 50 : 1) || age > 260) {
+        return draft.race === "Ведьмак" ? "Возраст ведьмака должен быть от 50 до 260 лет." : "Укажите возраст целым числом от 1 до 260.";
+      }
+      draft.age = String(age);
+      return "";
+    }
+    if (draft.step === "background") {
+      if (!draft.backgroundMode) return "Выберите ручную или случайную предысторию.";
+      if (draft.backgroundMode === "random" && !draft.generatedLifePath) return "Сначала сгенерируйте предысторию.";
+      return "";
+    }
+    if (draft.step === "attributes") {
+      if (draft.attributeMode === "points") {
+        const result = window.CharacterCreation.validatePointBuy(draft.attributes, draft.attributePool);
+        if (!result.ok) return result.message;
+        return "";
+      }
+      if (draft.attributeMode === "dice") {
+        const result = window.CharacterCreation.validateDiceAssignment(draft.diceAssignments, draft.rolls);
+        if (!result.ok) return result.message;
+        draft.attributes = result.attributes;
+        return "";
+      }
+      return "Выберите способ определения характеристик.";
+    }
+    const profession = window.CharacterSkills.findProfession(draft.professionId);
+    if (profession?.choice && draft.professionChoices.length !== profession.choice.requiredCount) {
+      return `Для профессии «${profession.name}» нужно выбрать ровно ${profession.choice.requiredCount} навыков.`;
+    }
+    const professionalSkills = professionSkillDescriptors(draft);
+    if (professionalSkills.length !== 11) return `В профессиональном наборе должно быть 11 навыков, сейчас: ${professionalSkills.length}.`;
+    const profSpent = startingSkillSpent(professionalSkills);
+    if (profSpent !== 44) return `Распределите 44 очка между профессиональными навыками. Сейчас распределено ${profSpent}.`;
+    const generalSkills = startingGeneralSkills(draft);
+    const generalSpent = startingSkillSpent(generalSkills);
+    const generalBudget = creationGeneralBudget(draft);
+    if (generalSpent > generalBudget) return `Общие навыки стоят ${generalSpent} очков при доступных ${generalBudget}.`;
+    return "";
+  }
+
+  function finishCharacterCreation() {
+    const draft = characterCreationDraft;
+    const error = validateCreationStep();
+    if (error) { setCreationError(error); return; }
+    const character = window.CharacterStore.createCharacter(uniqueCharacterName(draft.name.trim() || `Персонаж ${characterStore.characters.length + 1}`));
+    character.personal.race = draft.race;
+    character.personal.age = draft.age;
+    character.personal.professionId = draft.professionId;
+    character.personal.profession = window.CharacterSkills.findProfession(draft.professionId)?.name || "";
+    character.attributes = { ...draft.attributes };
+    character.creation = {
+      method: "guided",
+      backgroundMode: draft.backgroundMode,
+      attributeMethod: draft.attributeMode,
+      attributePool: draft.attributeMode === "points" ? Number(draft.attributePool) : null,
+      attributeRolls: draft.attributeMode === "dice" ? [...draft.rolls] : [],
+      professionSkillBudget: 44,
+      generalSkillBudget: creationGeneralBudget(draft),
+    };
+    if (draft.backgroundMode === "random") {
+      const generated = JSON.parse(JSON.stringify(draft.generatedLifePath));
+      character.lifePath.generated = generated;
+      if (generated.homeland?.region) {
+        character.personal.homeland = generated.homeland.region;
+        character.lifePath.familyHistory = generated.familyFate || "";
+        character.lifePath.familyStation = generated.familyStation || "";
+        character.lifePath.parents = generated.parents || "";
+        character.lifePath.siblings = (generated.siblings || []).map(sibling => `${sibling.role}${sibling.ageBand ? `, ${sibling.ageBand.toLowerCase()}` : ""}: ${sibling.relation}; ${sibling.personality}`).join("\n");
+      } else if (generated.kind === "witcher") {
+        character.lifePath.familyHistory = `${generated.school}. ${generated.importantEvent}`;
+        character.lifePath.familyStation = generated.presentStatus || "";
+        character.lifePath.parents = generated.training || "";
+      }
+      character.lifePath.decadeEvents = (generated.decadeEvents || []).map(event => `${event.decadeStart === undefined ? "" : `${event.decadeStart}–${event.decadeEnd} лет: `}${event.title || event.type}. ${event.description || ""}`.trim());
+      character.lifePath.allies = (generated.relatives || []).filter(relative => relative.role.startsWith("Союзник") || relative.role.startsWith("Друг")).map(relative => `${relative.role}: ${relative.details}`);
+      character.lifePath.enemies = (generated.relatives || []).filter(relative => relative.role.startsWith("Враг")).map(relative => `${relative.role}: ${relative.details}`);
+      character.lifePath.relationships = (generated.relatives || []).filter(relative => /возлюблен|роман|отношен/i.test(relative.role)).map(relative => `${relative.role}: ${relative.details}`);
+    }
+    window.CharacterSkills.setProfession(character, draft.professionId);
+    const profession = window.CharacterSkills.findProfession(draft.professionId);
+    if (profession?.choice) window.CharacterSkills.setProfessionChoices(character, profession.id, draft.professionChoices);
     window.CharacterSkills.initializeCharacterSkills(character);
+    const professionalRanks = new Map(professionSkillDescriptors(draft).map(skill => [skill.key, skill.rank]));
+    for (const skill of character.skills) {
+      if (skill.source === "profession") {
+        const key = skill.professionSkillId || skill.catalogId;
+        if (professionalRanks.has(key)) skill.rank = professionalRanks.get(key);
+      } else if (skill.source === "general") {
+        skill.rank = draft.generalRanks[skill.catalogId] ?? 0;
+      }
+    }
+    character.professionTrees[draft.professionId] = window.CharacterProfessionTrees.createProgress();
     characterStore.characters.push(character);
     characterStore.activeCharacterId = character.characterId;
     inventory = character.equipment;
     characterViewMode = "editor";
     $("#character-library").hidden = true;
     $("#character-editor").hidden = false;
+    closeCharacterCreation();
     renderCharacterEditor();
     renderInventory();
-    persistStore("Создан новый персонаж.");
+    persistStore("Персонаж создан по шагам мастера.");
+  }
+
+  function moveCharacterCreation(direction) {
+    const draft = characterCreationDraft;
+    if (!draft) return;
+    if (direction > 0) {
+      const error = validateCreationStep();
+      if (error) { setCreationError(error); return; }
+    }
+    const index = creationSteps.findIndex(([id]) => id === draft.step);
+    draft.step = creationSteps[Math.max(0, Math.min(creationSteps.length - 1, index + direction))][0];
+    setCreationError("");
+    renderCreationWizard();
+  }
+
+  function generateCreationLifePath() {
+    const draft = characterCreationDraft;
+    try {
+      draft.generatedLifePath = window.CharacterCreation.generateLifePath({
+        race: draft.race,
+        age: Number(draft.age),
+        risk: draft.witcherRisk,
+      });
+      setCreationError("");
+    } catch (error) {
+      setCreationError(error.message || "Не удалось создать предысторию.");
+    }
+    renderCreationWizard();
+  }
+
+  function handleCreationInput(event) {
+    const draft = characterCreationDraft;
+    if (!draft) return;
+    const field = event.target.closest("[data-creation-field]");
+    if (field && ["input", "change"].includes(event.type)) {
+      if (field.tagName === "SELECT" && event.type !== "change") return;
+      const key = field.dataset.creationField;
+      if (key === "race") {
+        draft.race = field.value;
+        if (draft.professionId && draft.race && !window.CharacterCreation.validRaceProfession(draft.race, draft.professionId)) {
+          draft.professionId = "";
+          draft.professionChoices = [];
+        }
+        draft.generatedLifePath = null;
+        renderCreationWizard();
+      } else if (key === "profession") {
+        draft.professionId = field.value;
+        draft.professionChoices = [];
+        draft.professionRanks = {};
+        renderCreationWizard();
+      } else if (key === "age") {
+        draft.age = field.value;
+        if (draft.backgroundMode === "random") draft.generatedLifePath = null;
+      } else if (key === "name") {
+        draft.name = field.value;
+      } else if (key === "witcherRisk") {
+        draft.witcherRisk = field.value;
+        if (draft.backgroundMode === "random" && draft.generatedLifePath) generateCreationLifePath();
+      } else if (key === "attributePool") {
+        draft.attributePool = Number(field.value);
+        draft.attributes = window.CharacterCreation.balancedAttributes(draft.attributePool);
+        renderCreationWizard();
+      }
+      return;
+    }
+    const attributeInput = event.target.closest("[data-attribute-point]");
+    if (attributeInput && ["input", "change"].includes(event.type)) {
+      const value = attributeInput.value === "" ? null : Number(attributeInput.value);
+      if (value !== null && (!Number.isInteger(value) || value < 1 || value > 10)) return;
+      draft.attributes ||= window.CharacterCreation.balancedAttributes(draft.attributePool);
+      draft.attributes[attributeInput.dataset.attributePoint] = value;
+      const total = Object.values(draft.attributes).reduce((sum, current) => sum + Number(current || 0), 0);
+      $("#creation-attribute-spent").textContent = `${total} / ${draft.attributePool}`;
+      if (event.type === "change") renderCreationWizard();
+      return;
+    }
+    const diceInput = event.target.closest("[data-dice-attribute]");
+    if (diceInput && event.type === "change") {
+      if (diceInput.value === "") delete draft.diceAssignments[diceInput.dataset.diceAttribute];
+      else draft.diceAssignments[diceInput.dataset.diceAttribute] = Number(diceInput.value);
+      renderCreationWizard();
+      return;
+    }
+    const professionChoice = event.target.closest("[data-creation-profession-choice]");
+    if (professionChoice && event.type === "change") {
+      const skillId = professionChoice.dataset.creationProfessionChoice;
+      const selected = new Set(draft.professionChoices);
+      if (professionChoice.checked) selected.add(skillId); else selected.delete(skillId);
+      const profession = window.CharacterSkills.findProfession(draft.professionId);
+      if (profession?.choice && selected.size > profession.choice.requiredCount) {
+        setCreationError(`Выберите ровно ${profession.choice.requiredCount} навыков.`);
+        renderCreationWizard();
+        return;
+      }
+      draft.professionChoices = [...selected];
+      setCreationError("");
+      renderCreationWizard();
+      return;
+    }
+    const skillInput = event.target.closest("[data-skill-rank]");
+    if (skillInput && event.type === "change") {
+      const value = skillInput.dataset.skillRank;
+      const separator = value.indexOf(".");
+      const kind = value.slice(0, separator);
+      const key = value.slice(separator + 1);
+      changeCreationSkill(kind, key, Number(skillInput.value));
+    }
+  }
+
+  function handleCreationClick(event) {
+    const draft = characterCreationDraft;
+    if (!draft) return;
+    const action = event.target.closest("[data-creation-action]")?.dataset.creationAction;
+    if (action === "cancel") { closeCharacterCreation(); return; }
+    if (action === "back") { moveCharacterCreation(-1); return; }
+    if (action === "next") { moveCharacterCreation(1); return; }
+    if (action === "finish") { finishCharacterCreation(); return; }
+    if (action === "generate-life-path") { generateCreationLifePath(); return; }
+    const background = event.target.closest("[data-creation-background]");
+    if (background) {
+      draft.backgroundMode = background.dataset.creationBackground;
+      draft.generatedLifePath = null;
+      setCreationError("");
+      renderCreationWizard();
+      return;
+    }
+    const attributeMode = event.target.closest("[data-attribute-mode]");
+    if (attributeMode) {
+      draft.attributeMode = attributeMode.dataset.attributeMode;
+      if (draft.attributeMode === "dice") {
+        draft.rolls = window.CharacterCreation.rollAttributes();
+        draft.diceAssignments = {};
+        draft.attributes = null;
+      } else {
+        draft.attributePool ||= 70;
+        draft.attributes = window.CharacterCreation.balancedAttributes(draft.attributePool);
+      }
+      setCreationError("");
+      renderCreationWizard();
+      return;
+    }
+    const attributeStep = event.target.closest("[data-attribute-step]");
+    if (attributeStep) {
+      const code = attributeStep.dataset.attributeCode;
+      draft.attributes ||= window.CharacterCreation.balancedAttributes(draft.attributePool);
+      const nextValue = Number(draft.attributes[code]) + Number(attributeStep.dataset.attributeStep);
+      const nextTotal = Object.values(draft.attributes).reduce((sum, value, index) => sum + (window.CharacterCreation.ATTRIBUTES[index] === code ? nextValue : Number(value)), 0);
+      if (nextValue < 1 || nextValue > 10 || nextTotal > Number(draft.attributePool)) return;
+      draft.attributes[code] = nextValue;
+      setCreationError("");
+      renderCreationWizard();
+      return;
+    }
+    const skillStep = event.target.closest("[data-skill-step]");
+    if (skillStep) {
+      const kind = skillStep.dataset.skillKind;
+      const key = skillStep.dataset.skillKey;
+      const skills = kind === "profession" ? professionSkillDescriptors(draft) : startingGeneralSkills(draft);
+      const skill = skills.find(entry => entry.key === key);
+      if (skill) changeCreationSkill(kind, key, skill.rank + Number(skillStep.dataset.skillStep));
+    }
   }
 
   function downloadRawRecoveryBackup(raw) {
@@ -911,6 +1454,23 @@
   document.querySelectorAll(".nav-item").forEach(button => button.addEventListener("click", () => showPage(button.dataset.page)));
 
   function updateCharacterFromForm(event) {
+    const relativeNameControl = event.target.closest("[data-generated-relative-name]");
+    if (relativeNameControl) {
+      if (!['input', 'change'].includes(event.type)) return true;
+      const relative = activeCharacter().lifePath.generated?.relatives?.find(entry => entry.id === relativeNameControl.dataset.generatedRelativeName);
+      if (relative) {
+        relative.name = relativeNameControl.value;
+        persistStore("Имя персонажа из предыстории сохранено.", event.type === "change");
+      }
+      return true;
+    }
+    const treeRankControl = event.target.closest("[data-tree-rank]");
+    if (treeRankControl) {
+      if (event.type !== "change") return true;
+      const [professionId, branchId, index] = treeRankControl.dataset.treeRank.split(".");
+      changeProfessionTreeRank(professionId, branchId, Number(index), Number(treeRankControl.value));
+      return true;
+    }
     const selectControl = event.target.closest("[data-character-select]");
     const professionChoice = event.target.closest("[data-profession-choice]");
     if (professionChoice) {
@@ -938,6 +1498,14 @@
       if (event.type !== "change") return true;
       const character = activeCharacter();
       const selection = selectControl.dataset.characterSelect;
+      const nextRace = selection === "race" ? selectControl.value : character.personal.race;
+      const currentProfession = window.CharacterSkills.findCharacterProfession(character);
+      const nextProfessionId = selection === "profession" ? selectControl.value : currentProfession?.id || "";
+      if (nextRace && nextProfessionId && !window.CharacterCreation.validRaceProfession(nextRace, nextProfessionId)) {
+        setSaveMessage("Эта раса несовместима с выбранной профессией по правилам.", true);
+        renderCharacterSelects(character);
+        return true;
+      }
       if (selection === "race") character.personal.race = selectControl.value;
       else if (selection === "gender") character.personal.gender = selectControl.value;
       else if (selection === "profession") {
@@ -947,6 +1515,9 @@
       }
       renderCharacterSelects(character);
       renderSkillRows();
+      renderRaceTraits(character);
+      renderProfessionTree(character);
+      renderGeneratedLifePath(character);
       renderCharacterDerived();
       persistStore(selection === "profession" ? "Профессия и её навыки обновлены." : "Личные данные обновлены.");
       return true;
@@ -984,6 +1555,15 @@
 
   $("#character-form").addEventListener("input", updateCharacterFromForm);
   $("#character-form").addEventListener("change", updateCharacterFromForm);
+  $("#character-profession-tree").addEventListener("click", event => {
+    const button = event.target.closest("[data-tree-step]");
+    if (!button) return;
+    const professionId = button.dataset.treeProfession;
+    const branchId = button.dataset.treeBranch;
+    const index = Number(button.dataset.treeIndex);
+    const current = activeCharacter().professionTrees?.[professionId]?.branches?.[branchId]?.[index] ?? 0;
+    changeProfessionTreeRank(professionId, branchId, index, current + Number(button.dataset.treeStep));
+  });
   $("#character-search").addEventListener("input", renderCharacterLibrary);
   $("#character-list").addEventListener("click", event => {
     const button = event.target.closest("[data-character-action]");
@@ -999,7 +1579,11 @@
       if (character) exportCharacterData(character);
     } else if (action === "delete") deleteCharacter(characterId);
   });
-  $("#new-character").addEventListener("click", addNewCharacter);
+  $("#new-character").addEventListener("click", beginCharacterCreation);
+  $("#character-create-dialog").addEventListener("input", handleCreationInput);
+  $("#character-create-dialog").addEventListener("change", handleCreationInput);
+  $("#character-create-dialog").addEventListener("click", handleCreationClick);
+  $("#character-create-dialog").addEventListener("cancel", event => { event.preventDefault(); closeCharacterCreation(); });
   $("#recover-character-data").addEventListener("click", recoverCharacterData);
   $("#export-characters").addEventListener("click", () => exportCharacterData());
   $("#import-characters").addEventListener("click", () => $("#character-file").click());

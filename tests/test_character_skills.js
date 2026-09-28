@@ -80,3 +80,10 @@ test("changing profession preserves existing ratings and keeps the old defining 
   assert.equal(character.skills.find(skill => skill.professionSkillId === "bard.defining").source, "other");
   assert.equal(character.personal.professionId, "doctor");
 });
+
+test("the playable-race list matches the core rules and keeps criminal awareness in its starting package", () => {
+  assert.deepEqual(CharacterSkills.RACES, ["Человек", "Эльф", "Краснолюд", "Ведьмак"]);
+  assert.equal(CharacterSkills.RACES.includes("Полурослик"), false);
+  const criminal = CharacterSkills.findProfession("criminal");
+  assert.ok(criminal.skills.includes("awareness"));
+});

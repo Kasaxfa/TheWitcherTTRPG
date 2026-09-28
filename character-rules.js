@@ -21,6 +21,20 @@
     12: { melee: 6, punch: "1d6+6", kick: "1d6+10" },
     13: { melee: 8, punch: "1d6+8", kick: "1d6+12" },
   });
+  const RACE_ATTRIBUTES = Object.freeze({
+    "Ведьмак": Object.freeze({ REF: 1, DEX: 1, EMP: -4 }),
+  });
+  const MINIMUM_RACE_ATTRIBUTES = Object.freeze({ "Ведьмак": Object.freeze({ EMP: 1 }) });
+  const RACE_SKILLS = Object.freeze({
+    "Человек": Object.freeze({ deduction: 1 }),
+    "Эльф": Object.freeze({ art: 1, bow: 2 }),
+    "Краснолюд": Object.freeze({ strength: 1, trade: 1 }),
+    "Ведьмак": Object.freeze({ awareness: 1 }),
+  });
+  const SKILL_NAMES = Object.freeze({
+    "Внимание": "awareness", "Дедукция": "deduction", "Искусство": "art", "Стрельба из лука": "bow",
+    "Сила": "strength", "Торговля": "trade",
+  });
 
   function finiteNumber(value) {
     return typeof value === "number" && Number.isFinite(value) ? value : null;
@@ -42,13 +56,41 @@
       const base = finiteNumber(character.attributes?.[code]);
       const permanent = modifierValue(modifiers, "permanent");
       const temporary = modifierValue(modifiers, "temporary");
+      const race = character.personal?.race || "";
+      const racial = finiteNumber(RACE_ATTRIBUTES[race]?.[code]) ?? 0;
+      const background = (character.lifePath?.generated?.effects || [])
+        .filter(effect => effect?.type === "attributeModifier" && effect.attribute === code)
+        .reduce((sum, effect) => sum + (finiteNumber(effect.value) ?? 0), 0);
+      const minimum = MINIMUM_RACE_ATTRIBUTES[race]?.[code] ?? null;
+      const rawTotal = base === null ? null : base + permanent + temporary + racial + background;
       return [code, {
         base,
         permanent,
         temporary,
-        total: effectiveAttribute(base, modifiers),
+        racial,
+        background,
+        total: rawTotal === null ? null : minimum === null ? rawTotal : Math.max(minimum, rawTotal),
       }];
     }));
+  }
+
+  function skillCatalogId(skill) {
+    return skill?.catalogId || SKILL_NAMES[skill?.name] || null;
+  }
+
+  function skillBonuses(character, skill) {
+    const skillId = skillCatalogId(skill);
+    const racial = finiteNumber(RACE_SKILLS[character.personal?.race || ""]?.[skillId]) ?? 0;
+    const origin = (character.lifePath?.generated?.effects || [])
+      .filter(effect => {
+        const bonus = effect?.effect?.type === "skillBonus" ? effect.effect : effect;
+        return bonus?.type === "skillBonus" && bonus.skillId === skillId;
+      })
+      .reduce((sum, effect) => {
+        const bonus = effect?.effect?.type === "skillBonus" ? effect.effect : effect;
+        return sum + (finiteNumber(bonus.value) ?? 0);
+      }, 0);
+    return { racial, origin };
   }
 
   function calculateSkill(skill, attributes) {
@@ -66,7 +108,8 @@
     const speed = attributes.SPD.total;
     const physicalBasis = body === null || will === null ? null : Math.floor((body + will) / 2);
     const basisSupported = physicalBasis !== null && physicalBasis >= 2 && physicalBasis <= 13;
-    const encumbranceKg = body === null || body < 1 ? null : body * 10;
+    const racialCapacityBonus = character.personal?.race === "Краснолюд" ? 25 : 0;
+    const encumbranceKg = body === null || body < 1 ? null : body * 10 + racialCapacityBonus;
     const liftLimitKg = body === null || body < 1 ? null : body * 50;
     const damage = body !== null && Number.isInteger(body) ? BODY_DAMAGE[body] || null : null;
     const knownWeight = finiteNumber(carriedWeightKg);
@@ -91,10 +134,16 @@
         : Math.max(1, total - loadPenalty);
     }
 
-    const skills = (Array.isArray(character.skills) ? character.skills : []).map(skill => ({
-      id: skill.id,
-      total: calculateSkill(skill, attributes),
-    }));
+    const skills = (Array.isArray(character.skills) ? character.skills : []).map(skill => {
+      const bonuses = skillBonuses(character, skill);
+      const baseTotal = calculateSkill(skill, attributes);
+      return {
+        id: skill.id,
+        racialBonus: bonuses.racial,
+        originBonus: bonuses.origin,
+        total: baseTotal === null ? null : baseTotal + bonuses.racial + bonuses.origin,
+      };
+    });
 
     return {
       attributes,
@@ -108,7 +157,9 @@
       runMeters: speed === null ? null : speed * 3,
       leapMeters: speed === null ? null : Math.floor((speed * 3) / 5),
       encumbranceKg,
+      racialCapacityBonus,
       liftLimitKg,
+      naturalProtection: character.personal?.race === "Краснолюд" ? 2 : 0,
       meleeDamageBonus: damage?.melee ?? null,
       punchDamage: damage?.punch ?? null,
       kickDamage: damage?.kick ?? null,
@@ -122,5 +173,5 @@
     };
   }
 
-  return Object.freeze({ ATTRIBUTE_CODES, effectiveAttribute, calculateAttributes, calculateSkill, deriveCharacter });
+  return Object.freeze({ ATTRIBUTE_CODES, effectiveAttribute, calculateAttributes, calculateSkill, skillBonuses, deriveCharacter });
 });

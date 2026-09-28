@@ -5,7 +5,7 @@
 })(typeof globalThis !== "undefined" ? globalThis : this, function () {
   "use strict";
 
-  const RACES = Object.freeze(["Человек", "Эльф", "Краснолюд", "Полурослик", "Ведьмак"]);
+  const RACES = Object.freeze(["Человек", "Эльф", "Краснолюд", "Ведьмак"]);
   const GENDERS = Object.freeze(["Мужской", "Женский", "Другое"]);
 
   const SKILLS = Object.freeze([

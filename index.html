@@ -20,6 +20,8 @@
   <script src="./character-store.js" defer></script>
   <script src="./character-rules.js" defer></script>
   <script src="./character-skills.js" defer></script>
+  <script src="./character-profession-trees.js" defer></script>
+  <script src="./character-creation.js" defer></script>
   <script src="./app.js" defer></script>
 </head>
 <body>
@@ -133,6 +135,7 @@
               <label class="field">Профессия<select data-character-select="profession" aria-label="Профессия персонажа"></select></label>
               <label class="field">Версия правил<input data-character-path="rulesVersion" maxlength="120"></label>
             </div>
+            <div id="character-race-traits" class="race-trait-list" aria-live="polite"></div>
           </fieldset>
 
           <fieldset class="character-panel">
@@ -152,6 +155,7 @@
               <label class="field">Враги<textarea data-character-lines="lifePath.enemies" rows="3" placeholder="Каждый враг — с новой строки"></textarea></label>
               <label class="field">Отношения<textarea data-character-lines="lifePath.relationships" rows="3" placeholder="Каждая связь — с новой строки"></textarea></label>
             </div>
+            <div id="character-life-path-generated" class="generated-life-path" aria-live="polite"></div>
             <div class="list-heading"><span>Игровые последствия</span></div>
             <div id="character-life-path-outcomes" class="character-entry-list"></div>
             <button class="button secondary" id="add-life-path-outcome" type="button">Добавить последствие</button>
@@ -170,6 +174,7 @@
             <div id="character-profession-choice-fields" class="profession-choice-fields"></div>
             <div id="character-skills" class="character-entry-list"></div>
             <button class="button secondary" id="add-character-skill" type="button">Добавить собственный навык</button>
+            <div id="character-profession-tree" class="profession-tree-list" aria-live="polite"></div>
           </fieldset>
 
           <fieldset class="character-panel">
@@ -208,6 +213,13 @@
             <div class="rename-dialog-actions"><button class="button secondary" value="cancel">Отмена</button><button class="button primary" id="save-character-name" value="save">Сохранить</button></div>
           </form>
         </dialog>
+        <dialog id="character-create-dialog" class="creation-dialog" aria-labelledby="character-create-title">
+          <div class="creation-dialog-inner">
+            <div id="character-create-content"></div>
+            <p id="character-create-error" class="creation-error" role="alert" hidden></p>
+            <div class="creation-dialog-actions" id="character-create-actions"></div>
+          </div>
+        </dialog>
       </section>
 
       <section id="inventory-page" class="page-view" aria-labelledby="inventory-title" hidden>
@@ -215,7 +227,7 @@
           <div><div class="eyebrow"><span class="eyebrow-line"></span>Лист персонажа</div><h1 id="inventory-title">Инвентарь</h1><p class="intro">Снаряжение персонажа: <strong id="inventory-character-name">Персонаж 1</strong>.</p></div>
         </div>
         <div class="inventory-summary">
-          <label class="capacity-field">Грузоподъёмность, ручной предел <span><input id="capacity-input" type="number" min="0" step="0.1" inputmode="decimal" placeholder="по BODY" aria-label="Ручной предел грузоподъёмности в килограммах"> кг</span></label>
+          <label class="capacity-field">Грузоподъёмность, ручной предел <span><input id="capacity-input" type="number" min="0" step="0.1" inputmode="decimal" placeholder="по Тел" aria-label="Ручной предел грузоподъёмности в килограммах"> кг</span></label>
           <div class="weight-readout"><strong id="weight-total">0 кг</strong><span id="weight-caption">из 0 кг</span></div>
           <div class="weight-track" role="progressbar" aria-label="Загрузка грузоподъёмности" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="weight-progress"></span></div>
           <p id="weight-warning" class="inline-warning" hidden></p>

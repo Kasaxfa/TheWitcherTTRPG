@@ -6,10 +6,10 @@
   "use strict";
 
   const FORMAT = "witcher-workshop-characters";
-  const SCHEMA_VERSION = 4;
+  const SCHEMA_VERSION = 5;
   const STORAGE_KEY = "witcher-workshop-characters-v1";
   const LEGACY_INVENTORY_KEY = "witcher-workshop-inventory-v1";
-  const RULES_VERSION = "witcher-core-russian-errata-v4";
+  const RULES_VERSION = "witcher-core-russian-errata-v5";
   const ATTRIBUTES = ["INT", "REF", "DEX", "BODY", "SPD", "EMP", "CRA", "WILL", "LUCK"];
   const ATTRIBUTE_SET = new Set(ATTRIBUTES);
 
@@ -75,11 +75,14 @@
         style: "",
         values: "",
         outcomes: [],
+        generated: null,
       },
       attributes: Object.fromEntries(ATTRIBUTES.map(attribute => [attribute, null])),
       attributeModifiers: createAttributeModifiers(),
       skills: [],
       professionSkillChoices: {},
+      professionTrees: {},
+      creation: {},
       state: {
         currentHp: null,
         currentSta: null,
@@ -156,6 +159,39 @@
       return { ...outcome, id, type, description, source };
     });
     ensureUnique(lifePath.outcomes, outcome => outcome.id, "ID последствия жизненного пути");
+    if (lifePath.generated !== null && !isObject(lifePath.generated)) {
+      throw new Error(`Жизненный путь персонажа ${index + 1}: сгенерированные данные должны быть объектом или null.`);
+    }
+    if (lifePath.generated !== null) {
+      const serialized = JSON.stringify(lifePath.generated);
+      if (!serialized || serialized.length > 500000) throw new Error(`Жизненный путь персонажа ${index + 1}: превышен размер сгенерированных данных.`);
+      lifePath.generated = JSON.parse(serialized);
+      const generated = lifePath.generated;
+      for (const key of ["decadeEvents", "relatives", "rolls", "effects"]) {
+        if (generated[key] !== undefined && !Array.isArray(generated[key])) throw new Error(`Сгенерированный жизненный путь: поле «${key}» должно быть массивом.`);
+      }
+      const relativeIds = new Set();
+      for (const [relativeIndex, relative] of (generated.relatives || []).entries()) {
+        if (!isObject(relative)) throw new Error(`Сгенерированный родственник ${relativeIndex + 1}: ожидался объект.`);
+        relative.id = boundedString(String(relative.id || ""), `Сгенерированный родственник ${relativeIndex + 1}, ID`, 160, false);
+        relative.role = boundedString(String(relative.role || ""), `Сгенерированный родственник ${relativeIndex + 1}, роль`, 200, false);
+        relative.name = boundedString(String(relative.name ?? ""), `Имя родственника ${relativeIndex + 1}`, 200);
+        relative.details = boundedString(String(relative.details ?? ""), `Сведения о родственнике ${relativeIndex + 1}`, 4000);
+        relative.status = boundedString(String(relative.status ?? ""), `Статус родственника ${relativeIndex + 1}`, 200);
+        if (relativeIds.has(relative.id)) throw new Error(`Повторяется ID сгенерированного родственника: ${relative.id}.`);
+        relativeIds.add(relative.id);
+      }
+      const eventIds = new Set();
+      for (const [eventIndex, event] of (generated.decadeEvents || []).entries()) {
+        if (!isObject(event)) throw new Error(`Событие жизненного пути ${eventIndex + 1}: ожидался объект.`);
+        event.id = boundedString(String(event.id || ""), `Событие жизненного пути ${eventIndex + 1}, ID`, 160, false);
+        event.title = boundedString(String(event.title ?? event.type ?? "Событие"), `Событие жизненного пути ${eventIndex + 1}, заголовок`, 300);
+        event.description = boundedString(String(event.description ?? ""), `Событие жизненного пути ${eventIndex + 1}, описание`, 4000);
+        if (eventIds.has(event.id)) throw new Error(`Повторяется ID события жизненного пути: ${event.id}.`);
+        eventIds.add(event.id);
+        if (event.personId && !relativeIds.has(event.personId)) throw new Error(`Событие «${event.title}» ссылается на отсутствующего родственника ${event.personId}.`);
+      }
+    }
 
     const attributes = { ...defaults.attributes, ...attributesRaw };
     for (const attribute of ATTRIBUTES) attributes[attribute] = optionalNumber(attributes[attribute], `Характеристика ${attribute}`, { min: 0, max: 1000 });
@@ -196,6 +232,30 @@
       ensureUnique(professionSkillChoices[professionId], value => value, `ID выбранного навыка профессии «${professionId}»`);
     }
 
+    const professionTreesRaw = raw.professionTrees ?? {};
+    if (!isObject(professionTreesRaw)) throw new Error(`Деревья профессий персонажа ${index + 1} должны быть объектом.`);
+    const professionTrees = {};
+    for (const [professionId, tree] of Object.entries(professionTreesRaw)) {
+      boundedString(professionId, `Профессия в деревьях персонажа ${index + 1}`, 120, false);
+      if (!isObject(tree) || !isObject(tree.branches ?? {})) throw new Error(`Ветка дерева профессии «${professionId}» имеет неверный формат.`);
+      professionTrees[professionId] = { branches: {} };
+      for (const branchId of ["A", "B", "C"]) {
+        const ranks = tree.branches?.[branchId] ?? [0, 0, 0];
+        if (!Array.isArray(ranks) || ranks.length !== 3 || ranks.some(rank => !Number.isInteger(rank) || rank < 0 || rank > 10)) {
+          throw new Error(`Ранги дерева «${professionId}», ветка ${branchId}: нужны три целых значения от 0 до 10.`);
+        }
+        if ((ranks[1] > 0 && ranks[0] < 5) || (ranks[2] > 0 && ranks[1] < 5)) {
+          throw new Error(`В дереве «${professionId}», ветка ${branchId} есть ранг закрытой способности.`);
+        }
+        professionTrees[professionId].branches[branchId] = [...ranks];
+      }
+    }
+    const creationRaw = raw.creation ?? {};
+    if (!isObject(creationRaw)) throw new Error(`Данные создания персонажа ${index + 1} должны быть объектом.`);
+    const creationSerialized = JSON.stringify(creationRaw);
+    if (!creationSerialized || creationSerialized.length > 100000) throw new Error(`Данные создания персонажа ${index + 1} слишком велики.`);
+    const creation = JSON.parse(creationSerialized);
+
     const state = { ...defaults.state, ...stateRaw };
     for (const key of ["currentHp", "currentSta", "currentLuck"]) state[key] = optionalNumber(state[key], `Состояние «${key}»`, { min: 0, max: 100000 });
     if (!Array.isArray(state.conditions)) throw new Error(`Персонаж ${index + 1}: состояния должны быть массивом.`);
@@ -234,6 +294,8 @@
       attributeModifiers,
       skills,
       professionSkillChoices,
+      professionTrees,
+      creation,
       state,
       abilities,
       equipment,
@@ -261,6 +323,19 @@
     for (const entry of copy.abilities) entry.id = makeId();
     for (const entry of copy.equipment.items) entry.id = makeId();
     for (const entry of copy.lifePath.outcomes) entry.id = makeId();
+    if (copy.lifePath.generated) {
+      const relativeIdMap = new Map();
+      for (const relative of copy.lifePath.generated.relatives || []) {
+        const oldId = relative.id;
+        relative.id = makeId();
+        relativeIdMap.set(oldId, relative.id);
+      }
+      for (const event of copy.lifePath.generated.decadeEvents || []) {
+        event.id = makeId();
+        if (event.personId && relativeIdMap.has(event.personId)) event.personId = relativeIdMap.get(event.personId);
+      }
+      for (const effect of copy.lifePath.generated.effects || []) if (effect.id) effect.id = makeId();
+    }
     return normalizeCharacter(copy, 0);
   }
 
@@ -292,6 +367,17 @@
         schemaVersion: 4,
         personal: { ...(character.personal ?? {}), professionId: character.personal?.professionId ?? "" },
         professionSkillChoices: character.professionSkillChoices ?? {},
+      })),
+    }),
+    4: raw => ({
+      ...raw,
+      schemaVersion: 5,
+      characters: raw.characters.map(character => ({
+        ...character,
+        schemaVersion: 5,
+        lifePath: { ...(character.lifePath ?? {}), generated: character.lifePath?.generated ?? null },
+        professionTrees: character.professionTrees ?? {},
+        creation: character.creation ?? {},
       })),
     }),
   });

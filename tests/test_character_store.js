@@ -70,7 +70,7 @@ test("version 2 characters gain separate modifiers without losing ratings or sou
   const result = CharacterStore.load(storage);
   const migrated = result.store.characters[0];
   assert.equal(result.migratedSchemaVersion, true);
-  assert.equal(result.store.schemaVersion, 4);
+  assert.equal(result.store.schemaVersion, 5);
   assert.equal(migrated.attributes.BODY, 6);
   assert.deepEqual(migrated.attributeModifiers.BODY, { permanent: 0, temporary: 0 });
   assert.equal(migrated.skills[0].rank, 5);
@@ -93,8 +93,8 @@ test("version 3 characters migrate profession identity and choice storage withou
 
   const result = CharacterStore.load(storage);
   const migrated = result.store.characters[0];
-  assert.equal(result.store.schemaVersion, 4);
-  assert.equal(migrated.schemaVersion, 4);
+  assert.equal(result.store.schemaVersion, 5);
+  assert.equal(migrated.schemaVersion, 5);
   assert.equal(migrated.personal.profession, "Бард");
   assert.equal(migrated.personal.professionId, "");
   assert.deepEqual(migrated.professionSkillChoices, {});
@@ -102,6 +102,36 @@ test("version 3 characters migrate profession identity and choice storage withou
   assert.equal(migrated.skills[0].rank, 4);
   assert.equal(migrated.skills[0].permanentModifier, 1);
   assert.equal(storage.getItem(`${CharacterStore.STORAGE_KEY}.backup-v3`), raw);
+});
+
+test("version 4 migration adds creation, generated life path, and profession-tree storage without losing data", () => {
+  const original = CharacterStore.createStore("Версия 4");
+  original.schemaVersion = 4;
+  const character = original.characters[0];
+  character.schemaVersion = 4;
+  character.personal.race = "Человек";
+  character.attributes.INT = 8;
+  character.skills.push({ id: "stable-skill", name: "Дедукция", attribute: "INT", rank: 3 });
+  delete character.creation;
+  delete character.professionTrees;
+  delete character.lifePath.generated;
+  const migrated = CharacterStore.migrateStore(original).characters[0];
+  assert.equal(migrated.schemaVersion, 5);
+  assert.equal(migrated.personal.race, "Человек");
+  assert.equal(migrated.attributes.INT, 8);
+  assert.equal(migrated.skills[0].id, "stable-skill");
+  assert.deepEqual(migrated.creation, {});
+  assert.deepEqual(migrated.professionTrees, {});
+  assert.equal(migrated.lifePath.generated, null);
+});
+
+test("generated life-path event links must point to a stored relative", () => {
+  const store = CharacterStore.createStore();
+  store.characters[0].lifePath.generated = {
+    kind: "standard", rolls: [], effects: [], relatives: [],
+    decadeEvents: [{ id: "event-1", title: "Событие", description: "", personId: "missing-relative" }],
+  };
+  assert.throws(() => CharacterStore.migrateStore(store), /ссылается на отсутствующего родственника/);
 });
 
 test("legacy inventory migrates to the first character and remains available as a backup", () => {
