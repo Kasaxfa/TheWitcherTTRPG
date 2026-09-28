@@ -1,12 +1,15 @@
 (function (root, factory) {
-  const store = factory();
+  const skillCatalog = typeof module !== "undefined" && module.exports
+    ? require("./character-skills.js")
+    : null;
+  const store = factory(skillCatalog);
   if (typeof module !== "undefined" && module.exports) module.exports = store;
   if (root) root.CharacterStore = store;
-})(typeof globalThis !== "undefined" ? globalThis : this, function () {
+})(typeof globalThis !== "undefined" ? globalThis : this, function (initialSkillCatalog) {
   "use strict";
 
   const FORMAT = "witcher-workshop-characters";
-  const SCHEMA_VERSION = 6;
+  const SCHEMA_VERSION = 7;
   const STORAGE_KEY = "witcher-workshop-characters-v1";
   const LEGACY_INVENTORY_KEY = "witcher-workshop-inventory-v1";
   const RULES_VERSION = "witcher-core-russian-errata-v5";
@@ -83,7 +86,7 @@
       professionSkillChoices: {},
       professionTrees: {},
       creation: {},
-      development: { earnedPoints: 0, availablePoints: 0 },
+      development: { earnedPoints: 0, availablePoints: 0, draft: { attributes: {}, skills: {}, professionAbilities: {} } },
       state: {
         currentHp: null,
         currentSta: null,
@@ -264,7 +267,68 @@
     if (!Number.isInteger(earnedPoints) || !Number.isInteger(availablePoints) || availablePoints > earnedPoints) {
       throw new Error("Баланс очков улучшения персонажа " + (index + 1) + " некорректен.");
     }
-    const development = { earnedPoints, availablePoints };
+    const draftRaw = developmentRaw.draft ?? {};
+    if (!isObject(draftRaw)) throw new Error(`Черновик прокачки персонажа ${index + 1} должен быть объектом.`);
+    const draft = { attributes: {}, skills: {}, professionAbilities: {} };
+    for (const group of ["attributes", "skills", "professionAbilities"]) {
+      const map = draftRaw[group] ?? {};
+      if (!isObject(map)) throw new Error(`Черновик «${group}» должен быть объектом.`);
+      for (const [key, rawCount] of Object.entries(map)) {
+        const count = optionalNumber(rawCount, `Черновик «${group}», ранг «${key}»`, { min: 1, max: 10 });
+        if (!Number.isInteger(count)) throw new Error(`Черновик «${group}», ранг «${key}» должен быть целым числом.`);
+        if (group === "attributes") {
+          if (!ATTRIBUTE_SET.has(key) || attributes[key] === null || Number(attributes[key]) + count > 10) throw new Error(`Черновик содержит недопустимое улучшение характеристики «${key}».`);
+        } else if (group === "skills") {
+          const skill = skills.find(entry => entry.id === key);
+          if (!skill || Number(skill.rank ?? 0) + count > 10) throw new Error(`Черновик содержит недопустимое улучшение навыка «${key}».`);
+        } else {
+          const match = /^([a-z0-9-]+):([ABC]):([012])$/i.exec(key);
+          const ranks = match && professionTrees[match[1]]?.branches?.[match[2]];
+          const nodeIndex = match ? Number(match[3]) : -1;
+          if (!match || !ranks || ranks[nodeIndex] + count > 10) throw new Error(`Черновик содержит недопустимое улучшение умения «${key}».`);
+        }
+        draft[group][key] = count;
+      }
+    }
+    for (const [professionId, tree] of Object.entries(professionTrees)) {
+      for (const [branchId, ranks] of Object.entries(tree.branches)) {
+        const effective = ranks.map((rank, nodeIndex) => rank + Number(draft.professionAbilities[`${professionId}:${branchId}:${nodeIndex}`] || 0));
+        if ((effective[1] > 0 && effective[0] < 5) || (effective[2] > 0 && effective[1] < 5)) {
+          throw new Error(`В черновике дерева «${professionId}», ветка ${branchId} есть ранг закрытой способности.`);
+        }
+      }
+    }
+    const skillCatalog = initialSkillCatalog || globalThis.CharacterSkills;
+    const rankCost = (baseRank, count, multiplier = 1) => {
+      let total = 0;
+      if (!Number.isInteger(baseRank)) return null;
+      for (let offset = 0; offset < count; offset += 1) {
+        const rank = baseRank + offset;
+        if (rank >= 10) return null;
+        total += Math.max(1, rank) * multiplier;
+      }
+      return total;
+    };
+    let reservedPoints = 0;
+    for (const [code, count] of Object.entries(draft.attributes)) {
+      for (let offset = 0; offset < count; offset += 1) reservedPoints += (Number(attributes[code]) + offset) * 10;
+    }
+    for (const [skillId, count] of Object.entries(draft.skills)) {
+      const skill = skills.find(entry => entry.id === skillId);
+      const definition = skill?.catalogId && skillCatalog?.SKILLS?.find(entry => entry.id === skill.catalogId);
+      const cost = rankCost(Number(skill?.rank ?? 0), count, definition?.doubleCost ? 2 : 1);
+      if (cost === null) throw new Error(`Черновик навыка «${skillId}» содержит неверные ранги.`);
+      reservedPoints += cost;
+    }
+    for (const [key, count] of Object.entries(draft.professionAbilities)) {
+      const match = /^([a-z0-9-]+):([ABC]):([012])$/i.exec(key);
+      const baseRank = match ? professionTrees[match[1]]?.branches?.[match[2]]?.[Number(match[3])] : undefined;
+      const cost = rankCost(Number(baseRank), count);
+      if (cost === null) throw new Error(`Черновик умения «${key}» содержит неверные ранги.`);
+      reservedPoints += cost;
+    }
+    if (availablePoints + reservedPoints > earnedPoints) throw new Error("Начисленных очков не хватает на сохранённый черновик прокачки.");
+    const development = { earnedPoints, availablePoints, draft };
 
     const state = { ...defaults.state, ...stateRaw };
     for (const key of ["currentHp", "currentSta", "currentLuck"]) state[key] = optionalNumber(state[key], `Состояние «${key}»`, { min: 0, max: 100000 });
@@ -398,6 +462,18 @@
         ...character,
         schemaVersion: 6,
         development: character.development ?? { earnedPoints: 0, availablePoints: 0 },
+      })),
+    }),
+    6: raw => ({
+      ...raw,
+      schemaVersion: 7,
+      characters: raw.characters.map(character => ({
+        ...character,
+        schemaVersion: 7,
+        development: {
+          ...(character.development ?? { earnedPoints: 0, availablePoints: 0 }),
+          draft: character.development?.draft ?? { attributes: {}, skills: {}, professionAbilities: {} },
+        },
       })),
     }),
   });

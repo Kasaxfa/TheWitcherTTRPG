@@ -70,7 +70,7 @@ test("version 2 characters gain separate modifiers without losing ratings or sou
   const result = CharacterStore.load(storage);
   const migrated = result.store.characters[0];
   assert.equal(result.migratedSchemaVersion, true);
-  assert.equal(result.store.schemaVersion, 6);
+  assert.equal(result.store.schemaVersion, 7);
   assert.equal(migrated.attributes.BODY, 6);
   assert.deepEqual(migrated.attributeModifiers.BODY, { permanent: 0, temporary: 0 });
   assert.equal(migrated.skills[0].rank, 5);
@@ -93,8 +93,8 @@ test("version 3 characters migrate profession identity and choice storage withou
 
   const result = CharacterStore.load(storage);
   const migrated = result.store.characters[0];
-  assert.equal(result.store.schemaVersion, 6);
-  assert.equal(migrated.schemaVersion, 6);
+  assert.equal(result.store.schemaVersion, 7);
+  assert.equal(migrated.schemaVersion, 7);
   assert.equal(migrated.personal.profession, "Бард");
   assert.equal(migrated.personal.professionId, "");
   assert.deepEqual(migrated.professionSkillChoices, {});
@@ -114,15 +114,16 @@ test("version 4 migration adds creation, generated life path, profession-tree st
   character.skills.push({ id: "stable-skill", name: "Дедукция", attribute: "INT", rank: 3 });
   delete character.creation;
   delete character.professionTrees;
+  delete character.development;
   delete character.lifePath.generated;
   const migrated = CharacterStore.migrateStore(original).characters[0];
-  assert.equal(migrated.schemaVersion, 6);
+  assert.equal(migrated.schemaVersion, 7);
   assert.equal(migrated.personal.race, "Человек");
   assert.equal(migrated.attributes.INT, 8);
   assert.equal(migrated.skills[0].id, "stable-skill");
   assert.deepEqual(migrated.creation, {});
   assert.deepEqual(migrated.professionTrees, {});
-  assert.deepEqual(migrated.development, { earnedPoints: 0, availablePoints: 0 });
+  assert.deepEqual(migrated.development, { earnedPoints: 0, availablePoints: 0, draft: { attributes: {}, skills: {}, professionAbilities: {} } });
   assert.equal(migrated.lifePath.generated, null);
 });
 
@@ -134,13 +135,50 @@ test("version 5 migration adds an empty improvement-point ledger and preserves t
   character.personal.name = "Цири";
   character.attributes.INT = 8;
   character.skills.push({ id: "stable-skill", name: "Дедукция", attribute: "INT", rank: 4 });
+  delete character.development;
   const migrated = CharacterStore.migrateStore(original);
-  assert.equal(migrated.schemaVersion, 6);
-  assert.equal(migrated.characters[0].schemaVersion, 6);
+  assert.equal(migrated.schemaVersion, 7);
+  assert.equal(migrated.characters[0].schemaVersion, 7);
   assert.equal(migrated.characters[0].personal.name, "Цири");
   assert.equal(migrated.characters[0].attributes.INT, 8);
   assert.equal(migrated.characters[0].skills[0].id, "stable-skill");
-  assert.deepEqual(migrated.characters[0].development, { earnedPoints: 0, availablePoints: 0 });
+  assert.deepEqual(migrated.characters[0].development, { earnedPoints: 0, availablePoints: 0, draft: { attributes: {}, skills: {}, professionAbilities: {} } });
+});
+
+test("version 6 migration adds a draft ledger and preserves available improvement points", () => {
+  const original = CharacterStore.createStore("Версия 6");
+  original.schemaVersion = 6;
+  const character = original.characters[0];
+  character.schemaVersion = 6;
+  character.development = { earnedPoints: 25, availablePoints: 9 };
+  const migrated = CharacterStore.migrateStore(original);
+  assert.equal(migrated.schemaVersion, 7);
+  assert.equal(migrated.characters[0].schemaVersion, 7);
+  assert.deepEqual(migrated.characters[0].development, { earnedPoints: 25, availablePoints: 9, draft: { attributes: {}, skills: {}, professionAbilities: {} } });
+});
+
+test("pending advancement survives normalization and rejects missing skill links", () => {
+  const store = CharacterStore.createStore("Черновик");
+  const character = store.characters[0];
+  character.attributes.INT = 5;
+  character.skills.push({ id: "stable-skill", name: "Внимание", attribute: "INT", rank: 1 });
+  character.development = {
+    earnedPoints: 60,
+    availablePoints: 7,
+    draft: { attributes: { INT: 1 }, skills: { "stable-skill": 2 }, professionAbilities: {} },
+  };
+  const normalized = CharacterStore.migrateStore(store).characters[0];
+  assert.deepEqual(normalized.development.draft, character.development.draft);
+  normalized.development.draft.skills.missing = 1;
+  assert.throws(() => CharacterStore.migrateStore({ ...store, characters: [normalized] }), /недопустимое улучшение навыка/);
+});
+
+test("reserved draft points cannot exceed the earned balance", () => {
+  const store = CharacterStore.createStore("Баланс О.У.");
+  const character = store.characters[0];
+  character.attributes.INT = 5;
+  character.development = { earnedPoints: 40, availablePoints: 0, draft: { attributes: { INT: 1 }, skills: {}, professionAbilities: {} } };
+  assert.throws(() => CharacterStore.migrateStore(store), /не хватает на сохранённый черновик/);
 });
 
 test("improvement-point balances must be integers and available points cannot exceed earned points", () => {

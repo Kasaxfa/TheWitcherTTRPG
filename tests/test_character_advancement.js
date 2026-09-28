@@ -17,60 +17,109 @@ test("skill and attribute costs follow the advancement table and normal limits",
   assert.equal(Advancement.attributeUpgradeCost(""), null);
 });
 
-test("awarded points are spent transactionally on ordinary and complex skills", () => {
+test("skill upgrades stay pending until apply and rank-up cost escalates", () => {
   const character = CharacterStore.createCharacter("Тест");
   character.skills.push({ id: "ordinary", catalogId: "awareness", name: "Внимание", attribute: "INT", rank: 0 });
   character.skills.push({ id: "complex", catalogId: "monster-lore", name: "Монстрология", attribute: "INT", rank: 0 });
+  Advancement.awardPoints(character, 8);
 
-  assert.equal(Advancement.awardPoints(character, 4).ok, true);
-  assert.equal(Advancement.improveSkill(character, "ordinary").cost, 1);
+  assert.equal(Advancement.stageSkillUpgrade(character, "ordinary").cost, 1);
+  assert.equal(Advancement.stageSkillUpgrade(character, "ordinary").cost, 1);
+  assert.equal(Advancement.stageSkillUpgrade(character, "complex", { doubleCost: true }).cost, 2);
+  assert.equal(character.skills[0].rank, 0);
+  assert.equal(character.skills[1].rank, 0);
+  assert.deepEqual(Advancement.draftSummary(character, Trees), {
+    earnedPoints: 8,
+    availablePoints: 4,
+    reservedPoints: 4,
+    spentPoints: 0,
+    hasDraft: true,
+  });
+
+  assert.equal(Advancement.undoSkillUpgrade(character, "ordinary").cost, 1);
+  assert.equal(Advancement.draftCount(character, "skills", "ordinary"), 1);
+  assert.equal(character.development.availablePoints, 5);
+  assert.equal(Advancement.applyDraft(character, Trees).appliedPoints, 3);
   assert.equal(character.skills[0].rank, 1);
-  assert.equal(Advancement.improveSkill(character, "complex", { doubleCost: true }).cost, 2);
   assert.equal(character.skills[1].rank, 1);
-  assert.equal(Advancement.progression(character).earnedPoints, 4);
-  assert.equal(Advancement.progression(character).availablePoints, 1);
-
-  const failed = Advancement.improveSkill(character, "complex", { doubleCost: true });
-  assert.equal(failed.ok, false);
-  assert.equal(character.skills[1].rank, 1);
-  assert.equal(Advancement.progression(character).availablePoints, 1);
+  assert.equal(character.development.availablePoints, 5);
+  assert.equal(Advancement.draftSummary(character, Trees).spentPoints, 3);
+  assert.equal(Advancement.undoSkillUpgrade(character, "ordinary").ok, false);
 });
 
-test("attributes cost ten times their current base value and stop at ten", () => {
+test("attributes can be adjusted down before apply and applied points cannot be reassigned", () => {
   const character = CharacterStore.createCharacter("Тест");
   character.attributes.INT = 5;
-  character.attributes.REF = 10;
-  Advancement.awardPoints(character, 50);
-
-  const improved = Advancement.improveAttribute(character, "INT");
-  assert.equal(improved.cost, 50);
+  Advancement.awardPoints(character, 110);
+  assert.equal(Advancement.stageAttributeUpgrade(character, "INT").cost, 50);
+  assert.equal(Advancement.stageAttributeUpgrade(character, "INT").cost, 60);
+  assert.equal(character.attributes.INT, 5);
+  assert.equal(Advancement.undoAttributeUpgrade(character, "INT").cost, 60);
+  assert.equal(character.development.availablePoints, 60);
+  assert.equal(Advancement.applyDraft(character, Trees).appliedPoints, 50);
   assert.equal(character.attributes.INT, 6);
-  assert.equal(Advancement.progression(character).availablePoints, 0);
-  assert.equal(Advancement.improveAttribute(character, "REF").ok, false);
+  assert.equal(Advancement.undoAttributeUpgrade(character, "INT").ok, false);
+  assert.equal(Advancement.stageAttributeUpgrade(character, "REF").ok, false);
+  assert.equal(character.development.availablePoints, 60);
 });
 
-test("profession-branch advancement unlocks the next node at rank five", () => {
+test("canceling the draft returns all reserved points without changing ranks", () => {
+  const character = CharacterStore.createCharacter("Тест");
+  character.attributes.INT = 4;
+  character.skills.push({ id: "ordinary", catalogId: "awareness", name: "Внимание", attribute: "INT", rank: 0 });
+  Advancement.awardPoints(character, 50);
+  Advancement.stageAttributeUpgrade(character, "INT");
+  Advancement.stageSkillUpgrade(character, "ordinary");
+  assert.equal(Advancement.cancelDraft(character, Trees).refunded, 41);
+  assert.equal(character.attributes.INT, 4);
+  assert.equal(character.skills[0].rank, 0);
+  assert.equal(character.development.availablePoints, 50);
+  assert.equal(Advancement.draftSummary(character, Trees).hasDraft, false);
+});
+
+test("profession tree can stage the unlocking rank and then invest in the next node", () => {
   const character = CharacterStore.createCharacter("Тест");
   character.personal.professionId = "criminal";
   Trees.ensureProgress(character, "criminal");
   assert.equal(Trees.setRank(character, "criminal", "A", 0, 4).ok, true);
-  Advancement.awardPoints(character, 5);
+  Advancement.awardPoints(character, 16);
 
-  const fifthRank = Advancement.improveProfessionAbility(character, "criminal", "A", 0, Trees);
-  assert.equal(fifthRank.cost, 4);
-  assert.equal(Trees.getNodeState(character, "criminal", "A", 1).unlocked, true);
-  const firstRank = Advancement.improveProfessionAbility(character, "criminal", "A", 1, Trees);
-  assert.equal(firstRank.cost, 1);
-  assert.equal(Trees.getNodeState(character, "criminal", "A", 1).rank, 1);
-  assert.equal(Advancement.progression(character).availablePoints, 0);
+  assert.equal(Advancement.stageProfessionAbilityUpgrade(character, "criminal", "A", 0, Trees).cost, 4);
+  assert.equal(Advancement.professionAbilityState(character, "criminal", "A", 1, Trees).unlocked, true);
+  assert.equal(Advancement.stageProfessionAbilityUpgrade(character, "criminal", "A", 1, Trees).cost, 1);
+  for (let index = 0; index < 4; index += 1) assert.equal(Advancement.stageProfessionAbilityUpgrade(character, "criminal", "A", 1, Trees).ok, true);
+  assert.equal(Advancement.stageProfessionAbilityUpgrade(character, "criminal", "A", 2, Trees).cost, 1);
+  assert.deepEqual(character.professionTrees.criminal.branches.A, [4, 0, 0]);
+
+  const undone = Advancement.undoProfessionAbilityUpgrade(character, "criminal", "A", 0, Trees);
+  assert.equal(undone.ok, true);
+  assert.equal(undone.refundedDescendants, 12);
+  assert.deepEqual(character.development.draft.professionAbilities, {});
+  assert.equal(character.development.availablePoints, 16);
+  assert.equal(Advancement.applyDraft(character, Trees).ok, false);
+  assert.deepEqual(character.professionTrees.criminal.branches.A, [4, 0, 0]);
 });
 
-test("a locked profession ability cannot spend points", () => {
+test("an earlier profession ability remains upgradeable after the last node reaches rank 10", () => {
+  const character = CharacterStore.createCharacter("Тест");
+  character.personal.professionId = "criminal";
+  Trees.ensureProgress(character, "criminal");
+  Trees.setRank(character, "criminal", "A", 0, 5);
+  Trees.setRank(character, "criminal", "A", 1, 5);
+  Trees.setRank(character, "criminal", "A", 2, 10);
+  Advancement.awardPoints(character, 5);
+
+  assert.equal(Advancement.stageProfessionAbilityUpgrade(character, "criminal", "A", 0, Trees).ok, true);
+  assert.equal(Advancement.applyDraft(character, Trees).ok, true);
+  assert.deepEqual(character.professionTrees.criminal.branches.A, [6, 5, 10]);
+});
+
+test("a locked profession ability cannot reserve points", () => {
   const character = CharacterStore.createCharacter("Тест");
   character.personal.professionId = "criminal";
   Advancement.awardPoints(character, 10);
-  const result = Advancement.improveProfessionAbility(character, "criminal", "A", 1, Trees);
+  const result = Advancement.stageProfessionAbilityUpgrade(character, "criminal", "A", 1, Trees);
   assert.equal(result.ok, false);
-  assert.match(result.message, /предыдущую способность/);
+  assert.match(result.message, /предыдущее умение/);
   assert.equal(Advancement.progression(character).availablePoints, 10);
 });

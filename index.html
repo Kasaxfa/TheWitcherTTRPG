@@ -153,7 +153,7 @@
               </div>
           <fieldset class="character-panel">
             <legend>Навыки</legend>
-            <p class="character-panel-hint">Характеристики служат заголовками групп. Нажмите на сокращение, чтобы открыть параметры; ранги меняются во вкладке «Развитие».</p>
+            <p class="character-panel-hint">Все навыки показаны сразу. Нажмите на название навыка или характеристику, чтобы открыть настройки; ранги повышаются во вкладке «Развитие».</p>
             <p id="character-profession-skill-note" class="character-panel-hint"></p>
             <div id="character-profession-choice-fields" class="profession-choice-fields"></div>
             <div id="character-skills" class="character-entry-list"></div>
@@ -213,7 +213,7 @@
             <section id="character-development-panel" class="character-tab-panel" role="tabpanel" aria-labelledby="character-tab-development" data-character-tab-panel="development" hidden>
               <fieldset class="character-panel">
                 <legend>Очки улучшения</legend>
-                <p class="character-panel-hint">Начисляйте очки после сессии и тратьте их на ранги навыков, умений дерева профессии и характеристики.</p>
+                <p class="character-panel-hint">Начисляйте О.У. после сессии. Улучшения остаются черновыми, пока вы не примените их; до этого ранги можно уменьшать. После применения потраченные О.У. нельзя перераспределить.</p>
                 <div class="improvement-points-summary" id="character-improvement-summary"></div>
                 <div class="improvement-award-row">
                   <label class="field">Начислить очки<input id="improvement-points-input" type="number" min="1" max="100000" step="1" value="1" inputmode="numeric"></label>
@@ -222,7 +222,11 @@
               </fieldset>
               <fieldset class="character-panel">
                 <legend>Покупка улучшений</legend>
-                <p class="character-panel-hint">Обычный навык: цена равна текущему рангу, первый ранг стоит 1; сложный навык стоит вдвое дороже. Характеристика: текущее исходное значение × 10. Обычный предел характеристики — 10.</p>
+                <p class="character-panel-hint">Обычный навык: цена равна текущему рангу, первый ранг стоит 1; сложный навык стоит вдвое дороже. Характеристика: текущее исходное значение × 10. Обычный предел характеристики — 10. О.У. распределяются между черновыми улучшениями, а не переносятся из уже применённых.</p>
+                <div class="advancement-commit-bar">
+                  <span id="character-advancement-draft-note" class="character-panel-hint">Нет неподтверждённых улучшений.</span>
+                  <div><button class="button secondary" id="cancel-character-improvements" type="button" disabled>Отменить черновик</button><button class="button primary" id="apply-character-improvements" type="button" disabled>Применить прокачку</button></div>
+                </div>
                 <div id="character-advancement-list" class="character-advancement-list" aria-live="polite"></div>
               </fieldset>
             </section>
@@ -297,6 +301,19 @@
             </div>
             <div class="character-info-dialog-total"><span>Итог с расой и предысторией</span><strong id="character-attribute-dialog-total">—</strong></div>
             <div class="rename-dialog-actions"><button class="button secondary" id="close-character-attribute-dialog" type="button">Готово</button></div>
+          </div>
+        </dialog>
+        <dialog id="character-skill-dialog" class="character-info-dialog" aria-labelledby="character-skill-dialog-title">
+          <div class="character-info-dialog-content">
+            <h2 id="character-skill-dialog-title">Навык</h2>
+            <p id="character-skill-dialog-meta" class="character-panel-hint"></p>
+            <div class="character-field-grid">
+              <label class="field">Постоянное изменение<input id="character-skill-permanent" data-skill-setting="permanentModifier" type="number" min="-1000" max="1000" step="1"></label>
+              <label class="field">Временное изменение<input id="character-skill-temporary" data-skill-setting="temporaryModifier" type="number" min="-1000" max="1000" step="1"></label>
+            </div>
+            <div class="character-info-dialog-total"><span>Текущий ранг · меняется во вкладке «Развитие»</span><strong id="character-skill-dialog-rank">0</strong></div>
+            <div class="character-info-dialog-total"><span>Итог навыка</span><strong id="character-skill-dialog-total">—</strong></div>
+            <div class="rename-dialog-actions"><button class="button secondary" id="close-character-skill-dialog" type="button">Готово</button><button class="button primary" id="open-character-skill-development" type="button">Открыть развитие</button></div>
           </div>
         </dialog>
         <dialog id="profession-skill-dialog" class="character-info-dialog" aria-labelledby="profession-skill-dialog-title">

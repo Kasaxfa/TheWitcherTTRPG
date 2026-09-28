@@ -646,3 +646,69 @@ kbd { padding: 1px 6px 2px; border: 1px solid var(--line); border-radius: 4px; c
   .creation-dialog-actions .button { flex: 1; }
   .generated-path-heading, .profession-tree-heading { align-items: flex-start; }
 }
+
+/* Compact, always-open skill groups. */
+.skill-group-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-items: start; gap: 8px; }
+.skill-group-grid .skill-attribute-group { min-width: 0; margin: 0; border: 1px solid var(--line); border-radius: 8px; background: var(--panel-soft); }
+.skill-attribute-heading { min-height: 36px; align-items: center; padding: 3px 7px; }
+.skill-attribute-heading .attribute-setting-trigger { min-height: 29px; }
+.skill-group-count { align-self: center; color: var(--faint); font-size: 9px; white-space: nowrap; }
+.skill-attribute-body { gap: 5px; padding: 0 6px 6px; }
+.character-entry.skill-entry { min-width: 0; grid-template-columns: minmax(0,1fr) auto auto auto; align-items: center; gap: 5px; padding: 6px; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); }
+.character-entry.custom-skill-entry { grid-template-columns: minmax(0,1fr) minmax(100px,.7fr) auto auto 27px 27px; }
+.skill-name-field { min-width: 0; font-size: 10px; }
+.skill-settings-trigger { min-width: 0; padding: 0; border: 0; background: transparent; color: var(--text); cursor: pointer; font: 650 10px/1.35 var(--sans); text-align: left; overflow-wrap: anywhere; }
+.skill-settings-trigger:hover { color: var(--teal-strong); text-decoration: underline; }
+.skill-settings-icon { width: 27px; height: 27px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel-soft); color: var(--teal-strong); cursor: pointer; }
+.skill-settings-icon:hover { border-color: var(--accent-line); background: var(--teal-soft); }
+.skill-rank-readout { min-width: 52px; padding: 4px 5px; }
+.skill-total { min-width: 56px; min-height: 29px; display: grid; align-content: center; gap: 1px; text-align: center; }
+.skill-total span { color: var(--faint); font-size: 8px; }
+.skill-total strong { font-size: 11px; }
+.character-entry.custom-skill-entry .skill-name-field { grid-column: 1; grid-row: 1; }
+.character-entry.custom-skill-entry .skill-attribute-field { grid-column: 1 / 3; grid-row: 2; }
+.character-entry.custom-skill-entry .skill-rank-readout { grid-column: 3; grid-row: 1; }
+.character-entry.custom-skill-entry .skill-total { grid-column: 4; grid-row: 1; }
+.character-entry.custom-skill-entry .skill-settings-icon { grid-column: 5; grid-row: 1; }
+.character-entry.custom-skill-entry .character-remove { grid-column: 6; grid-row: 1; }
+.character-entry.skill-entry .skill-name-field, .character-entry.skill-entry .skill-rank-readout, .character-entry.skill-entry .skill-total, .character-entry.skill-entry .skill-settings-icon, .character-entry.skill-entry .character-remove { grid-row: auto; }
+.character-entry.catalog-skill-entry .skill-name-field, .character-entry.catalog-skill-entry .skill-rank-readout, .character-entry.catalog-skill-entry .skill-total { grid-column: auto; }
+.character-entry.catalog-skill-entry .skill-name-field { grid-column: auto; }
+.improvement-points-summary { grid-template-columns: repeat(4,minmax(0,1fr)); }
+.improvement-point-card.is-reserved { border-color: var(--hover-line); background: var(--hover); }
+.advancement-commit-bar { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin: 2px 0 10px; padding: 9px 10px; border: 1px solid var(--line); border-radius: 8px; background: var(--panel-soft); }
+.advancement-commit-bar .character-panel-hint { margin: 0; }
+.advancement-commit-bar > div { display: flex; flex-wrap: wrap; gap: 7px; }
+.advancement-commit-bar .button { min-height: 34px; padding: 0 10px; font-size: 10px; }
+.advancement-commit-bar .button:disabled { opacity: .55; cursor: not-allowed; }
+.advancement-row { grid-template-columns: minmax(0,1fr) auto auto; }
+.advancement-stepper { display: inline-flex; align-items: center; gap: 4px; }
+.improvement-adjust-button { min-width: 31px; min-height: 31px; padding: 3px 7px; border: 1px solid var(--line); border-radius: 6px; background: var(--panel-soft); color: var(--text); cursor: pointer; font: 700 12px var(--sans); white-space: nowrap; }
+.improvement-adjust-button.is-add { border-color: var(--accent-line); background: var(--teal-soft); color: var(--teal-strong); font-size: 9px; }
+.improvement-adjust-button:hover:not(:disabled) { border-color: var(--teal); }
+.improvement-adjust-button:disabled { color: var(--faint); cursor: not-allowed; opacity: .6; }
+.advancement-current small { color: var(--teal-strong); font-size: 8px; }
+@media (max-width: 900px) {
+  .skill-group-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 760px) {
+  .improvement-points-summary { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .advancement-commit-bar { align-items: stretch; flex-direction: column; }
+  .advancement-commit-bar > div { width: 100%; }
+  .advancement-commit-bar .button { flex: 1; }
+  .advancement-row { grid-template-columns: minmax(0,1fr) auto; gap: 6px 8px; padding: 8px; }
+  .advancement-row-title { grid-column: 1; grid-row: 1; }
+  .advancement-current { grid-column: 1; grid-row: 2; }
+  .advancement-stepper { grid-column: 2; grid-row: 1 / 3; }
+  .advancement-cost-note { grid-column: 1 / -1; }
+}
+@media (max-width: 620px) {
+  .character-entry.skill-entry { grid-template-columns: minmax(0,1fr) auto auto auto; gap: 4px; padding: 5px; }
+  .character-entry.custom-skill-entry { grid-template-columns: minmax(0,1fr) auto auto 26px 26px; }
+  .character-entry.custom-skill-entry .skill-name-field { grid-column: 1 / 4; grid-row: 1; }
+  .character-entry.custom-skill-entry .skill-attribute-field { grid-column: 1 / -1; grid-row: 2; }
+  .character-entry.custom-skill-entry .skill-rank-readout { grid-column: 1; grid-row: 3; }
+  .character-entry.custom-skill-entry .skill-total { grid-column: 2; grid-row: 3; }
+  .character-entry.custom-skill-entry .skill-settings-icon { grid-column: 4; grid-row: 1; }
+  .character-entry.custom-skill-entry .character-remove { grid-column: 5; grid-row: 1; }
+}
