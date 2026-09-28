@@ -347,12 +347,12 @@
     $("#inventory-character-name").textContent = activeCharacter().personal.name.trim() || "Без имени";
     const { knownKg: knownWeight, unknownCount } = inventoryWeight();
     const derived = window.CharacterRules.deriveCharacter(activeCharacter(), { carriedWeightKg: knownWeight, unknownWeightCount: unknownCount });
-    const capacity = inventory.capacityKg ?? derived.encumbranceKg;
-    $("#capacity-input").value = inventory.capacityKg === null ? "" : String(inventory.capacityKg);
+    const capacity = derived.encumbranceKg;
+    $("#capacity-readout").textContent = capacity === null ? "—" : numberText(capacity);
     $("#weight-total").textContent = `${numberText(knownWeight)} кг${unknownCount ? " + ?" : ""}`;
     $("#weight-caption").textContent = capacity === null
-      ? "грузоподъёмность не задана"
-      : `из ${numberText(capacity)} кг · ${inventory.capacityKg === null ? "Вес по Тел" : "задано вручную"}`;
+      ? "введите Тел для расчёта"
+      : `из ${numberText(capacity)} кг · расчёт по Тел`;
     const progress = $("#weight-progress");
     const track = $(".weight-track");
     const percent = capacity > 0 ? Math.min(100, knownWeight / capacity * 100) : 0;
@@ -362,7 +362,7 @@
     track.setAttribute("aria-valuemax", "100");
     const warnings = [];
     if (unknownCount) warnings.push(`У ${unknownCount} ${unknownCount === 1 ? "позиции" : "позиций"} не указан вес; общий вес показан без них.`);
-    if (capacity !== null && knownWeight > capacity) warnings.push("Превышена заданная грузоподъёмность.");
+    if (capacity !== null && knownWeight > capacity) warnings.push("Превышена грузоподъёмность по Тел.");
     if (derived.load.status === "over-lift-limit") warnings.push(`Вес превышает предел подъёма по Тел (${numberText(derived.liftLimitKg)} кг).`);
     $("#weight-warning").hidden = warnings.length === 0;
     $("#weight-warning").textContent = warnings.join(" ");
@@ -377,7 +377,7 @@
       return `<div class="inventory-row" data-entry-id="${escapeHtml(entry.id)}">
         <div class="inventory-item-name">${itemName}<span class="inventory-subline">${escapeHtml(kind)}</span></div>
         <label class="sr-only" for="qty-${escapeHtml(entry.id)}">Количество: ${escapeHtml(entry.name)}</label><input id="qty-${escapeHtml(entry.id)}" class="inventory-input inventory-qty" data-field="quantity" type="number" min="0.1" step="0.1" value="${escapeHtml(entry.quantity)}" aria-label="Количество: ${escapeHtml(entry.name)}">
-        <label class="sr-only" for="wt-${escapeHtml(entry.id)}">Вес за единицу в килограммах: ${escapeHtml(entry.name)}</label><input id="wt-${escapeHtml(entry.id)}" class="inventory-input inventory-unit" data-field="unitWeightKg" type="number" min="0" step="0.1" value="${entry.unitWeightKg === null ? "" : escapeHtml(entry.unitWeightKg)}" placeholder="Вес, кг" aria-label="Вес за единицу: ${escapeHtml(entry.name)}">
+        <label class="sr-only" for="wt-${escapeHtml(entry.id)}">Вес за единицу в килограммах: ${escapeHtml(entry.name)}</label><input id="wt-${escapeHtml(entry.id)}" class="inventory-input inventory-unit" data-field="unitWeightKg" type="number" min="0" step="0.01" value="${entry.unitWeightKg === null ? "" : escapeHtml(entry.unitWeightKg)}" placeholder="Вес, кг" aria-label="Вес за единицу: ${escapeHtml(entry.name)}">
         <label class="sr-only" for="condition-${escapeHtml(entry.id)}">Состояние: ${escapeHtml(entry.name)}</label><input id="condition-${escapeHtml(entry.id)}" class="inventory-input inventory-condition" data-field="conditionNotes" maxlength="2000" value="${escapeHtml(entry.conditionNotes || "")}" placeholder="Состояние" aria-label="Состояние: ${escapeHtml(entry.name)}">
         ${armorRelated ? `<label class="sr-only" for="ev-${escapeHtml(entry.id)}">Переопределить EV брони: ${escapeHtml(entry.name)}</label><input id="ev-${escapeHtml(entry.id)}" class="inventory-input inventory-ev" data-field="armorEv" type="number" min="0" max="100" step="1" value="${entry.armorEv === null || entry.armorEv === undefined ? "" : escapeHtml(entry.armorEv)}" placeholder="EV ${catalogEv === null ? "?" : escapeHtml(catalogEv)}" aria-label="Переопределить EV брони: ${escapeHtml(entry.name)}">` : `<span class="inventory-no-ev">—</span>`}
         <span class="inventory-weight">${total}</span><button class="remove-item" type="button" data-remove="${escapeHtml(entry.id)}" aria-label="Удалить ${escapeHtml(entry.name)}">×</button></div>`;
@@ -2699,12 +2699,6 @@
     addInventoryEntry({ id: createEntryId(), itemId: null, name, quantity, unitWeightKg, conditionNotes: "", armorEv: null, customCategory: $("#custom-item-category").value, custom: true });
     event.target.reset();
     $("#custom-item-quantity").value = "1";
-  });
-  $("#capacity-input").addEventListener("change", event => {
-    const value = event.target.value;
-    inventory.capacityKg = value === "" ? null : Number(value);
-    if (inventory.capacityKg !== null && (!Number.isFinite(inventory.capacityKg) || inventory.capacityKg < 0)) inventory.capacityKg = null;
-    saveInventory("Грузоподъёмность сохранена.");
   });
   $("#inventory-list").addEventListener("change", event => {
     const input = event.target.closest("[data-field]");
