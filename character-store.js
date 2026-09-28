@@ -6,7 +6,7 @@
   "use strict";
 
   const FORMAT = "witcher-workshop-characters";
-  const SCHEMA_VERSION = 1;
+  const SCHEMA_VERSION = 2;
   const STORAGE_KEY = "witcher-workshop-characters-v1";
   const LEGACY_INVENTORY_KEY = "witcher-workshop-inventory-v1";
   const RULES_VERSION = "witcher-core-russian-errata-v4";
@@ -57,6 +57,20 @@
         location: "",
         profession: "",
       },
+      lifePath: {
+        familyHistory: "",
+        familyStation: "",
+        parents: "",
+        siblings: "",
+        decadeEvents: [],
+        allies: [],
+        enemies: [],
+        relationships: [],
+        addictionTrauma: "",
+        style: "",
+        values: "",
+        outcomes: [],
+      },
       attributes: Object.fromEntries(ATTRIBUTES.map(attribute => [attribute, null])),
       skills: [],
       state: {
@@ -105,15 +119,35 @@
     const characterId = boundedString(String(raw.characterId || ""), `Персонаж ${index + 1}, characterId`, 160, false).trim();
     const defaults = createCharacter("Новый персонаж");
     const personalRaw = raw.personal ?? {};
+    const lifePathRaw = raw.lifePath ?? {};
     const attributesRaw = raw.attributes ?? {};
     const stateRaw = raw.state ?? {};
     const equipmentRaw = raw.equipment ?? {};
-    if (!isObject(personalRaw) || !isObject(attributesRaw) || !isObject(stateRaw) || !isObject(equipmentRaw)) {
+    if (!isObject(personalRaw) || !isObject(lifePathRaw) || !isObject(attributesRaw) || !isObject(stateRaw) || !isObject(equipmentRaw)) {
       throw new Error(`Персонаж ${index + 1}: личные данные, характеристики, состояние и снаряжение должны быть объектами.`);
     }
 
     const personal = { ...defaults.personal, ...personalRaw };
     for (const [key, value] of Object.entries(personal)) boundedString(value, `Личные данные «${key}»`, 2000);
+
+    const lifePath = { ...defaults.lifePath, ...lifePathRaw };
+    for (const key of ["familyHistory", "familyStation", "parents", "siblings", "addictionTrauma", "style", "values"]) {
+      lifePath[key] = boundedString(lifePath[key], `Жизненный путь «${key}»`, 20000);
+    }
+    for (const key of ["decadeEvents", "allies", "enemies", "relationships"]) {
+      if (!Array.isArray(lifePath[key])) throw new Error(`Жизненный путь «${key}» должен быть списком.`);
+      lifePath[key] = lifePath[key].map((entry, entryIndex) => boundedString(entry, `Жизненный путь «${key}», запись ${entryIndex + 1}`, 2000, false).trim());
+    }
+    if (!Array.isArray(lifePath.outcomes)) throw new Error("Последствия жизненного пути должны быть списком.");
+    lifePath.outcomes = lifePath.outcomes.map((outcome, outcomeIndex) => {
+      if (!isObject(outcome)) throw new Error(`Последствие жизненного пути ${outcomeIndex + 1}: ожидался объект.`);
+      const type = boundedString(String(outcome.type || "Прочее"), `Последствие ${outcomeIndex + 1}, тип`, 100, false).trim();
+      const description = boundedString(String(outcome.description ?? ""), `Последствие ${outcomeIndex + 1}, описание`, 20000);
+      const source = boundedString(String(outcome.source ?? ""), `Последствие ${outcomeIndex + 1}, источник`, 2000);
+      const id = boundedString(String(outcome.id || makeId()), `Последствие ${outcomeIndex + 1}, ID`, 160, false);
+      return { ...outcome, id, type, description, source };
+    });
+    ensureUnique(lifePath.outcomes, outcome => outcome.id, "ID последствия жизненного пути");
 
     const attributes = { ...defaults.attributes, ...attributesRaw };
     for (const attribute of ATTRIBUTES) attributes[attribute] = optionalNumber(attributes[attribute], `Характеристика ${attribute}`, { min: 0, max: 1000 });
@@ -164,6 +198,7 @@
       createdAt,
       updatedAt,
       personal: { ...personal, name },
+      lifePath,
       attributes,
       skills,
       state,
@@ -183,7 +218,11 @@
   }
 
   const STORE_MIGRATIONS = Object.freeze({
-    // Add a pure version-to-version migration here when the character schema changes.
+    1: raw => ({
+      ...raw,
+      schemaVersion: 2,
+      characters: raw.characters.map(character => ({ ...character, schemaVersion: 2 })),
+    }),
   });
 
   function migrateStore(raw) {
@@ -196,9 +235,10 @@
     while (version < SCHEMA_VERSION) {
       const migration = STORE_MIGRATIONS[version];
       if (!migration) throw new Error(`Нет миграции формата ${version} → ${version + 1}; данные не изменены.`);
+      const previousVersion = version;
       value = migration(value);
       version = Number(value.schemaVersion);
-      if (!Number.isInteger(version) || version <= sourceVersion) throw new Error("Миграция не обновила версию формата.");
+      if (!Number.isInteger(version) || version !== previousVersion + 1) throw new Error("Миграция не обновила версию формата последовательно.");
     }
     if (value.format !== FORMAT) throw new Error("Формат файла персонажей не распознан.");
     if (!Array.isArray(value.characters) || value.characters.length === 0) throw new Error("В файле должен быть хотя бы один персонаж.");
@@ -238,7 +278,7 @@
       if (parsedVersion < SCHEMA_VERSION) storage.setItem(`${STORAGE_KEY}.backup-v${parsedVersion}`, existingRaw);
       const normalizedRaw = JSON.stringify(normalized);
       if (normalizedRaw !== existingRaw) storage.setItem(STORAGE_KEY, normalizedRaw);
-      return { store: normalized, migratedLegacyInventory: false, legacyBackup: null };
+      return { store: normalized, migratedLegacyInventory: false, migratedSchemaVersion: parsedVersion < SCHEMA_VERSION, legacyBackup: null };
     }
 
     const legacyRaw = storage.getItem(LEGACY_INVENTORY_KEY);
@@ -251,12 +291,12 @@
       store.characters[0].equipment = equipment;
       store.legacyInventoryBackup = clone(legacy);
       storage.setItem(STORAGE_KEY, JSON.stringify(store));
-      return { store, migratedLegacyInventory: true, legacyBackup: clone(legacy) };
+      return { store, migratedLegacyInventory: true, migratedSchemaVersion: false, legacyBackup: clone(legacy) };
     }
 
     const store = createStore();
     storage.setItem(STORAGE_KEY, JSON.stringify(store));
-    return { store, migratedLegacyInventory: false, legacyBackup: null };
+    return { store, migratedLegacyInventory: false, migratedSchemaVersion: false, legacyBackup: null };
   }
 
   function save(storage, store) {
