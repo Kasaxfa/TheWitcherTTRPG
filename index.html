@@ -110,6 +110,28 @@
           </fieldset>
 
           <fieldset class="character-panel">
+            <legend>Жизненный путь</legend>
+            <div class="character-field-grid">
+              <label class="field">История семьи<input data-character-path="lifePath.familyHistory" maxlength="2000"></label>
+              <label class="field">Положение семьи<input data-character-path="lifePath.familyStation" maxlength="2000"></label>
+              <label class="field">Родители<input data-character-path="lifePath.parents" maxlength="2000"></label>
+              <label class="field">Братья и сёстры<input data-character-path="lifePath.siblings" maxlength="2000"></label>
+              <label class="field">Зависимость и травмы<input data-character-path="lifePath.addictionTrauma" maxlength="2000"></label>
+              <label class="field">Стиль<input data-character-path="lifePath.style" maxlength="2000"></label>
+              <label class="field">Ценности<input data-character-path="lifePath.values" maxlength="2000"></label>
+            </div>
+            <div class="character-field-grid life-path-lists">
+              <label class="field">Важные события<textarea data-character-lines="lifePath.decadeEvents" rows="3" placeholder="Каждое событие — с новой строки"></textarea></label>
+              <label class="field">Союзники<textarea data-character-lines="lifePath.allies" rows="3" placeholder="Каждый союзник — с новой строки"></textarea></label>
+              <label class="field">Враги<textarea data-character-lines="lifePath.enemies" rows="3" placeholder="Каждый враг — с новой строки"></textarea></label>
+              <label class="field">Отношения<textarea data-character-lines="lifePath.relationships" rows="3" placeholder="Каждая связь — с новой строки"></textarea></label>
+            </div>
+            <div class="list-heading"><span>Игровые последствия</span></div>
+            <div id="character-life-path-outcomes" class="character-entry-list"></div>
+            <button class="button secondary" id="add-life-path-outcome" type="button">Добавить последствие</button>
+          </fieldset>
+
+          <fieldset class="character-panel">
             <legend>Характеристики</legend>
             <div class="attribute-input-grid">
               <label class="field">Интеллект · INT<input data-character-number="attributes.INT" type="number" min="0" max="1000" step="1"></label>
