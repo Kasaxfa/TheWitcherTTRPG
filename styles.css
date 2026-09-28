@@ -109,6 +109,7 @@ button { color: inherit; }
 .character-entry { display: grid; align-items: center; gap: 8px; }
 .character-entry.skill-entry { grid-template-columns: minmax(120px,1fr) minmax(125px,.7fr) 90px 34px; }
 .character-entry.ability-entry { grid-template-columns: minmax(120px,.7fr) minmax(200px,1.3fr) 34px; }
+.character-entry.life-path-outcome { grid-template-columns: minmax(115px,.45fr) minmax(180px,1fr) minmax(140px,.7fr) 34px; }
 .character-entry input, .character-entry select, .character-entry textarea { width: 100%; min-width: 0; min-height: 37px; padding: 7px 9px; border: 1px solid var(--line); border-radius: 7px; background: var(--panel-soft); color: var(--text); font: 12px var(--sans); }
 .character-entry textarea { min-height: 37px; resize: vertical; }
 .character-entry input:focus, .character-entry select:focus, .character-entry textarea:focus { outline: 2px solid var(--teal); outline-offset: 1px; }
@@ -266,6 +267,9 @@ kbd { padding: 1px 6px 2px; border: 1px solid var(--line); border-radius: 4px; c
   .character-entry.ability-entry input { grid-column: 1; }
   .character-entry.ability-entry textarea { grid-column: 1; }
   .character-entry.ability-entry .character-remove { grid-column: 2; grid-row: 1; }
+  .character-entry.life-path-outcome { grid-template-columns: minmax(0,1fr) 32px; }
+  .character-entry.life-path-outcome select, .character-entry.life-path-outcome input { grid-column: 1; }
+  .character-entry.life-path-outcome .character-remove { grid-column: 2; grid-row: 1; }
   .workspace-head { align-items: flex-start; }
   .intro { max-width: 42ch; font-size: 12px; }
   .controls { flex-wrap: wrap; margin-top: 20px; }
