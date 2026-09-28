@@ -42,7 +42,6 @@
       <nav class="section-nav" aria-label="Разделы">
         <button class="nav-item active" data-page="recipes" aria-current="page"><span class="nav-icon">⌕</span>Рецепты</button>
         <button class="nav-item" data-page="items"><span class="nav-icon">◇</span>Предметы</button>
-        <button class="nav-item" data-page="inventory"><span class="nav-icon">▤</span>Инвентарь</button>
         <button class="nav-item" data-page="characters"><span class="nav-icon">♙</span>Персонажи</button>
       </nav>
     </aside>
@@ -111,17 +110,60 @@
               <div class="character-identity-summary"><span id="character-sheet-race">Раса не указана</span><span id="character-sheet-profession">Профессия не указана</span></div>
             </div>
           </div>
+          <nav class="character-tabs" role="tablist" aria-label="Разделы листа персонажа">
+            <button id="character-tab-sheet" class="character-tab active" type="button" role="tab" aria-selected="true" aria-controls="character-sheet-panel" tabindex="0" data-character-tab="sheet">Лист</button>
+            <button id="character-tab-inventory" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-inventory-panel" tabindex="-1" data-character-tab="inventory">Инвентарь</button>
+            <button id="character-tab-background" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-background-panel" tabindex="-1" data-character-tab="background">Предыстория</button>
+            <button id="character-tab-abilities" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-abilities-panel" tabindex="-1" data-character-tab="abilities">Способности</button>
+            <button id="character-tab-notes" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-notes-panel" tabindex="-1" data-character-tab="notes">Заметки</button>
+          </nav>
+          <form id="character-form" class="character-form" autocomplete="off">
+            <section id="character-sheet-panel" class="character-tab-panel" role="tabpanel" aria-labelledby="character-tab-sheet" data-character-tab-panel="sheet">
           <section class="character-status-summary" aria-label="Текущее состояние персонажа">
             <div><span>ПЗ</span><strong id="character-summary-hp">—</strong></div>
             <div><span>Выносливость</span><strong id="character-summary-sta">—</strong></div>
             <div><span>Удача</span><strong id="character-summary-luck">—</strong></div>
             <div class="character-summary-conditions"><span>Состояния</span><strong id="character-summary-conditions">Не отмечены</strong></div>
           </section>
-          <div class="character-value-legend" aria-label="Обозначения значений">
+          <details class="character-value-help"><summary>Как читаются значения</summary>
+              <div class="character-value-legend" aria-label="Обозначения значений">
             <span><i class="value-dot manual"></i>Ручной ввод</span>
             <span><i class="value-dot calculated"></i>Расчёт по правилам</span>
           </div>
-          <form id="character-form" class="character-form" autocomplete="off">
+          </details>
+
+
+              <div class="character-sheet-metrics">
+          <fieldset class="character-panel">
+            <legend>Текущее состояние</legend>
+            <div class="character-field-grid state-field-grid">
+              <label class="field">Текущие ПЗ · ввод<input data-character-number="state.currentHp" type="number" min="0" step="1"></label>
+              <label class="field">Текущая Выносливость · ввод<input data-character-number="state.currentSta" type="number" min="0" step="1"></label>
+              <label class="field">Текущая Удача · ввод<input data-character-number="state.currentLuck" type="number" min="0" step="1"></label>
+            </div>
+            <label class="field block-field">Состояния и ранения<textarea id="character-conditions" rows="3" placeholder="Каждое состояние — с новой строки"></textarea></label>
+          </fieldset>          <fieldset class="character-panel">
+            <legend>Производные показатели</legend>
+            <p class="character-panel-hint">Расчёт по правилам; непроверенные диапазоны остаются неизвестными.</p>
+            <div id="character-derived-values" class="character-derived-grid" aria-live="polite"></div>
+            <p id="character-derived-note" class="character-derived-note" hidden></p>
+          </fieldset>
+              </div>
+          <fieldset class="character-panel">
+            <legend>Характеристики</legend>
+            <p class="character-panel-hint">Введите исходное значение и модификаторы; итог рассчитывается автоматически.</p>
+            <div id="character-attributes" class="character-attribute-list"></div>
+          </fieldset>          <fieldset class="character-panel">
+            <legend>Навыки</legend>
+            <p class="character-panel-hint">Итог = характеристика + рейтинг + модификаторы.</p>
+            <p id="character-profession-skill-note" class="character-panel-hint"></p>
+            <div id="character-profession-choice-fields" class="profession-choice-fields"></div>
+            <div id="character-skills" class="character-entry-list"></div>
+            <button class="button secondary" id="add-character-skill" type="button">Добавить собственный навык</button>
+            
+          </fieldset>
+            </section>
+            <section id="character-background-panel" class="character-tab-panel" role="tabpanel" aria-labelledby="character-tab-background" data-character-tab-panel="background" hidden>
           <fieldset class="character-panel">
             <legend>Личные данные</legend>
             <div class="character-field-grid">
@@ -136,9 +178,7 @@
               <label class="field">Версия правил<input data-character-path="rulesVersion" maxlength="120"></label>
             </div>
             <div id="character-race-traits" class="race-trait-list" aria-live="polite"></div>
-          </fieldset>
-
-          <fieldset class="character-panel">
+          </fieldset>          <fieldset class="character-panel">
             <legend>Жизненный путь</legend>
             <div class="character-field-grid">
               <label class="field">История семьи<input data-character-path="lifePath.familyHistory" maxlength="2000"></label>
@@ -160,69 +200,26 @@
             <div id="character-life-path-outcomes" class="character-entry-list"></div>
             <button class="button secondary" id="add-life-path-outcome" type="button">Добавить последствие</button>
           </fieldset>
-
-          <fieldset class="character-panel">
-            <legend>Характеристики</legend>
-            <p class="character-panel-hint">Исходное значение и ручные модификаторы вводятся отдельно. Итог пересчитывается автоматически.</p>
-            <div id="character-attributes" class="character-attribute-list"></div>
-          </fieldset>
-
-          <fieldset class="character-panel">
-            <legend>Навыки</legend>
-            <p class="character-panel-hint">Итог навыка = итог ведущей характеристики + рейтинг + постоянное и временное изменения.</p>
-            <p id="character-profession-skill-note" class="character-panel-hint"></p>
-            <div id="character-profession-choice-fields" class="profession-choice-fields"></div>
-            <div id="character-skills" class="character-entry-list"></div>
-            <button class="button secondary" id="add-character-skill" type="button">Добавить собственный навык</button>
-            <div id="character-profession-tree" class="profession-tree-list" aria-live="polite"></div>
-          </fieldset>
-
-          <fieldset class="character-panel">
-            <legend>Производные показатели</legend>
-            <p class="character-panel-hint">Рассчитано отдельным модулем по подтверждённым формулам. Значения вне табличных диапазонов отмечаются как неизвестные.</p>
-            <div id="character-derived-values" class="character-derived-grid" aria-live="polite"></div>
-            <p id="character-derived-note" class="character-derived-note" hidden></p>
-          </fieldset>
-
-          <fieldset class="character-panel">
-            <legend>Текущее состояние</legend>
-            <div class="character-field-grid state-field-grid">
-              <label class="field">Текущие ПЗ · ввод<input data-character-number="state.currentHp" type="number" min="0" step="1"></label>
-              <label class="field">Текущая Выносливость · ввод<input data-character-number="state.currentSta" type="number" min="0" step="1"></label>
-              <label class="field">Текущая Удача · ввод<input data-character-number="state.currentLuck" type="number" min="0" step="1"></label>
-            </div>
-            <label class="field block-field">Состояния и ранения<textarea id="character-conditions" rows="3" placeholder="Каждое состояние — с новой строки"></textarea></label>
-          </fieldset>
-
+            </section>
+            <section id="character-abilities-panel" class="character-tab-panel" role="tabpanel" aria-labelledby="character-tab-abilities" data-character-tab-panel="abilities" hidden>
+              <fieldset class="character-panel">
+                <legend>Дерево профессии</legend>
+                <div id="character-profession-tree" class="profession-tree-list" aria-live="polite"></div>
+              </fieldset>
           <fieldset class="character-panel">
             <legend>Способности</legend>
             <div id="character-abilities" class="character-entry-list"></div>
             <button class="button secondary" id="add-character-ability" type="button">Добавить способность</button>
           </fieldset>
-
+            </section>
+            <section id="character-notes-panel" class="character-tab-panel" role="tabpanel" aria-labelledby="character-tab-notes" data-character-tab-panel="notes" hidden>
           <fieldset class="character-panel">
             <legend>Заметки</legend>
             <label class="field block-field">Личные заметки<textarea data-character-path="notes" rows="6" maxlength="100000" placeholder="История, цели, заметки игровой сессии…"></textarea></label>
           </fieldset>
+            </section>
           </form>
-        </div>
-        <dialog id="rename-character-dialog" class="rename-character-dialog" aria-labelledby="rename-character-title">
-          <form id="rename-character-form" method="dialog">
-            <h2 id="rename-character-title">Переименовать персонажа</h2>
-            <label class="field">Имя персонажа<input id="rename-character-input" maxlength="120" required></label>
-            <div class="rename-dialog-actions"><button class="button secondary" value="cancel">Отмена</button><button class="button primary" id="save-character-name" value="save">Сохранить</button></div>
-          </form>
-        </dialog>
-        <dialog id="character-create-dialog" class="creation-dialog" aria-labelledby="character-create-title">
-          <div class="creation-dialog-inner">
-            <div id="character-create-content"></div>
-            <p id="character-create-error" class="creation-error" role="alert" hidden></p>
-            <div class="creation-dialog-actions" id="character-create-actions"></div>
-          </div>
-        </dialog>
-      </section>
-
-      <section id="inventory-page" class="page-view" aria-labelledby="inventory-title" hidden>
+      <section id="character-inventory-panel" class="character-tab-panel inventory-tab-panel" role="tabpanel" aria-labelledby="character-tab-inventory" data-character-tab-panel="inventory" hidden>
         <div class="workspace-head">
           <div><div class="eyebrow"><span class="eyebrow-line"></span>Лист персонажа</div><h1 id="inventory-title">Инвентарь</h1><p class="intro">Снаряжение персонажа: <strong id="inventory-character-name">Персонаж 1</strong>.</p></div>
         </div>
@@ -260,6 +257,24 @@
         <p id="inventory-message" class="status-message" role="status" aria-live="polite"></p>
         <p class="privacy-note">Данные хранятся в этом браузере. JSON-файл можно перенести на другое устройство или использовать как резервную копию.</p>
       </section>
+        </div>
+        <dialog id="rename-character-dialog" class="rename-character-dialog" aria-labelledby="rename-character-title">
+          <form id="rename-character-form" method="dialog">
+            <h2 id="rename-character-title">Переименовать персонажа</h2>
+            <label class="field">Имя персонажа<input id="rename-character-input" maxlength="120" required></label>
+            <div class="rename-dialog-actions"><button class="button secondary" value="cancel">Отмена</button><button class="button primary" id="save-character-name" value="save">Сохранить</button></div>
+          </form>
+        </dialog>
+        <dialog id="character-create-dialog" class="creation-dialog" aria-labelledby="character-create-title">
+          <div class="creation-dialog-inner">
+            <div id="character-create-content"></div>
+            <p id="character-create-error" class="creation-error" role="alert" hidden></p>
+            <div class="creation-dialog-actions" id="character-create-actions"></div>
+          </div>
+        </dialog>
+      </section>
+
+
     </div>
   </main>
 </body>

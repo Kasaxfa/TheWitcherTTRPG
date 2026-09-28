@@ -4,13 +4,14 @@
   const alchemySymbols = window.ALCHEMY_SYMBOLS || {};
   const itemAliases = window.ITEM_ID_ALIASES || {};
   const itemById = new Map(items.map(item => [item.id, item]));
-  const sections = { recipes: "Рецепты", items: "Предметы", inventory: "Инвентарь", characters: "Персонажи" };
+  const sections = { recipes: "Рецепты", items: "Предметы", characters: "Персонажи" };
   const $ = selector => document.querySelector(selector);
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
   const normalize = value => String(value ?? "").toLocaleLowerCase("ru-RU").replaceAll("ё", "е");
   const numberText = value => new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(value);
   let activePage = "recipes";
   let characterViewMode = "library";
+  let activeCharacterTab = "sheet";
   let renameTargetCharacterId = null;
   let characterCreationDraft = null;
 
@@ -692,6 +693,24 @@
     renderCharacterLibrary();
   }
 
+  function showCharacterTab(tab, updateHash = true, focusTab = false) {
+    const button = document.querySelector(`[data-character-tab="${tab}"]`);
+    if (!button) return;
+    activeCharacterTab = tab;
+    document.querySelectorAll("[data-character-tab]").forEach(tabButton => {
+      const selected = tabButton === button;
+      tabButton.classList.toggle("active", selected);
+      tabButton.setAttribute("aria-selected", String(selected));
+      tabButton.tabIndex = selected ? 0 : -1;
+    });
+    document.querySelectorAll("[data-character-tab-panel]").forEach(panel => {
+      panel.hidden = panel.dataset.characterTabPanel !== tab;
+    });
+    if (tab === "inventory") renderInventory();
+    if (focusTab) button.focus();
+    if (updateHash && activePage === "characters") history.replaceState(null, "", `#characters/${tab}`);
+  }
+
   function openCharacter(characterId) {
     if (!persistenceReady) return;
     const character = characterStore.characters.find(value => value.characterId === characterId);
@@ -703,6 +722,7 @@
     $("#character-library").hidden = true;
     $("#character-editor").hidden = false;
     renderCharacterEditor();
+    showCharacterTab("sheet");
     renderInventory();
     persistStore(`Открыт персонаж «${characterName(character)}».`);
   }
@@ -775,9 +795,6 @@
       </div>`;
     };
     const attributeOrder = window.CharacterStore.ATTRIBUTES.filter(code => code !== "SPD" && code !== "LUCK");
-    const professionalHeading = profession
-      ? `<div class="skill-group-heading"><h3>Навыки профессии: ${escapeHtml(profession.name)}</h3><span>${professional.length}/11</span></div>`
-      : `<div class="skill-group-heading"><h3>Профессиональные навыки</h3><span>Выберите профессию выше</span></div>`;
     const professionalHtml = professional.length
       ? professional.map(skillRow).join("")
       : `<p class="character-empty">Выберите профессию, чтобы добавить её определяющий навык и набор.</p>`;
@@ -786,12 +803,18 @@
       if (!skills.length) return "";
       return `<section class="skill-attribute-group"><h4>${escapeHtml(attributeLabels[attribute])} <span>${shortAttribute(attribute)}</span></h4>${skills.map(skillRow).join("")}</section>`;
     }).join("");
-    list.innerHTML = `<section class="skill-group">${professionalHeading}${professionalHtml}</section>
-      <section class="skill-group"><div class="skill-group-heading"><h3>Общие навыки</h3><span>${general.length} навыков</span></div>${generalHtml || `<p class="character-empty">Общие навыки не найдены.</p>`}</section>
+    list.innerHTML = `<details class="skill-group skill-group-disclosure">
+        <summary class="skill-disclosure-summary"><span>Профессиональный набор${profession ? ` · ${escapeHtml(profession.name)}` : ""}</span><span>${professional.length} навыков</span></summary>
+        ${professionalHtml}
+      </details>
+      <details class="skill-group skill-group-disclosure">
+        <summary class="skill-disclosure-summary"><span>Общие навыки</span><span>${general.length}</span></summary>
+        ${generalHtml || `<p class="character-empty">Общие навыки не найдены.</p>`}
+      </details>
       ${other.length ? `<section class="skill-group"><div class="skill-group-heading"><h3>Дополнительные навыки</h3><span>${other.length}</span></div>${other.map(skillRow).join("")}</section>` : ""}`;
     renderProfessionChoiceFields(profession, character);
     $("#character-profession-skill-note").textContent = profession
-      ? `Стартовый пакет ${profession.name}: определяющий навык и 10 профессиональных навыков. На создании у них должен быть рейтинг не ниже 1; карьерное дерево способностей профессии показано отдельно ниже.`
+      ? `Стартовый набор ${profession.name}: 11 навыков. Дерево развития находится во вкладке «Способности».`
       : "Все навыки общего списка показаны ниже. После выбора профессии появятся её определяющий навык и профессиональный набор.";
     renderSkillTotals();
   }
@@ -908,8 +931,9 @@
       return;
     }
     window.CharacterProfessionTrees.ensureProgress(character, profession.id);
-    const branches = tree.branches.map(branch => `<section class="profession-tree-branch"><h4>${escapeHtml(branch.name)}</h4>
-      ${branch.nodes.map((node, index) => {
+    const branches = tree.branches.map(branch => `<details class="profession-tree-branch">
+      <summary><span>${escapeHtml(branch.name)}</span><span>3 способности</span></summary>
+      <div class="profession-tree-node-list">${branch.nodes.map((node, index) => {
         const state = window.CharacterProfessionTrees.getNodeState(character, profession.id, branch.id, index);
         return `<div class="profession-tree-node${state.unlocked ? "" : " is-locked"}">
           <div class="profession-tree-node-name"><span>${index + 1}</span><strong>${escapeHtml(node.name)}</strong>${node.attribute ? `<small>${shortAttribute(node.attribute)}</small>` : ""}</div>
@@ -918,8 +942,8 @@
             <button class="tree-rank-button" type="button" data-tree-step="1" data-tree-profession="${profession.id}" data-tree-branch="${branch.id}" data-tree-index="${index}" aria-label="Увеличить ранг способности ${escapeHtml(node.name)}"${!state.unlocked || state.rank >= 10 ? " disabled" : ""}>＋</button></div>
           <small class="profession-tree-unlock">${state.unlocked ? (index < 2 && state.rank < 5 ? `Следующая способность откроется на ранге ${state.nextUnlockAt}.` : "Доступно") : `Откроется при ранге 5 предыдущей способности.`}</small>
         </div>`;
-      }).join("")}</section>`).join("");
-    container.innerHTML = `<div class="profession-tree-heading"><div><h3>Дерево профессии · ${escapeHtml(profession.name)}</h3><p>В каждой ветви сначала доступен первый узел с рангом 0. Следующий узел открывается при ранге 5 предыдущего.</p></div><span>0–10</span></div><div class="profession-tree-branches">${branches}</div>`;
+      }).join("")}</div></details>`).join("");
+    container.innerHTML = `<div class="profession-tree-heading"><div><h3>Дерево профессии · ${escapeHtml(profession.name)}</h3><p>Следующий узел открывается при ранге 5 предыдущего.</p></div><span>0–10</span></div><div class="profession-tree-branches">${branches}</div>`;
   }
 
   function renderCharacterEditor() {
@@ -950,6 +974,7 @@
     renderAbilityRows();
     renderLifePathOutcomes();
     renderCharacterDerived();
+    showCharacterTab(activeCharacterTab, false);
     if (catalogChanged && persistenceReady) persistStore("Список навыков персонажа обновлён.");
   }
 
@@ -1137,6 +1162,7 @@
     $("#character-editor").hidden = false;
     closeCharacterCreation();
     renderCharacterEditor();
+    showCharacterTab("sheet");
     renderInventory();
     persistStore("Персонаж создан по шагам мастера.");
   }
@@ -1428,7 +1454,7 @@
 
   function lockEditingForInvalidSave() {
     if (persistenceReady) return;
-    document.querySelectorAll("#character-form input, #character-form select, #character-form textarea, #character-form button, #new-character, #character-editor button, #inventory-page input, #inventory-page button")
+    document.querySelectorAll("#character-editor input, #character-editor select, #character-editor textarea, #character-editor button, #new-character")
       .forEach(control => { control.disabled = true; });
     $("#export-characters").disabled = false;
     $("#import-characters").disabled = false;
@@ -1437,9 +1463,21 @@
     $("#character-message").classList.add("is-error");
   }
 
-  function showPage(page) {
+  function showPage(page, requestedTab = null) {
+    if (page === "inventory") {
+      page = "characters";
+      requestedTab = "inventory";
+    }
+    if (page.includes("/")) {
+      const [pageName, tabName] = page.split("/", 2);
+      page = pageName;
+      requestedTab = tabName || requestedTab;
+    }
     if (!sections[page]) return;
     activePage = page;
+    if (page === "characters" && requestedTab && characterViewMode === "library" && persistenceReady) {
+      openCharacter(activeCharacter().characterId);
+    }
     if (page === "characters" && characterViewMode === "library") renderCharacterLibrary();
     document.querySelectorAll(".page-view").forEach(view => { view.hidden = view.id !== `${page}-page`; });
     document.querySelectorAll(".nav-item").forEach(button => {
@@ -1447,11 +1485,25 @@
       button.classList.toggle("active", active);
       if (active) button.setAttribute("aria-current", "page"); else button.removeAttribute("aria-current");
     });
+    if (page === "characters" && requestedTab) showCharacterTab(requestedTab, false);
     document.title = `${sections[page]} — Кодекс ремесленника`;
-    history.replaceState(null, "", `#${page}`);
+    history.replaceState(null, "", `#${page}${page === "characters" && requestedTab ? `/${requestedTab}` : ""}`);
   }
 
   document.querySelectorAll(".nav-item").forEach(button => button.addEventListener("click", () => showPage(button.dataset.page)));
+  document.querySelectorAll("[data-character-tab]").forEach(button => {
+    button.addEventListener("click", () => showCharacterTab(button.dataset.characterTab));
+  });
+  $("[role='tablist'][aria-label='Разделы листа персонажа']").addEventListener("keydown", event => {
+    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    const tabs = [...document.querySelectorAll("[data-character-tab]")];
+    const currentIndex = tabs.indexOf(document.activeElement);
+    if (currentIndex < 0) return;
+    event.preventDefault();
+    const nextIndex = event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1
+      : (currentIndex + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
+    showCharacterTab(tabs[nextIndex].dataset.characterTab, true, true);
+  });
 
   function updateCharacterFromForm(event) {
     const relativeNameControl = event.target.closest("[data-generated-relative-name]");
@@ -1881,5 +1933,5 @@
     if (saveTimer) persistStore("Лист персонажа обновлён.", true);
   });
   const initialPage = location.hash.slice(1);
-  if (sections[initialPage]) showPage(initialPage);
+  if (sections[initialPage] || initialPage === "inventory" || initialPage.startsWith("characters/")) showPage(initialPage);
 })();
