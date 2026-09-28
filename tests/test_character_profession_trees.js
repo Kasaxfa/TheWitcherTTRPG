@@ -8,7 +8,12 @@ test("all nine professions have three branches with three ordered nodes", () => 
   for (const tree of Trees.TREE_LIST) {
     assert.equal(tree.branches.length, 3, tree.professionId);
     assert.ok(tree.branches.every(branch => branch.nodes.length === 3), tree.professionId);
+    for (const node of tree.branches.flatMap(branch => branch.nodes)) {
+      assert.ok(node.description.length > 80, `${node.id} should have a useful rules summary`);
+      assert.equal("sourcePage" in node, false, `${node.id} should not expose book page numbers`);
+    }
   }
+  assert.equal(Object.keys(Trees.NODE_DESCRIPTIONS).length, 81);
 });
 
 test("a profession branch opens the next rank-zero node when the preceding rank reaches five", () => {

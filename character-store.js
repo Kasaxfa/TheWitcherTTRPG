@@ -6,7 +6,7 @@
   "use strict";
 
   const FORMAT = "witcher-workshop-characters";
-  const SCHEMA_VERSION = 5;
+  const SCHEMA_VERSION = 6;
   const STORAGE_KEY = "witcher-workshop-characters-v1";
   const LEGACY_INVENTORY_KEY = "witcher-workshop-inventory-v1";
   const RULES_VERSION = "witcher-core-russian-errata-v5";
@@ -83,6 +83,7 @@
       professionSkillChoices: {},
       professionTrees: {},
       creation: {},
+      development: { earnedPoints: 0, availablePoints: 0 },
       state: {
         currentHp: null,
         currentSta: null,
@@ -256,6 +257,15 @@
     if (!creationSerialized || creationSerialized.length > 100000) throw new Error(`Данные создания персонажа ${index + 1} слишком велики.`);
     const creation = JSON.parse(creationSerialized);
 
+    const developmentRaw = raw.development ?? defaults.development;
+    if (!isObject(developmentRaw)) throw new Error("Очки улучшения персонажа " + (index + 1) + " должны быть объектом.");
+    const earnedPoints = optionalNumber(developmentRaw.earnedPoints ?? 0, "Всего начислено очков улучшения", { min: 0, max: 100000 });
+    const availablePoints = optionalNumber(developmentRaw.availablePoints ?? 0, "Доступно очков улучшения", { min: 0, max: 100000 });
+    if (!Number.isInteger(earnedPoints) || !Number.isInteger(availablePoints) || availablePoints > earnedPoints) {
+      throw new Error("Баланс очков улучшения персонажа " + (index + 1) + " некорректен.");
+    }
+    const development = { earnedPoints, availablePoints };
+
     const state = { ...defaults.state, ...stateRaw };
     for (const key of ["currentHp", "currentSta", "currentLuck"]) state[key] = optionalNumber(state[key], `Состояние «${key}»`, { min: 0, max: 100000 });
     if (!Array.isArray(state.conditions)) throw new Error(`Персонаж ${index + 1}: состояния должны быть массивом.`);
@@ -296,6 +306,7 @@
       professionSkillChoices,
       professionTrees,
       creation,
+      development,
       state,
       abilities,
       equipment,
@@ -378,6 +389,15 @@
         lifePath: { ...(character.lifePath ?? {}), generated: character.lifePath?.generated ?? null },
         professionTrees: character.professionTrees ?? {},
         creation: character.creation ?? {},
+      })),
+    }),
+    5: raw => ({
+      ...raw,
+      schemaVersion: 6,
+      characters: raw.characters.map(character => ({
+        ...character,
+        schemaVersion: 6,
+        development: character.development ?? { earnedPoints: 0, availablePoints: 0 },
       })),
     }),
   });

@@ -21,6 +21,7 @@
   <script src="./character-rules.js" defer></script>
   <script src="./character-skills.js" defer></script>
   <script src="./character-profession-trees.js" defer></script>
+  <script src="./character-advancement.js" defer></script>
   <script src="./character-creation.js" defer></script>
   <script src="./app.js" defer></script>
 </head>
@@ -115,6 +116,7 @@
             <button id="character-tab-inventory" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-inventory-panel" tabindex="-1" data-character-tab="inventory">Инвентарь</button>
             <button id="character-tab-background" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-background-panel" tabindex="-1" data-character-tab="background">Предыстория</button>
             <button id="character-tab-abilities" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-abilities-panel" tabindex="-1" data-character-tab="abilities">Способности</button>
+            <button id="character-tab-development" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-development-panel" tabindex="-1" data-character-tab="development">Развитие</button>
             <button id="character-tab-notes" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-notes-panel" tabindex="-1" data-character-tab="notes">Заметки</button>
           </nav>
           <form id="character-form" class="character-form" autocomplete="off">
@@ -150,12 +152,8 @@
           </fieldset>
               </div>
           <fieldset class="character-panel">
-            <legend>Характеристики</legend>
-            <p class="character-panel-hint">Введите исходное значение и модификаторы; итог рассчитывается автоматически.</p>
-            <div id="character-attributes" class="character-attribute-list"></div>
-          </fieldset>          <fieldset class="character-panel">
             <legend>Навыки</legend>
-            <p class="character-panel-hint">Итог = характеристика + рейтинг + модификаторы.</p>
+            <p class="character-panel-hint">Характеристики служат заголовками групп. Нажмите на сокращение, чтобы открыть параметры; ранги меняются во вкладке «Развитие».</p>
             <p id="character-profession-skill-note" class="character-panel-hint"></p>
             <div id="character-profession-choice-fields" class="profession-choice-fields"></div>
             <div id="character-skills" class="character-entry-list"></div>
@@ -211,6 +209,22 @@
             <div id="character-abilities" class="character-entry-list"></div>
             <button class="button secondary" id="add-character-ability" type="button">Добавить способность</button>
           </fieldset>
+            </section>
+            <section id="character-development-panel" class="character-tab-panel" role="tabpanel" aria-labelledby="character-tab-development" data-character-tab-panel="development" hidden>
+              <fieldset class="character-panel">
+                <legend>Очки улучшения</legend>
+                <p class="character-panel-hint">Начисляйте очки после сессии и тратьте их на ранги навыков, умений дерева профессии и характеристики.</p>
+                <div class="improvement-points-summary" id="character-improvement-summary"></div>
+                <div class="improvement-award-row">
+                  <label class="field">Начислить очки<input id="improvement-points-input" type="number" min="1" max="100000" step="1" value="1" inputmode="numeric"></label>
+                  <button class="button primary" id="award-improvement-points" type="button">Начислить</button>
+                </div>
+              </fieldset>
+              <fieldset class="character-panel">
+                <legend>Покупка улучшений</legend>
+                <p class="character-panel-hint">Обычный навык: цена равна текущему рангу, первый ранг стоит 1; сложный навык стоит вдвое дороже. Характеристика: текущее исходное значение × 10. Обычный предел характеристики — 10.</p>
+                <div id="character-advancement-list" class="character-advancement-list" aria-live="polite"></div>
+              </fieldset>
             </section>
             <section id="character-notes-panel" class="character-tab-panel" role="tabpanel" aria-labelledby="character-tab-notes" data-character-tab-panel="notes" hidden>
           <fieldset class="character-panel">
@@ -270,6 +284,32 @@
             <div id="character-create-content"></div>
             <p id="character-create-error" class="creation-error" role="alert" hidden></p>
             <div class="creation-dialog-actions" id="character-create-actions"></div>
+          </div>
+        </dialog>
+        <dialog id="character-attribute-dialog" class="character-info-dialog" aria-labelledby="character-attribute-dialog-title">
+          <div class="character-info-dialog-content">
+            <h2 id="character-attribute-dialog-title">Характеристика</h2>
+            <p id="character-attribute-dialog-note" class="character-panel-hint"></p>
+            <div class="character-field-grid">
+              <label class="field">Исходное значение<input id="character-attribute-base" data-attribute-setting="base" type="number" min="0" max="1000" step="1"></label>
+              <label class="field">Постоянное изменение<input id="character-attribute-permanent" data-attribute-setting="permanent" type="number" min="-1000" max="1000" step="1"></label>
+              <label class="field">Временное изменение<input id="character-attribute-temporary" data-attribute-setting="temporary" type="number" min="-1000" max="1000" step="1"></label>
+            </div>
+            <div class="character-info-dialog-total"><span>Итог с расой и предысторией</span><strong id="character-attribute-dialog-total">—</strong></div>
+            <div class="rename-dialog-actions"><button class="button secondary" id="close-character-attribute-dialog" type="button">Готово</button></div>
+          </div>
+        </dialog>
+        <dialog id="profession-skill-dialog" class="character-info-dialog" aria-labelledby="profession-skill-dialog-title">
+          <div class="character-info-dialog-content">
+            <div class="profession-skill-dialog-kicker">Умение дерева профессии</div>
+            <h2 id="profession-skill-dialog-title">Умение</h2>
+            <p id="profession-skill-dialog-meta" class="profession-skill-dialog-meta"></p>
+            <p id="profession-skill-dialog-description" class="profession-skill-dialog-description"></p>
+            <p id="profession-skill-dialog-status" class="profession-skill-dialog-status"></p>
+            <div class="rename-dialog-actions">
+              <button class="button secondary" id="close-profession-skill-dialog" type="button">Закрыть</button>
+              <button class="button primary" id="open-profession-skill-development" type="button">Открыть развитие</button>
+            </div>
           </div>
         </dialog>
       </section>

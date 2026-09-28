@@ -386,24 +386,6 @@
     });
   }
 
-  function renderAttributeRows() {
-    const character = activeCharacter();
-    const values = window.CharacterRules.calculateAttributes(character);
-    $("#character-attributes").innerHTML = window.CharacterStore.ATTRIBUTES.map(code => {
-      const value = values[code];
-      const statNotes = [shortAttribute(code)];
-      if (value.racial) statNotes.push(`раса ${signed(value.racial)}`);
-      if (value.background) statNotes.push(`предыстория ${signed(value.background)}`);
-      return `<div class="character-stat-row" data-attribute-row="${code}">
-        <strong class="character-stat-name">${escapeHtml(attributeLabels[code])}<span>${escapeHtml(statNotes.join(" · "))}</span></strong>
-        <label class="field">Исходное<input data-attribute-input="${code}.base" type="number" min="0" max="1000" step="1" value="${value.base === null ? "" : escapeHtml(value.base)}" aria-label="Исходное значение: ${attributeLabels[code]}"></label>
-        <label class="field">Постоянное<input data-attribute-input="${code}.permanent" type="number" min="-1000" max="1000" step="1" value="${escapeHtml(value.permanent)}" aria-label="Постоянное изменение: ${attributeLabels[code]}"></label>
-        <label class="field">Временное<input data-attribute-input="${code}.temporary" type="number" min="-1000" max="1000" step="1" value="${escapeHtml(value.temporary)}" aria-label="Временное изменение: ${attributeLabels[code]}"></label>
-        <output class="character-stat-total" data-attribute-total="${code}" aria-label="Итог: ${attributeLabels[code]}">${valueOrDash(value.total)}</output>
-      </div>`;
-    }).join("");
-  }
-
   function renderCharacterStatus(derived) {
     const character = activeCharacter();
     $("#character-sheet-race").textContent = character.personal.race.trim() || "Раса не указана";
@@ -707,6 +689,7 @@
       panel.hidden = panel.dataset.characterTabPanel !== tab;
     });
     if (tab === "inventory") renderInventory();
+    if (tab === "development") renderCharacterAdvancement();
     if (focusTab) button.focus();
     if (updateHash && activePage === "characters") history.replaceState(null, "", `#characters/${tab}`);
   }
@@ -772,50 +755,49 @@
     const character = activeCharacter();
     const catalog = window.CharacterSkills;
     const profession = catalog.findCharacterProfession(character);
-    const professional = character.skills.filter(skill => skill.source === "profession" && skill.professionId === profession?.id);
-    const general = character.skills.filter(skill => skill.source === "general");
-    const other = character.skills.filter(skill => !["profession", "general"].includes(skill.source));
     const skillRow = skill => {
       const definition = catalog.SKILLS.find(entry => entry.id === skill.catalogId);
       const fixed = Boolean(definition || skill.professionSkillId);
-      const sourceLabel = skill.source === "profession" ? "Профессия" : skill.source === "general" ? "Общий список" : "Дополнительный";
-      const attribute = attributeLabels[skill.attribute] ? `${shortAttribute(skill.attribute)} · ${attributeLabels[skill.attribute]}` : "Характеристика не указана";
-      const nameControl = fixed
-        ? `<div class="skill-name-field"><strong>${escapeHtml(skill.name)}</strong><span class="skill-attribute-label">${escapeHtml(attribute)}</span>${definition?.doubleCost ? `<small>Повышение стоит вдвое дороже</small>` : ""}</div>`
-        : `<label class="field skill-name-field">Навык<input data-skill-field="name" maxlength="120" value="${escapeHtml(skill.name)}" aria-label="Название навыка"></label>`;
-      const attributeControl = fixed ? "" : `<label class="field skill-attribute-field">Ведущая характеристика<select data-skill-field="attribute" aria-label="Ведущая характеристика"><option value="">Не указана</option>${window.CharacterStore.ATTRIBUTES.map(code => `<option value="${code}"${skill.attribute === code ? " selected" : ""}>${shortAttribute(code)} · ${attributeLabels[code]}</option>`).join("")}</select></label>`;
       const removable = skill.source === "custom" || skill.source === "other";
-      return `<div class="character-entry skill-entry${fixed ? " catalog-skill-entry" : ""}" data-skill-id="${escapeHtml(skill.id)}">
-        ${nameControl}${attributeControl}
-        <label class="field">Рейтинг<input data-skill-field="rank" type="number" min="${skill.source === "profession" ? "1" : "0"}" max="1000" step="1" value="${skill.rank === null ? "" : escapeHtml(skill.rank)}" aria-label="Рейтинг навыка ${escapeHtml(skill.name)}"></label>
-        <label class="field">Постоянное<input data-skill-field="permanentModifier" type="number" min="-1000" max="1000" step="1" value="${escapeHtml(skill.permanentModifier)}" aria-label="Постоянное изменение навыка ${escapeHtml(skill.name)}"></label>
-        <label class="field">Временное<input data-skill-field="temporaryModifier" type="number" min="-1000" max="1000" step="1" value="${escapeHtml(skill.temporaryModifier)}" aria-label="Временное изменение навыка ${escapeHtml(skill.name)}"></label>
-        <output class="skill-total" data-skill-total="${escapeHtml(skill.id)}"><span>Итог</span><strong>—</strong><small data-skill-bonus></small></output>
-        ${removable ? `<button class="character-remove" type="button" data-remove-skill="${escapeHtml(skill.id)}" aria-label="Удалить навык ${escapeHtml(skill.name)}">×</button>` : `<span class="skill-source-label">${sourceLabel}</span>`}
-      </div>`;
+      const currentRank = Number.isInteger(skill.rank) ? skill.rank : 0;
+      const sourceLabel = skill.professionSkillId ? "Проф. навык" :
+        skill.source === "profession" ? "В наборе профессии" :
+        skill.source === "general" ? "Общий навык" : "Свой навык";
+      const nameControl = fixed
+        ? '<div class="skill-name-field"><strong>' + escapeHtml(skill.name) + '</strong><span class="skill-source-badge ' + (skill.source === "profession" ? 'is-professional' : '') + '">' + sourceLabel + '</span>' + (definition?.doubleCost ? '<small class="skill-cost-note">Сложный: цена ×2</small>' : '') + '</div>'
+        : '<label class="field skill-name-field">Навык<input data-skill-field="name" maxlength="120" value="' + escapeHtml(skill.name) + '" aria-label="Название навыка"></label>';
+      const attributeControl = fixed ? '' :
+        '<label class="field skill-attribute-field">Характеристика<select data-skill-field="attribute" aria-label="Ведущая характеристика"><option value="">Не указана</option>' +
+        window.CharacterStore.ATTRIBUTES.map(code => '<option value="' + code + '"' + (skill.attribute === code ? ' selected' : '') + '>' + escapeHtml(shortAttribute(code) + ' · ' + attributeLabels[code]) + '</option>').join("") +
+        '</select></label>';
+      const removeControl = removable
+        ? '<button class="character-remove" type="button" data-remove-skill="' + escapeHtml(skill.id) + '" aria-label="Удалить навык ' + escapeHtml(skill.name || "без названия") + '">×</button>'
+        : '<span class="skill-row-spacer" aria-hidden="true"></span>';
+      return '<div class="character-entry skill-entry' + (fixed ? ' catalog-skill-entry' : ' custom-skill-entry') + '" data-skill-id="' + escapeHtml(skill.id) + '">' +
+        nameControl + attributeControl +
+        '<span class="skill-rank-readout" aria-label="Ранг навыка ' + escapeHtml(skill.name) + '">Ранг <strong>' + currentRank + '</strong></span>' +
+        '<label class="field skill-modifier-field skill-modifier-permanent">Постоянное<input data-skill-field="permanentModifier" type="number" min="-1000" max="1000" step="1" value="' + escapeHtml(skill.permanentModifier) + '" aria-label="Постоянное изменение навыка ' + escapeHtml(skill.name) + '"></label>' +
+        '<label class="field skill-modifier-field skill-modifier-temporary">Временное<input data-skill-field="temporaryModifier" type="number" min="-1000" max="1000" step="1" value="' + escapeHtml(skill.temporaryModifier) + '" aria-label="Временное изменение навыка ' + escapeHtml(skill.name) + '"></label>' +
+        '<output class="skill-total" data-skill-total="' + escapeHtml(skill.id) + '"><span>Итог</span><strong>—</strong><small data-skill-bonus></small></output>' +
+        removeControl + '</div>';
     };
-    const attributeOrder = window.CharacterStore.ATTRIBUTES.filter(code => code !== "SPD" && code !== "LUCK");
-    const professionalHtml = professional.length
-      ? professional.map(skillRow).join("")
-      : `<p class="character-empty">Выберите профессию, чтобы добавить её определяющий навык и набор.</p>`;
-    const generalHtml = attributeOrder.map(attribute => {
-      const skills = general.filter(skill => skill.attribute === attribute);
-      if (!skills.length) return "";
-      return `<section class="skill-attribute-group"><h4>${escapeHtml(attributeLabels[attribute])} <span>${shortAttribute(attribute)}</span></h4>${skills.map(skillRow).join("")}</section>`;
+    const attributes = window.CharacterStore.ATTRIBUTES;
+    list.innerHTML = attributes.map(attribute => {
+      const skills = character.skills.filter(skill => skill.attribute === attribute);
+      const groupId = "skill-group-" + attribute.toLowerCase();
+      const value = window.CharacterRules.calculateAttributes(character)[attribute]?.total;
+      const skillHtml = skills.length ? skills.map(skillRow).join("") : '<p class="character-empty">Навыки пока не добавлены.</p>';
+      return '<section class="skill-attribute-group">' +
+        '<div class="skill-attribute-heading">' +
+        '<button class="attribute-setting-trigger" type="button" data-attribute-setting-open="' + attribute + '" aria-label="Настроить ' + escapeHtml(attributeLabels[attribute]) + '">' +
+        '<span>' + escapeHtml(shortAttribute(attribute)) + '</span><strong data-attribute-total="' + attribute + '">' + valueOrDash(value) + '</strong><span class="attribute-setting-icon" aria-hidden="true">⚙</span></button>' +
+        '<button class="skill-group-toggle" type="button" data-toggle-skill-group="' + attribute + '" aria-controls="' + groupId + '" aria-expanded="false"><span>' + skills.length + ' навыков</span><span class="skill-group-chevron" aria-hidden="true">⌄</span></button>' +
+        '</div><div class="skill-attribute-body" id="' + groupId + '" hidden>' + skillHtml + '</div></section>';
     }).join("");
-    list.innerHTML = `<details class="skill-group skill-group-disclosure">
-        <summary class="skill-disclosure-summary"><span>Профессиональный набор${profession ? ` · ${escapeHtml(profession.name)}` : ""}</span><span>${professional.length} навыков</span></summary>
-        ${professionalHtml}
-      </details>
-      <details class="skill-group skill-group-disclosure">
-        <summary class="skill-disclosure-summary"><span>Общие навыки</span><span>${general.length}</span></summary>
-        ${generalHtml || `<p class="character-empty">Общие навыки не найдены.</p>`}
-      </details>
-      ${other.length ? `<section class="skill-group"><div class="skill-group-heading"><h3>Дополнительные навыки</h3><span>${other.length}</span></div>${other.map(skillRow).join("")}</section>` : ""}`;
     renderProfessionChoiceFields(profession, character);
     $("#character-profession-skill-note").textContent = profession
-      ? `Стартовый набор ${profession.name}: 11 навыков. Дерево развития находится во вкладке «Способности».`
-      : "Все навыки общего списка показаны ниже. После выбора профессии появятся её определяющий навык и профессиональный набор.";
+      ? 'Общие и профессиональные навыки сгруппированы по характеристике. Навыки стартового набора отмечены бирюзовой меткой.'
+      : 'Выберите характеристику, чтобы раскрыть связанные навыки. После выбора профессии появятся её стартовые навыки.';
     renderSkillTotals();
   }
 
@@ -927,23 +909,84 @@
     const profession = window.CharacterSkills.findCharacterProfession(character);
     const tree = profession && window.CharacterProfessionTrees.TREES[profession.id];
     if (!tree) {
-      container.innerHTML = `<p class="character-empty">Выберите профессию, чтобы открыть её дерево способностей.</p>`;
+      container.innerHTML = '<p class="character-empty">Выберите профессию, чтобы открыть её дерево способностей.</p>';
       return;
     }
     window.CharacterProfessionTrees.ensureProgress(character, profession.id);
-    const branches = tree.branches.map(branch => `<details class="profession-tree-branch">
-      <summary><span>${escapeHtml(branch.name)}</span><span>3 способности</span></summary>
-      <div class="profession-tree-node-list">${branch.nodes.map((node, index) => {
+    const branches = tree.branches.map(branch => {
+      const nodes = branch.nodes.map((node, index) => {
         const state = window.CharacterProfessionTrees.getNodeState(character, profession.id, branch.id, index);
-        return `<div class="profession-tree-node${state.unlocked ? "" : " is-locked"}">
-          <div class="profession-tree-node-name"><span>${index + 1}</span><strong>${escapeHtml(node.name)}</strong>${node.attribute ? `<small>${shortAttribute(node.attribute)}</small>` : ""}</div>
-          <div class="profession-tree-rank"><button class="tree-rank-button" type="button" data-tree-step="-1" data-tree-profession="${profession.id}" data-tree-branch="${branch.id}" data-tree-index="${index}" aria-label="Уменьшить ранг способности ${escapeHtml(node.name)}"${!state.unlocked || state.rank <= 0 ? " disabled" : ""}>−</button>
-            <input data-tree-rank="${profession.id}.${branch.id}.${index}" type="number" min="0" max="10" step="1" value="${state.rank}" aria-label="Ранг способности ${escapeHtml(node.name)}"${!state.unlocked ? " disabled" : ""}>
-            <button class="tree-rank-button" type="button" data-tree-step="1" data-tree-profession="${profession.id}" data-tree-branch="${branch.id}" data-tree-index="${index}" aria-label="Увеличить ранг способности ${escapeHtml(node.name)}"${!state.unlocked || state.rank >= 10 ? " disabled" : ""}>＋</button></div>
-          <small class="profession-tree-unlock">${state.unlocked ? (index < 2 && state.rank < 5 ? `Следующая способность откроется на ранге ${state.nextUnlockAt}.` : "Доступно") : `Откроется при ранге 5 предыдущей способности.`}</small>
-        </div>`;
-      }).join("")}</div></details>`).join("");
-    container.innerHTML = `<div class="profession-tree-heading"><div><h3>Дерево профессии · ${escapeHtml(profession.name)}</h3><p>Следующий узел открывается при ранге 5 предыдущего.</p></div><span>0–10</span></div><div class="profession-tree-branches">${branches}</div>`;
+        const status = state.unlocked ? '<span class="tree-node-state is-available">Открыто</span>' : '<span class="tree-node-state is-locked">🔒 Закрыто</span>';
+        const unlockText = state.unlocked
+          ? (index < 2 && state.rank < 5 ? 'Следующее умение откроется на ранге 5.' : 'Можно улучшать во вкладке «Развитие».')
+          : 'Откроется, когда предыдущее умение достигнет ранга 5.';
+        return '<article class="profession-tree-node ' + (state.unlocked ? 'is-unlocked' : 'is-locked') + '"' + (state.unlocked ? '' : ' aria-disabled="true"') + '>' +
+          '<button class="profession-tree-node-open" type="button" data-tree-open-profession="' + profession.id + '" data-tree-open-branch="' + branch.id + '" data-tree-open-index="' + index + '" aria-label="Открыть описание умения ' + escapeHtml(node.name) + '">' +
+          '<span class="profession-tree-node-tier">' + (index + 1) + '</span><span class="profession-tree-node-copy"><strong>' + escapeHtml(node.name) + '</strong><small>' + (node.attribute ? escapeHtml(shortAttribute(node.attribute)) : 'Особая способность') + '</small></span><span class="profession-tree-node-kind">Дерево</span></button>' +
+          '<div class="profession-tree-node-meta"><span class="profession-tree-rank-readout">Ранг ' + state.rank + '</span>' + status + '</div>' +
+          '<small class="profession-tree-unlock">' + unlockText + '</small></article>';
+      }).join("");
+      return '<details class="profession-tree-branch"><summary><span>' + escapeHtml(branch.name) + '</span><span>3 умения</span></summary><div class="profession-tree-node-list">' + nodes + '</div></details>';
+    }).join("");
+    container.innerHTML = '<div class="profession-tree-heading"><div><h3>Дерево профессии · ' + escapeHtml(profession.name) + '</h3><p>Узлы дерева отмечены отдельным цветом. Закрытые умения откроются после ранга 5 предыдущего умения в ветви.</p></div><span>Ранги 0–10</span></div><div class="profession-tree-branches">' + branches + '</div>';
+  }
+
+  function renderCharacterAdvancement() {
+    if (!$("#character-advancement-list")) return;
+    const character = activeCharacter();
+    const advancement = window.CharacterAdvancement;
+    const points = advancement.progression(character);
+    const spent = points.earnedPoints - points.availablePoints;
+    $("#character-improvement-summary").innerHTML =
+      '<div class="improvement-point-card"><span>Начислено</span><strong>' + points.earnedPoints + '</strong></div>' +
+      '<div class="improvement-point-card"><span>Потрачено</span><strong>' + spent + '</strong></div>' +
+      '<div class="improvement-point-card is-available"><span>Доступно</span><strong>' + points.availablePoints + '</strong></div>';
+
+    const attributeValues = window.CharacterRules.calculateAttributes(character);
+    const attributeRows = window.CharacterStore.ATTRIBUTES.map(code => {
+      const base = character.attributes[code];
+      const cost = advancement.attributeUpgradeCost(base);
+      const canBuy = cost !== null && points.availablePoints >= cost;
+      const description = cost === null ? 'Нужно исходное значение ниже 10' : 'Следующий ранг стоит ' + cost + ' ОУ';
+      return '<div class="advancement-row advancement-attribute-row"><div class="advancement-row-title"><strong>' + escapeHtml(attributeLabels[code]) + '</strong><span>' + escapeHtml(shortAttribute(code)) + ' · итог ' + valueOrDash(attributeValues[code]?.total) + '</span></div>' +
+        '<span class="advancement-current">Исходное <strong>' + valueOrDash(base) + '</strong></span>' +
+        '<button class="improvement-buy-button" type="button" data-improve-attribute="' + code + '"' + (canBuy ? '' : ' disabled') + ' aria-label="Повысить ' + escapeHtml(attributeLabels[code]) + ', стоимость ' + (cost ?? 'недоступно') + ' очков улучшения">' + (cost === null ? 'Недоступно' : '+1 · ' + cost + ' ОУ') + '</button>' +
+        '<small class="advancement-cost-note">' + description + '</small></div>';
+    }).join("");
+
+    const attributeOrder = window.CharacterStore.ATTRIBUTES;
+    const skillRows = character.skills.map(skill => {
+      const definition = window.CharacterSkills.SKILLS.find(entry => entry.id === skill.catalogId);
+      const rank = Number.isInteger(skill.rank) ? skill.rank : 0;
+      const cost = advancement.skillUpgradeCost(rank, Boolean(definition?.doubleCost));
+      const canBuy = cost !== null && points.availablePoints >= cost;
+      const type = skill.professionSkillId ? 'Проф. умение' : skill.source === 'profession' ? 'Стартовый набор' : skill.source === 'general' ? 'Общий навык' : 'Свой навык';
+      return '<div class="advancement-row advancement-skill-row"><div class="advancement-row-title"><strong>' + escapeHtml(skill.name || 'Без названия') + '</strong><span>' + type + (definition?.doubleCost ? ' · сложный' : '') + '</span></div>' +
+        '<span class="advancement-current">Ранг <strong>' + rank + '</strong></span>' +
+        '<button class="improvement-buy-button" type="button" data-improve-skill="' + escapeHtml(skill.id) + '"' + (canBuy ? '' : ' disabled') + ' aria-label="Повысить навык ' + escapeHtml(skill.name || 'без названия') + ', стоимость ' + (cost ?? 'недоступно') + ' очков улучшения">' + (cost === null ? 'Максимум' : '+1 · ' + cost + ' ОУ') + '</button></div>';
+    });
+    const skillGroups = attributeOrder.map(attribute => {
+      const rows = character.skills.filter(skill => skill.attribute === attribute).map(skill => skillRows[character.skills.indexOf(skill)]).join("");
+      return rows ? '<section class="advancement-skill-group"><h3>' + escapeHtml(shortAttribute(attribute)) + ' · ' + escapeHtml(attributeLabels[attribute]) + '</h3>' + rows + '</section>' : '';
+    }).join("");
+    const unassignedRows = character.skills.filter(skill => !attributeOrder.includes(skill.attribute)).map(skill => skillRows[character.skills.indexOf(skill)]).join("");
+    const profession = window.CharacterSkills.findCharacterProfession(character);
+    const tree = profession && window.CharacterProfessionTrees.TREES[profession.id];
+    const treeGroups = tree ? tree.branches.map(branch => {
+      const rows = branch.nodes.map((node, index) => {
+        const state = window.CharacterProfessionTrees.getNodeState(character, profession.id, branch.id, index);
+        const cost = advancement.skillUpgradeCost(state.rank, false);
+        const canBuy = state.unlocked && cost !== null && points.availablePoints >= cost;
+        const status = state.unlocked ? 'Открыто' : 'Закрыто до ранга 5';
+        return '<div class="advancement-row advancement-tree-row' + (state.unlocked ? '' : ' is-locked') + '"><div class="advancement-row-title"><strong>' + escapeHtml(node.name) + '</strong><span>Умение дерева · ' + status + '</span></div>' +
+          '<span class="advancement-current">Ранг <strong>' + state.rank + '</strong></span>' +
+          '<button class="improvement-buy-button" type="button" data-improve-tree-profession="' + profession.id + '" data-improve-tree-branch="' + branch.id + '" data-improve-tree-index="' + index + '"' + (canBuy ? '' : ' disabled') + ' aria-label="Повысить умение ' + escapeHtml(node.name) + ', стоимость ' + (cost ?? 'недоступно') + ' очков улучшения">' + (!state.unlocked ? '🔒 Закрыто' : cost === null ? 'Максимум' : '+1 · ' + cost + ' ОУ') + '</button></div>';
+      }).join("");
+      return '<section class="advancement-skill-group advancement-tree-group"><h3>' + escapeHtml(branch.name) + '</h3>' + rows + '</section>';
+    }).join("") : '<p class="character-empty">Выберите профессию, чтобы открыть её умения дерева.</p>';
+    $("#character-advancement-list").innerHTML = '<section class="advancement-section"><h3>Характеристики</h3><div class="advancement-row-list">' + attributeRows + '</div></section>' +
+      '<section class="advancement-section"><h3>Навыки</h3>' + skillGroups + (unassignedRows ? '<div class="advancement-skill-group"><h4>Без характеристики</h4>' + unassignedRows + '</div>' : '') + '</section>' +
+      '<section class="advancement-section"><h3>Дерево профессии</h3><p class="character-panel-hint">Ранг 5 открывает следующий узел той же ветви. Стоимость рангов навыка и умений одинакова.</p>' + treeGroups + '</section>';
   }
 
   function renderCharacterEditor() {
@@ -966,11 +1009,11 @@
       input.value = path.reduce((value, part) => value?.[part], character)?.join("\n") || "";
     });
     $("#character-conditions").value = character.state.conditions.join("\n");
-    renderAttributeRows();
     renderSkillRows();
     renderRaceTraits(character);
     renderGeneratedLifePath(character);
     renderProfessionTree(character);
+    renderCharacterAdvancement();
     renderAbilityRows();
     renderLifePathOutcomes();
     renderCharacterDerived();
@@ -1004,15 +1047,64 @@
     else activeCharacter()[parts[0]][parts[1]] = value;
   }
 
-  function changeProfessionTreeRank(professionId, branchId, index, nextRank) {
-    const result = window.CharacterProfessionTrees.setRank(activeCharacter(), professionId, branchId, index, nextRank);
-    if (!result.ok) {
-      setSaveMessage(result.message, true);
-      renderProfessionTree();
-      return;
+  function openAttributeSettings(code) {
+    if (!window.CharacterStore.ATTRIBUTES.includes(code)) return;
+    const character = activeCharacter();
+    const values = window.CharacterRules.calculateAttributes(character)[code];
+    $("#character-attribute-dialog").dataset.attribute = code;
+    $("#character-attribute-dialog-title").textContent = attributeLabels[code] + " · " + shortAttribute(code);
+    $("#character-attribute-base").value = values.base === null ? "" : String(values.base);
+    $("#character-attribute-permanent").value = String(values.permanent);
+    $("#character-attribute-temporary").value = String(values.temporary);
+    const notes = [];
+    if (values.racial) notes.push("раса " + signed(values.racial));
+    if (values.background) notes.push("предыстория " + signed(values.background));
+    $("#character-attribute-dialog-note").textContent = notes.length
+      ? "Автоматические бонусы: " + notes.join(" · ") + "."
+      : "Здесь можно скорректировать исходное значение и временные или постоянные модификаторы.";
+    $("#character-attribute-dialog-total").textContent = valueOrDash(values.total);
+    $("#character-attribute-dialog").showModal();
+  }
+
+  function openProfessionSkillDetails(professionId, branchId, index) {
+    const tree = window.CharacterProfessionTrees.TREES[professionId];
+    const branch = tree?.branches.find(item => item.id === branchId);
+    const node = branch?.nodes[index];
+    if (!node) return;
+    const state = window.CharacterProfessionTrees.getNodeState(activeCharacter(), professionId, branchId, index);
+    const profession = window.CharacterSkills.findProfession(professionId);
+    const dialog = $("#profession-skill-dialog");
+    dialog.dataset.profession = professionId;
+    dialog.dataset.branch = branchId;
+    dialog.dataset.index = String(index);
+    $("#profession-skill-dialog-title").textContent = node.name;
+    $("#profession-skill-dialog-meta").textContent = (profession?.name || "") + " · " + branch.name + " · " + (node.attribute ? shortAttribute(node.attribute) : "Особая способность") + " · ранг " + state.rank;
+    $("#profession-skill-dialog-description").textContent = node.description || "Описание для этого умения пока не добавлено.";
+    $("#profession-skill-dialog-status").textContent = state.unlocked
+      ? "Умение открыто. Ранг повышается за очки улучшения во вкладке «Развитие»."
+      : "Умение заблокировано. Повышайте предыдущее умение в этой ветви до ранга 5.";
+    $("#open-profession-skill-development").disabled = !state.unlocked;
+    dialog.showModal();
+  }
+
+  function updateAttributeSetting(event) {
+    const control = event.target.closest("[data-attribute-setting]");
+    if (!control) return false;
+    const code = $("#character-attribute-dialog").dataset.attribute;
+    const part = control.dataset.attributeSetting;
+    if (!window.CharacterStore.ATTRIBUTES.includes(code)) return true;
+    const value = control.value === "" ? null : Number(control.value);
+    if (value !== null && (!Number.isInteger(value) || value < (part === "base" ? 0 : -1000) || value > (part === "base" ? 1000 : 1000))) {
+      control.value = part === "base" ? activeCharacter().attributes[code] ?? "" : activeCharacter().attributeModifiers[code][part];
+      return true;
     }
-    renderProfessionTree();
-    persistStore("Дерево профессии обновлено.");
+    if (part === "base") activeCharacter().attributes[code] = value;
+    else activeCharacter().attributeModifiers[code][part] = value ?? 0;
+    const result = window.CharacterRules.calculateAttributes(activeCharacter())[code];
+    $("#character-attribute-dialog-total").textContent = valueOrDash(result.total);
+    renderCharacterDerived();
+    persistStore("Характеристика обновлена.", event.type === "change");
+    return true;
   }
 
   function beginCharacterCreation() {
@@ -1416,15 +1508,13 @@
     const row = control.closest("[data-skill-id]");
     const skill = activeCharacter().skills.find(value => value.id === row?.dataset.skillId);
     if (!skill) return true;
-    if (control.dataset.skillField === "rank") {
-      const value = control.value === "" ? null : Number(control.value);
-      if (value !== null && (!Number.isFinite(value) || value < 0 || value > 1000)) return true;
-      skill.rank = value;
-    } else if (control.dataset.skillField === "permanentModifier" || control.dataset.skillField === "temporaryModifier") {
+    if (control.dataset.skillField === "rank") return true;
+    if (control.dataset.skillField === "permanentModifier" || control.dataset.skillField === "temporaryModifier") {
       const value = control.value === "" ? 0 : Number(control.value);
       if (!Number.isInteger(value) || value < -1000 || value > 1000) return true;
       skill[control.dataset.skillField] = value;
     } else skill[control.dataset.skillField] = control.value;
+    if (control.dataset.skillField === "attribute" && event.type === "change") renderSkillRows();
     renderCharacterDerived();
     persistStore("Навыки обновлены.", event.type === "change");
     return true;
@@ -1494,6 +1584,26 @@
   document.querySelectorAll("[data-character-tab]").forEach(button => {
     button.addEventListener("click", () => showCharacterTab(button.dataset.characterTab));
   });
+  $("#characters-page").addEventListener("click", event => {
+    const attributeButton = event.target.closest("[data-attribute-setting-open]");
+    if (attributeButton) {
+      openAttributeSettings(attributeButton.dataset.attributeSettingOpen);
+      return;
+    }
+    const groupButton = event.target.closest("[data-toggle-skill-group]");
+    if (groupButton) {
+      const panel = document.getElementById(groupButton.getAttribute("aria-controls"));
+      if (!panel) return;
+      const expanded = groupButton.getAttribute("aria-expanded") === "true";
+      groupButton.setAttribute("aria-expanded", String(!expanded));
+      panel.hidden = expanded;
+      return;
+    }
+    const treeButton = event.target.closest("[data-tree-open-profession]");
+    if (treeButton) {
+      openProfessionSkillDetails(treeButton.dataset.treeOpenProfession, treeButton.dataset.treeOpenBranch, Number(treeButton.dataset.treeOpenIndex));
+    }
+  });
   $("[role='tablist'][aria-label='Разделы листа персонажа']").addEventListener("keydown", event => {
     if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
     const tabs = [...document.querySelectorAll("[data-character-tab]")];
@@ -1514,13 +1624,6 @@
         relative.name = relativeNameControl.value;
         persistStore("Имя персонажа из предыстории сохранено.", event.type === "change");
       }
-      return true;
-    }
-    const treeRankControl = event.target.closest("[data-tree-rank]");
-    if (treeRankControl) {
-      if (event.type !== "change") return true;
-      const [professionId, branchId, index] = treeRankControl.dataset.treeRank.split(".");
-      changeProfessionTreeRank(professionId, branchId, Number(index), Number(treeRankControl.value));
       return true;
     }
     const selectControl = event.target.closest("[data-character-select]");
@@ -1607,14 +1710,66 @@
 
   $("#character-form").addEventListener("input", updateCharacterFromForm);
   $("#character-form").addEventListener("change", updateCharacterFromForm);
-  $("#character-profession-tree").addEventListener("click", event => {
-    const button = event.target.closest("[data-tree-step]");
-    if (!button) return;
-    const professionId = button.dataset.treeProfession;
-    const branchId = button.dataset.treeBranch;
-    const index = Number(button.dataset.treeIndex);
-    const current = activeCharacter().professionTrees?.[professionId]?.branches?.[branchId]?.[index] ?? 0;
-    changeProfessionTreeRank(professionId, branchId, index, current + Number(button.dataset.treeStep));
+  $("#character-development-panel").addEventListener("click", event => {
+    const attributeButton = event.target.closest("[data-improve-attribute]");
+    const skillButton = event.target.closest("[data-improve-skill]");
+    const treeButton = event.target.closest("[data-improve-tree-profession]");
+    if (!attributeButton && !skillButton && !treeButton) return;
+    let result;
+    if (attributeButton) {
+      result = window.CharacterAdvancement.improveAttribute(activeCharacter(), attributeButton.dataset.improveAttribute);
+    } else if (skillButton) {
+      const skill = activeCharacter().skills.find(entry => entry.id === skillButton.dataset.improveSkill);
+      const definition = window.CharacterSkills.SKILLS.find(entry => entry.id === skill?.catalogId);
+      result = window.CharacterAdvancement.improveSkill(activeCharacter(), skillButton.dataset.improveSkill, definition || {});
+    } else {
+      result = window.CharacterAdvancement.improveProfessionAbility(
+        activeCharacter(),
+        treeButton.dataset.improveTreeProfession,
+        treeButton.dataset.improveTreeBranch,
+        Number(treeButton.dataset.improveTreeIndex),
+        window.CharacterProfessionTrees,
+      );
+    }
+    if (!result.ok) {
+      setSaveMessage(result.message, true);
+      renderCharacterAdvancement();
+      return;
+    }
+    renderSkillRows();
+    renderProfessionTree();
+    renderCharacterDerived();
+    renderCharacterAdvancement();
+    persistStore("Улучшение куплено за " + result.cost + " ОУ.");
+  });
+  $("#award-improvement-points").addEventListener("click", () => {
+    const input = $("#improvement-points-input");
+    const result = window.CharacterAdvancement.awardPoints(activeCharacter(), input.value);
+    if (!result.ok) {
+      setSaveMessage(result.message, true);
+      return;
+    }
+    input.value = "1";
+    renderCharacterAdvancement();
+    persistStore("Начислено " + result.awarded + " очков улучшения.");
+  });
+  $("#character-attribute-dialog").addEventListener("input", updateAttributeSetting);
+  $("#character-attribute-dialog").addEventListener("change", updateAttributeSetting);
+  $("#close-character-attribute-dialog").addEventListener("click", () => $("#character-attribute-dialog").close());
+  $("#profession-skill-dialog").addEventListener("click", event => {
+    if (event.target.closest("#close-profession-skill-dialog")) {
+      $("#profession-skill-dialog").close();
+      return;
+    }
+    if (event.target.closest("#open-profession-skill-development")) {
+      const dialog = $("#profession-skill-dialog");
+      const professionId = dialog.dataset.profession;
+      const branchId = dialog.dataset.branch;
+      const index = dialog.dataset.index;
+      dialog.close();
+      showCharacterTab("development");
+      document.querySelector('[data-improve-tree-profession="' + professionId + '"][data-improve-tree-branch="' + branchId + '"][data-improve-tree-index="' + index + '"]')?.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
   });
   $("#character-search").addEventListener("input", renderCharacterLibrary);
   $("#character-list").addEventListener("click", event => {
@@ -1676,7 +1831,7 @@
     persistStore("Последствие жизненного пути удалено.");
   });
   $("#add-character-skill").addEventListener("click", () => {
-    activeCharacter().skills.push({ id: createEntryId(), name: "", attribute: null, rank: null, permanentModifier: 0, temporaryModifier: 0 });
+    activeCharacter().skills.push({ id: createEntryId(), name: "", attribute: null, rank: 0, permanentModifier: 0, temporaryModifier: 0, source: "custom" });
     renderSkillRows();
     persistStore("Добавлен навык.");
     [...$("#character-skills").querySelectorAll('[data-skill-field="name"]')].at(-1)?.focus();
