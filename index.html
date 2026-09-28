@@ -19,6 +19,7 @@
   <script src="./data.js" defer></script>
   <script src="./character-store.js" defer></script>
   <script src="./character-rules.js" defer></script>
+  <script src="./character-skills.js" defer></script>
   <script src="./app.js" defer></script>
 </head>
 <body>
@@ -90,6 +91,7 @@
           <div class="character-library-toolbar">
             <label class="searchbox"><span aria-hidden="true">⌕</span><input id="character-search" type="search" placeholder="Имя, игрок, раса или профессия…" autocomplete="off" aria-label="Поиск персонажей"><kbd>/</kbd></label>
             <button class="button primary" id="new-character" type="button">＋ Создать персонажа</button>
+            <button class="button secondary" id="recover-character-data" type="button" hidden>Создать новый лист</button>
             <button class="button secondary" id="export-characters" type="button">Экспорт списка</button>
             <button class="button secondary" id="import-characters" type="button">Импорт JSON</button>
             <input id="character-file" type="file" accept="application/json,.json" hidden>
@@ -123,12 +125,12 @@
             <div class="character-field-grid">
               <label class="field">Имя персонажа<input data-character-path="personal.name" maxlength="120"></label>
               <label class="field">Игрок<input data-character-path="personal.player" maxlength="120"></label>
-              <label class="field">Раса<input data-character-path="personal.race" maxlength="80"></label>
-              <label class="field">Пол<input data-character-path="personal.gender" maxlength="80"></label>
+              <label class="field">Раса<select data-character-select="race" aria-label="Раса персонажа"></select></label>
+              <label class="field">Пол<select data-character-select="gender" aria-label="Пол персонажа"></select></label>
               <label class="field">Возраст<input data-character-path="personal.age" maxlength="80"></label>
               <label class="field">Родина<input data-character-path="personal.homeland" maxlength="120"></label>
               <label class="field">Местоположение<input data-character-path="personal.location" maxlength="120"></label>
-              <label class="field">Профессия<input data-character-path="personal.profession" maxlength="120"></label>
+              <label class="field">Профессия<select data-character-select="profession" aria-label="Профессия персонажа"></select></label>
               <label class="field">Версия правил<input data-character-path="rulesVersion" maxlength="120"></label>
             </div>
           </fieldset>
@@ -164,8 +166,10 @@
           <fieldset class="character-panel">
             <legend>Навыки</legend>
             <p class="character-panel-hint">Итог навыка = итог ведущей характеристики + рейтинг + постоянное и временное изменения.</p>
+            <p id="character-profession-skill-note" class="character-panel-hint"></p>
+            <div id="character-profession-choice-fields" class="profession-choice-fields"></div>
             <div id="character-skills" class="character-entry-list"></div>
-            <button class="button secondary" id="add-character-skill" type="button">Добавить навык</button>
+            <button class="button secondary" id="add-character-skill" type="button">Добавить собственный навык</button>
           </fieldset>
 
           <fieldset class="character-panel">

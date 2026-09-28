@@ -6,7 +6,7 @@
   "use strict";
 
   const FORMAT = "witcher-workshop-characters";
-  const SCHEMA_VERSION = 3;
+  const SCHEMA_VERSION = 4;
   const STORAGE_KEY = "witcher-workshop-characters-v1";
   const LEGACY_INVENTORY_KEY = "witcher-workshop-inventory-v1";
   const RULES_VERSION = "witcher-core-russian-errata-v4";
@@ -60,6 +60,7 @@
         homeland: "",
         location: "",
         profession: "",
+        professionId: "",
       },
       lifePath: {
         familyHistory: "",
@@ -78,6 +79,7 @@
       attributes: Object.fromEntries(ATTRIBUTES.map(attribute => [attribute, null])),
       attributeModifiers: createAttributeModifiers(),
       skills: [],
+      professionSkillChoices: {},
       state: {
         currentHp: null,
         currentSta: null,
@@ -183,6 +185,17 @@
     });
     ensureUnique(skills, item => item.id, "ID навыка");
 
+    const professionSkillChoicesRaw = raw.professionSkillChoices ?? {};
+    if (!isObject(professionSkillChoicesRaw)) throw new Error(`Профессиональные навыки персонажа ${index + 1} должны быть объектом.`);
+    const professionSkillChoices = {};
+    for (const [professionId, choices] of Object.entries(professionSkillChoicesRaw)) {
+      boundedString(professionId, `Профессия в выборе навыков персонажа ${index + 1}`, 120, false);
+      if (!Array.isArray(choices)) throw new Error(`Выбор навыков профессии «${professionId}» должен быть списком.`);
+      professionSkillChoices[professionId] = choices.map((choice, choiceIndex) =>
+        boundedString(choice, `Выбор навыка профессии «${professionId}», запись ${choiceIndex + 1}`, 120, false));
+      ensureUnique(professionSkillChoices[professionId], value => value, `ID выбранного навыка профессии «${professionId}»`);
+    }
+
     const state = { ...defaults.state, ...stateRaw };
     for (const key of ["currentHp", "currentSta", "currentLuck"]) state[key] = optionalNumber(state[key], `Состояние «${key}»`, { min: 0, max: 100000 });
     if (!Array.isArray(state.conditions)) throw new Error(`Персонаж ${index + 1}: состояния должны быть массивом.`);
@@ -220,6 +233,7 @@
       attributes,
       attributeModifiers,
       skills,
+      professionSkillChoices,
       state,
       abilities,
       equipment,
@@ -268,6 +282,16 @@
           permanentModifier: skill.permanentModifier ?? 0,
           temporaryModifier: skill.temporaryModifier ?? 0,
         })),
+      })),
+    }),
+    3: raw => ({
+      ...raw,
+      schemaVersion: 4,
+      characters: raw.characters.map(character => ({
+        ...character,
+        schemaVersion: 4,
+        personal: { ...(character.personal ?? {}), professionId: character.personal?.professionId ?? "" },
+        professionSkillChoices: character.professionSkillChoices ?? {},
       })),
     }),
   });

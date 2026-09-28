@@ -518,6 +518,7 @@
       $("#character-empty p").textContent = "Создайте персонажа или загрузите JSON-файл.";
     }
     $("#new-character").disabled = !persistenceReady;
+    $("#recover-character-data").hidden = persistenceReady;
     $("#export-characters").disabled = !persistenceReady;
   }
 
@@ -586,20 +587,67 @@
 
   function renderSkillRows() {
     const list = $("#character-skills");
-    if (!activeCharacter().skills.length) {
-      list.innerHTML = `<p class="character-empty">Навыки пока не добавлены.</p>`;
+    const character = activeCharacter();
+    const catalog = window.CharacterSkills;
+    const profession = catalog.findCharacterProfession(character);
+    const professional = character.skills.filter(skill => skill.source === "profession" && skill.professionId === profession?.id);
+    const general = character.skills.filter(skill => skill.source === "general");
+    const other = character.skills.filter(skill => !["profession", "general"].includes(skill.source));
+    const skillRow = skill => {
+      const definition = catalog.SKILLS.find(entry => entry.id === skill.catalogId);
+      const fixed = Boolean(definition || skill.professionSkillId);
+      const sourceLabel = skill.source === "profession" ? "Профессия" : skill.source === "general" ? "Общий список" : "Дополнительный";
+      const attribute = attributeLabels[skill.attribute] ? `${skill.attribute} · ${attributeLabels[skill.attribute]}` : "Характеристика не указана";
+      const nameControl = fixed
+        ? `<div class="skill-name-field"><strong>${escapeHtml(skill.name)}</strong><span class="skill-attribute-label">${escapeHtml(attribute)}</span>${definition?.doubleCost ? `<small>Повышение стоит вдвое дороже</small>` : ""}</div>`
+        : `<label class="field skill-name-field">Навык<input data-skill-field="name" maxlength="120" value="${escapeHtml(skill.name)}" aria-label="Название навыка"></label>`;
+      const attributeControl = fixed ? "" : `<label class="field skill-attribute-field">Ведущая характеристика<select data-skill-field="attribute" aria-label="Ведущая характеристика"><option value="">Не указана</option>${window.CharacterStore.ATTRIBUTES.map(code => `<option value="${code}"${skill.attribute === code ? " selected" : ""}>${code} · ${attributeLabels[code]}</option>`).join("")}</select></label>`;
+      const removable = skill.source === "custom" || skill.source === "other";
+      return `<div class="character-entry skill-entry${fixed ? " catalog-skill-entry" : ""}" data-skill-id="${escapeHtml(skill.id)}">
+        ${nameControl}${attributeControl}
+        <label class="field">Рейтинг<input data-skill-field="rank" type="number" min="${skill.source === "profession" ? "1" : "0"}" max="1000" step="1" value="${skill.rank === null ? "" : escapeHtml(skill.rank)}" aria-label="Рейтинг навыка ${escapeHtml(skill.name)}"></label>
+        <label class="field">Постоянное<input data-skill-field="permanentModifier" type="number" min="-1000" max="1000" step="1" value="${escapeHtml(skill.permanentModifier)}" aria-label="Постоянное изменение навыка ${escapeHtml(skill.name)}"></label>
+        <label class="field">Временное<input data-skill-field="temporaryModifier" type="number" min="-1000" max="1000" step="1" value="${escapeHtml(skill.temporaryModifier)}" aria-label="Временное изменение навыка ${escapeHtml(skill.name)}"></label>
+        <output class="skill-total" data-skill-total="${escapeHtml(skill.id)}"><span>Итог</span><strong>—</strong></output>
+        ${removable ? `<button class="character-remove" type="button" data-remove-skill="${escapeHtml(skill.id)}" aria-label="Удалить навык ${escapeHtml(skill.name)}">×</button>` : `<span class="skill-source-label">${sourceLabel}</span>`}
+      </div>`;
+    };
+    const attributeOrder = window.CharacterStore.ATTRIBUTES.filter(code => code !== "SPD" && code !== "LUCK");
+    const professionalHeading = profession
+      ? `<div class="skill-group-heading"><h3>Навыки профессии: ${escapeHtml(profession.name)}</h3><span>${professional.length}/11</span></div>`
+      : `<div class="skill-group-heading"><h3>Профессиональные навыки</h3><span>Выберите профессию выше</span></div>`;
+    const professionalHtml = professional.length
+      ? professional.map(skillRow).join("")
+      : `<p class="character-empty">Выберите профессию, чтобы добавить её определяющий навык и набор.</p>`;
+    const generalHtml = attributeOrder.map(attribute => {
+      const skills = general.filter(skill => skill.attribute === attribute);
+      if (!skills.length) return "";
+      return `<section class="skill-attribute-group"><h4>${escapeHtml(attributeLabels[attribute])} <span>${attribute}</span></h4>${skills.map(skillRow).join("")}</section>`;
+    }).join("");
+    list.innerHTML = `<section class="skill-group">${professionalHeading}${professionalHtml}</section>
+      <section class="skill-group"><div class="skill-group-heading"><h3>Общие навыки</h3><span>${general.length} навыков</span></div>${generalHtml || `<p class="character-empty">Общие навыки не найдены.</p>`}</section>
+      ${other.length ? `<section class="skill-group"><div class="skill-group-heading"><h3>Дополнительные навыки</h3><span>${other.length}</span></div>${other.map(skillRow).join("")}</section>` : ""}`;
+    renderProfessionChoiceFields(profession, character);
+    $("#character-profession-skill-note").textContent = profession
+      ? `Профиль ${profession.name}: определяющий навык и профессиональный набор. На создании у всех 11 профессиональных навыков должен быть рейтинг не ниже 1; общий список навыков остаётся доступен каждому.`
+      : "Все навыки общего списка показаны ниже. После выбора профессии появятся её определяющий навык и профессиональный набор.";
+    renderSkillTotals();
+  }
+
+  function renderProfessionChoiceFields(profession, character) {
+    const container = $("#character-profession-choice-fields");
+    if (!profession?.choice) {
+      container.innerHTML = "";
       return;
     }
-    list.innerHTML = activeCharacter().skills.map(skill => `<div class="character-entry skill-entry" data-skill-id="${escapeHtml(skill.id)}">
-      <label class="field skill-name-field">Навык<input data-skill-field="name" maxlength="120" value="${escapeHtml(skill.name)}" aria-label="Название навыка"></label>
-      <label class="field skill-attribute-field">Ведущая характеристика<select data-skill-field="attribute" aria-label="Ведущая характеристика"><option value="">Не указана</option>${window.CharacterStore.ATTRIBUTES.map(attribute => `<option value="${attribute}"${skill.attribute === attribute ? " selected" : ""}>${attribute} · ${attributeLabels[attribute]}</option>`).join("")}</select></label>
-      <label class="field">Исходный рейтинг<input data-skill-field="rank" type="number" min="0" max="1000" step="1" value="${skill.rank === null ? "" : escapeHtml(skill.rank)}" aria-label="Исходный рейтинг навыка"></label>
-      <label class="field">Постоянное<input data-skill-field="permanentModifier" type="number" min="-1000" max="1000" step="1" value="${escapeHtml(skill.permanentModifier)}" aria-label="Постоянное изменение навыка"></label>
-      <label class="field">Временное<input data-skill-field="temporaryModifier" type="number" min="-1000" max="1000" step="1" value="${escapeHtml(skill.temporaryModifier)}" aria-label="Временное изменение навыка"></label>
-      <output class="skill-total" data-skill-total="${escapeHtml(skill.id)}"><span>Итог</span><strong>—</strong></output>
-      <button class="character-remove" type="button" data-remove-skill="${escapeHtml(skill.id)}" aria-label="Удалить навык">×</button>
-    </div>`).join("");
-    renderSkillTotals();
+    const selected = character.professionSkillChoices?.[profession.id] || [];
+    const options = profession.choice.options.map(skillId => {
+      const skill = window.CharacterSkills.SKILLS.find(entry => entry.id === skillId);
+      if (!skill) return "";
+      const checked = selected.includes(skillId) ? " checked" : "";
+      return `<label class="profession-choice-option"><input type="checkbox" data-profession-choice="${escapeHtml(skillId)}"${checked}><span>${escapeHtml(skill.name)}</span><small>${skill.attribute} · ${escapeHtml(attributeLabels[skill.attribute])}</small></label>`;
+    }).join("");
+    container.innerHTML = `<fieldset class="profession-choice-box"><legend>${escapeHtml(profession.choice.label)}</legend><p>Выбрано ${selected.length} из ${profession.choice.requiredCount}. Отметьте любые навыки из списка.</p><div class="profession-choice-grid">${options}</div></fieldset>`;
   }
 
   function renderSkillTotals(derived = activeDerivedValues()) {
@@ -644,8 +692,10 @@
 
   function renderCharacterEditor() {
     const character = activeCharacter();
+    const catalogChanged = window.CharacterSkills.initializeCharacterSkills(character);
     $("#character-editor-name").textContent = characterName(character);
     $("#inventory-character-name").textContent = character.personal.name.trim() || "Без имени";
+    renderCharacterSelects(character);
     document.querySelectorAll("[data-character-path]").forEach(input => {
       const path = input.dataset.characterPath.split(".");
       input.value = path.length === 1 ? character[path[0]] ?? "" : character[path[0]]?.[path[1]] ?? "";
@@ -665,6 +715,27 @@
     renderAbilityRows();
     renderLifePathOutcomes();
     renderCharacterDerived();
+    if (catalogChanged && persistenceReady) persistStore("Список навыков персонажа обновлён.");
+  }
+
+  function fillCharacterSelect(select, placeholder, options, value, { keepUnknown = false } = {}) {
+    const optionHtml = options.map(option => `<option value="${escapeHtml(option.value)}">${escapeHtml(option.label)}</option>`);
+    if (keepUnknown && value && !options.some(option => option.value === value)) {
+      optionHtml.push(`<option value="${escapeHtml(value)}">Сохранённое значение: ${escapeHtml(value)}</option>`);
+    }
+    select.innerHTML = `<option value="">${escapeHtml(placeholder)}</option>${optionHtml.join("")}`;
+    select.value = value && (options.some(option => option.value === value) || keepUnknown) ? value : "";
+  }
+
+  function renderCharacterSelects(character = activeCharacter()) {
+    const personal = character.personal;
+    fillCharacterSelect($("[data-character-select='race']"), "Выберите расу", window.CharacterSkills.RACES.map(value => ({ value, label: value })), personal.race, { keepUnknown: true });
+    fillCharacterSelect($("[data-character-select='gender']"), "Не указано", window.CharacterSkills.GENDERS.map(value => ({ value, label: value })), personal.gender, { keepUnknown: true });
+    const profession = window.CharacterSkills.findCharacterProfession(character);
+    const professionOptions = window.CharacterSkills.PROFESSIONS.map(value => ({ value: value.id, label: value.name }));
+    const currentProfessionValue = profession?.id || (personal.profession ? "legacy-profession" : "");
+    if (currentProfessionValue === "legacy-profession") professionOptions.push({ value: currentProfessionValue, label: `Сохранённое значение: ${personal.profession}` });
+    fillCharacterSelect($("[data-character-select='profession']"), "Выберите профессию", professionOptions, currentProfessionValue);
   }
 
   function updateCharacterPath(path, value) {
@@ -676,6 +747,7 @@
   function addNewCharacter() {
     if (!persistenceReady) return;
     const character = window.CharacterStore.createCharacter(uniqueCharacterName(`Персонаж ${characterStore.characters.length + 1}`));
+    window.CharacterSkills.initializeCharacterSkills(character);
     characterStore.characters.push(character);
     characterStore.activeCharacterId = character.characterId;
     inventory = character.equipment;
@@ -685,6 +757,45 @@
     renderCharacterEditor();
     renderInventory();
     persistStore("Создан новый персонаж.");
+  }
+
+  function downloadRawRecoveryBackup(raw) {
+    const blob = new Blob([raw], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const anchor = document.createElement("a");
+    anchor.href = url;
+    anchor.download = "witcher-characters-recovery.json";
+    anchor.click();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
+
+  function recoverCharacterData() {
+    if (persistenceReady) return;
+    if (!window.confirm("Создать новый пустой лист? Текущее сохранение сначала будет сохранено отдельно, если браузер позволит.")) return;
+    let raw = null;
+    try { raw = localStorage.getItem(window.CharacterStore.STORAGE_KEY); }
+    catch (error) { setSaveMessage(`Браузер не разрешил прочитать сохранение: ${error.message || "ошибка хранилища"}`, true); return; }
+    if (raw !== null) {
+      try { localStorage.setItem(`${window.CharacterStore.STORAGE_KEY}.recovery-backup-${Date.now()}`, raw); }
+      catch { downloadRawRecoveryBackup(raw); }
+    }
+    const candidate = window.CharacterStore.createStore("Персонаж 1");
+    window.CharacterSkills.initializeCharacterSkills(candidate.characters[0]);
+    try {
+      characterStore = window.CharacterStore.save(localStorage, candidate);
+      persistenceReady = true;
+      persistenceError = "";
+      inventory = activeCharacter().equipment;
+      characterViewMode = "editor";
+      $("#character-library").hidden = true;
+      $("#character-editor").hidden = false;
+      renderCharacterLibrary();
+      renderCharacterEditor();
+      renderInventory();
+      setSaveMessage(raw === null ? "Создан новый лист персонажа." : "Создан новый лист; прежнее сохранение сохранено отдельно или скачано.");
+    } catch (error) {
+      setSaveMessage(`Не удалось создать новый лист; исходное сохранение не заменено. ${error.message || "Ошибка хранилища."}`, true);
+    }
   }
 
   function downloadJson(payload, filename) {
@@ -778,6 +889,7 @@
       .forEach(control => { control.disabled = true; });
     $("#export-characters").disabled = false;
     $("#import-characters").disabled = false;
+    $("#recover-character-data").hidden = false;
     $("#character-message").textContent = `${persistenceError} Данные в браузере оставлены без изменений; загрузите резервную копию.`;
     $("#character-message").classList.add("is-error");
   }
@@ -799,6 +911,46 @@
   document.querySelectorAll(".nav-item").forEach(button => button.addEventListener("click", () => showPage(button.dataset.page)));
 
   function updateCharacterFromForm(event) {
+    const selectControl = event.target.closest("[data-character-select]");
+    const professionChoice = event.target.closest("[data-profession-choice]");
+    if (professionChoice) {
+      if (event.type !== "change") return true;
+      const character = activeCharacter();
+      const profession = window.CharacterSkills.findCharacterProfession(character);
+      if (!profession?.choice) return true;
+      const selected = [...(character.professionSkillChoices?.[profession.id] || [])];
+      const skillId = professionChoice.dataset.professionChoice;
+      const next = professionChoice.checked
+        ? [...new Set([...selected, skillId])]
+        : selected.filter(value => value !== skillId);
+      const result = window.CharacterSkills.setProfessionChoices(character, profession.id, next);
+      if (!result.ok) {
+        setSaveMessage(result.message, true);
+        renderProfessionChoiceFields(profession, character);
+        return true;
+      }
+      renderSkillRows();
+      renderCharacterDerived();
+      persistStore("Профессиональные навыки обновлены.");
+      return true;
+    }
+    if (selectControl) {
+      if (event.type !== "change") return true;
+      const character = activeCharacter();
+      const selection = selectControl.dataset.characterSelect;
+      if (selection === "race") character.personal.race = selectControl.value;
+      else if (selection === "gender") character.personal.gender = selectControl.value;
+      else if (selection === "profession") {
+        if (selectControl.value === "legacy-profession") return true;
+        window.CharacterSkills.setProfession(character, selectControl.value);
+        if (!selectControl.value) character.professionSkillChoices = {};
+      }
+      renderCharacterSelects(character);
+      renderSkillRows();
+      renderCharacterDerived();
+      persistStore(selection === "profession" ? "Профессия и её навыки обновлены." : "Личные данные обновлены.");
+      return true;
+    }
     const textControl = event.target.closest("[data-character-path]");
     const numberControl = event.target.closest("[data-character-number]");
     const linesControl = event.target.closest("[data-character-lines]");
@@ -848,6 +1000,7 @@
     } else if (action === "delete") deleteCharacter(characterId);
   });
   $("#new-character").addEventListener("click", addNewCharacter);
+  $("#recover-character-data").addEventListener("click", recoverCharacterData);
   $("#export-characters").addEventListener("click", () => exportCharacterData());
   $("#import-characters").addEventListener("click", () => $("#character-file").click());
   $("#character-list-back").addEventListener("click", showCharacterLibrary);

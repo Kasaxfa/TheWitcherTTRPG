@@ -70,13 +70,38 @@ test("version 2 characters gain separate modifiers without losing ratings or sou
   const result = CharacterStore.load(storage);
   const migrated = result.store.characters[0];
   assert.equal(result.migratedSchemaVersion, true);
-  assert.equal(result.store.schemaVersion, 3);
+  assert.equal(result.store.schemaVersion, 4);
   assert.equal(migrated.attributes.BODY, 6);
   assert.deepEqual(migrated.attributeModifiers.BODY, { permanent: 0, temporary: 0 });
   assert.equal(migrated.skills[0].rank, 5);
   assert.equal(migrated.skills[0].permanentModifier, 0);
   assert.equal(migrated.skills[0].temporaryModifier, 0);
   assert.equal(storage.getItem(`${CharacterStore.STORAGE_KEY}.backup-v2`), raw);
+});
+
+test("version 3 characters migrate profession identity and choice storage without losing skills", () => {
+  const storage = new MemoryStorage();
+  const original = CharacterStore.createStore("Версия 3");
+  original.schemaVersion = 3;
+  const character = original.characters[0];
+  character.schemaVersion = 3;
+  character.personal.profession = "Бард";
+  character.attributes.INT = 7;
+  character.skills.push({ id: "old-skill", name: "Харизма", attribute: "EMP", rank: 4, permanentModifier: 1, temporaryModifier: 0 });
+  const raw = JSON.stringify(original);
+  storage.setItem(CharacterStore.STORAGE_KEY, raw);
+
+  const result = CharacterStore.load(storage);
+  const migrated = result.store.characters[0];
+  assert.equal(result.store.schemaVersion, 4);
+  assert.equal(migrated.schemaVersion, 4);
+  assert.equal(migrated.personal.profession, "Бард");
+  assert.equal(migrated.personal.professionId, "");
+  assert.deepEqual(migrated.professionSkillChoices, {});
+  assert.equal(migrated.attributes.INT, 7);
+  assert.equal(migrated.skills[0].rank, 4);
+  assert.equal(migrated.skills[0].permanentModifier, 1);
+  assert.equal(storage.getItem(`${CharacterStore.STORAGE_KEY}.backup-v3`), raw);
 });
 
 test("legacy inventory migrates to the first character and remains available as a backup", () => {
