@@ -175,7 +175,6 @@
               <label class="field">Профессия<select data-character-select="profession" aria-label="Профессия персонажа"></select></label>
               <label class="field">Версия правил<input data-character-path="rulesVersion" maxlength="120"></label>
             </div>
-            <div id="character-race-traits" class="race-trait-list" aria-live="polite"></div>
           </fieldset>          <fieldset class="character-panel">
             <legend>Жизненный путь</legend>
             <div class="character-field-grid">
@@ -200,6 +199,10 @@
           </fieldset>
             </section>
             <section id="character-abilities-panel" class="character-tab-panel" role="tabpanel" aria-labelledby="character-tab-abilities" data-character-tab-panel="abilities" hidden>
+              <fieldset class="character-panel">
+                <legend>Особенности расы</legend>
+                <div id="character-race-traits" class="race-trait-list" aria-live="polite"></div>
+              </fieldset>
               <fieldset class="character-panel">
                 <legend>Дерево профессии</legend>
                 <div id="character-profession-tree" class="profession-tree-list" aria-live="polite"></div>

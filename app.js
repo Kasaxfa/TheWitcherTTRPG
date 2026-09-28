@@ -882,7 +882,7 @@
       container.innerHTML = `<p class="character-empty">Выберите расу, чтобы увидеть её особенности и автоматически учитываемые бонусы.</p>`;
       return;
     }
-    container.innerHTML = `<div class="race-trait-heading"><strong>Особенности расы · ${escapeHtml(character.personal.race)}</strong><span>Игровые эффекты</span></div>
+    container.innerHTML = `<div class="race-trait-heading"><strong>${escapeHtml(character.personal.race)}</strong><span>Игровые эффекты</span></div>
       <ul>${traits.features.map(feature => `<li>${escapeHtml(feature)}</li>`).join("")}</ul>`;
   }
 
