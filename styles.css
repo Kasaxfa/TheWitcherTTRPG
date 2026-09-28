@@ -461,7 +461,7 @@ kbd { padding: 1px 6px 2px; border: 1px solid var(--line); border-radius: 4px; c
 .inventory-summary { margin-top: 24px; padding: 17px 18px 16px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel); }
 .capacity-field { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: var(--muted); font-size: 12px; }
 .capacity-field span { display: flex; align-items: center; gap: 7px; color: var(--muted); }
-.capacity-field input { width: 88px; height: 34px; padding: 0 8px; border: 1px solid var(--line); border-radius: 7px; color: var(--text); background: var(--panel-soft); }
+.capacity-field output { display: inline-flex; align-items: center; justify-content: flex-end; min-width: 88px; height: 34px; padding: 0 8px; border: 1px solid var(--line); border-radius: 7px; color: var(--text); background: var(--panel-soft); }
 .weight-readout { display: flex; align-items: baseline; gap: 8px; margin-top: 14px; }
 .weight-readout strong { color: var(--text); font: 600 24px var(--serif); }
 .weight-readout span { color: var(--muted); font-size: 12px; }
@@ -473,7 +473,7 @@ kbd { padding: 1px 6px 2px; border: 1px solid var(--line); border-radius: 4px; c
 .field { display: grid; gap: 5px; min-width: 105px; color: var(--muted); font-size: 10px; font-weight: 650; }
 .field.grow { flex: 1; min-width: 170px; }
 .field input, .field select { width: 100%; height: 39px; min-width: 0; padding: 0 9px; border: 1px solid var(--line); border-radius: 7px; outline: none; background: var(--panel-soft); color: var(--text); font-size: 12px; }
-.field input:focus, .field select:focus, .capacity-field input:focus { border-color: var(--teal); box-shadow: 0 0 0 3px var(--focus-ring); }
+.field input:focus, .field select:focus { border-color: var(--teal); box-shadow: 0 0 0 3px var(--focus-ring); }
 .inventory-search-control { position: relative; }
 .inventory-search-results { position: absolute; z-index: 20; top: calc(100% + 4px); inset-inline: 0; max-height: 270px; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); box-shadow: 0 12px 26px rgba(24,47,49,.16); }
 .inventory-search-results[hidden] { display: none; }
