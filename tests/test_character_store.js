@@ -70,7 +70,7 @@ test("version 2 characters gain separate modifiers without losing ratings or sou
   const result = CharacterStore.load(storage);
   const migrated = result.store.characters[0];
   assert.equal(result.migratedSchemaVersion, true);
-  assert.equal(result.store.schemaVersion, 7);
+  assert.equal(result.store.schemaVersion, 8);
   assert.equal(migrated.attributes.BODY, 6);
   assert.deepEqual(migrated.attributeModifiers.BODY, { permanent: 0, temporary: 0 });
   assert.equal(migrated.skills[0].rank, 5);
@@ -93,8 +93,8 @@ test("version 3 characters migrate profession identity and choice storage withou
 
   const result = CharacterStore.load(storage);
   const migrated = result.store.characters[0];
-  assert.equal(result.store.schemaVersion, 7);
-  assert.equal(migrated.schemaVersion, 7);
+  assert.equal(result.store.schemaVersion, 8);
+  assert.equal(migrated.schemaVersion, 8);
   assert.equal(migrated.personal.profession, "Бард");
   assert.equal(migrated.personal.professionId, "");
   assert.deepEqual(migrated.professionSkillChoices, {});
@@ -117,7 +117,7 @@ test("version 4 migration adds creation, generated life path, profession-tree st
   delete character.development;
   delete character.lifePath.generated;
   const migrated = CharacterStore.migrateStore(original).characters[0];
-  assert.equal(migrated.schemaVersion, 7);
+  assert.equal(migrated.schemaVersion, 8);
   assert.equal(migrated.personal.race, "Человек");
   assert.equal(migrated.attributes.INT, 8);
   assert.equal(migrated.skills[0].id, "stable-skill");
@@ -137,8 +137,8 @@ test("version 5 migration adds an empty improvement-point ledger and preserves t
   character.skills.push({ id: "stable-skill", name: "Дедукция", attribute: "INT", rank: 4 });
   delete character.development;
   const migrated = CharacterStore.migrateStore(original);
-  assert.equal(migrated.schemaVersion, 7);
-  assert.equal(migrated.characters[0].schemaVersion, 7);
+  assert.equal(migrated.schemaVersion, 8);
+  assert.equal(migrated.characters[0].schemaVersion, 8);
   assert.equal(migrated.characters[0].personal.name, "Цири");
   assert.equal(migrated.characters[0].attributes.INT, 8);
   assert.equal(migrated.characters[0].skills[0].id, "stable-skill");
@@ -152,9 +152,43 @@ test("version 6 migration adds a draft ledger and preserves available improvemen
   character.schemaVersion = 6;
   character.development = { earnedPoints: 25, availablePoints: 9 };
   const migrated = CharacterStore.migrateStore(original);
-  assert.equal(migrated.schemaVersion, 7);
-  assert.equal(migrated.characters[0].schemaVersion, 7);
+  assert.equal(migrated.schemaVersion, 8);
+  assert.equal(migrated.characters[0].schemaVersion, 8);
   assert.deepEqual(migrated.characters[0].development, { earnedPoints: 25, availablePoints: 9, draft: { attributes: {}, skills: {}, professionAbilities: {} } });
+});
+
+test("version 7 migration adds combat, wound, and magic sections without replacing older entries", () => {
+  const original = CharacterStore.createStore("Версия 7");
+  original.schemaVersion = 7;
+  const character = original.characters[0];
+  character.schemaVersion = 7;
+  character.personal.name = "Трисс";
+  character.state.currentHp = 22;
+  character.state.conditions = ["Оглушена"];
+  delete character.state.wounds;
+  delete character.magic;
+  character.equipment.items.push(inventoryItem("old-gear", "Посох", 1, 1.5, "catalog-staff"));
+  delete character.equipment.items[0].conditionNotes;
+  delete character.equipment.items[0].armorEv;
+  delete character.equipment.items[0].customCategory;
+  delete character.equipment.combat;
+
+  const migrated = CharacterStore.migrateStore(original);
+  const restored = migrated.characters[0];
+  assert.equal(migrated.schemaVersion, 8);
+  assert.equal(restored.characterId, character.characterId);
+  assert.equal(restored.personal.name, "Трисс");
+  assert.equal(restored.state.currentHp, 22);
+  assert.deepEqual(restored.state.conditions, ["Оглушена"]);
+  assert.deepEqual(restored.state.wounds, []);
+  assert.equal(restored.state.currentReputation, null);
+  assert.equal(restored.state.reputationNotes, "");
+  assert.deepEqual(restored.magic, { energyBase: null, energyCurrent: null, vigor: null, vigorModifier: null, focus: null, entries: [] });
+  assert.equal(restored.equipment.items[0].id, "old-gear");
+  assert.equal(restored.equipment.items[0].conditionNotes, "");
+  assert.equal(restored.equipment.items[0].armorEv, null);
+  assert.deepEqual(restored.equipment.combat.weapons, []);
+  assert.equal(restored.equipment.combat.shield.inventoryEntryId, null);
 });
 
 test("pending advancement survives normalization and rejects missing skill links", () => {
@@ -212,7 +246,18 @@ test("legacy inventory migrates to the first character and remains available as 
   const first = result.store.characters[0];
   assert.equal(result.migratedLegacyInventory, true);
   assert.equal(first.personal.name, "Персонаж 1");
-  assert.deepEqual(first.equipment, { capacityKg: 75, items: legacy.items });
+  assert.equal(first.equipment.capacityKg, 75);
+  assert.deepEqual(first.equipment.items[0], {
+    ...legacy.items[0], conditionNotes: "", armorEv: null, customCategory: "",
+  });
+  assert.deepEqual(first.equipment.combat.armorByZone, {
+    head: { inventoryEntryId: null, currentSP: null, damage: "" },
+    torso: { inventoryEntryId: null, currentSP: null, damage: "" },
+    rightArm: { inventoryEntryId: null, currentSP: null, damage: "" },
+    leftArm: { inventoryEntryId: null, currentSP: null, damage: "" },
+    rightLeg: { inventoryEntryId: null, currentSP: null, damage: "" },
+    leftLeg: { inventoryEntryId: null, currentSP: null, damage: "" },
+  });
   assert.equal(storage.getItem(CharacterStore.LEGACY_INVENTORY_KEY), legacyRaw);
   assert.deepEqual(result.store.legacyInventoryBackup, legacy);
   const backup = CharacterStore.createBackup(result.store);
@@ -229,6 +274,8 @@ test("characters keep independent sheets and inventories after save and reload",
   first.attributeModifiers.REF = { permanent: 1, temporary: -2 };
   first.skills.push({ id: "skill-1", name: "Ближний бой", attribute: "REF", rank: 6, permanentModifier: 2, temporaryModifier: -1 });
   first.state.currentHp = 28;
+  first.state.currentReputation = 4;
+  first.state.reputationNotes = "Известен в Блавикене";
   first.abilities.push({ id: "ability-1", name: "Знак Квен", description: "Защитный знак" });
   first.equipment.items.push(inventoryItem("entry-1", "Медальон", 1, 0.2));
   const second = CharacterStore.createCharacter("Йеннифэр");
@@ -248,6 +295,8 @@ test("characters keep independent sheets and inventories after save and reload",
   assert.equal(restoredFirst.skills[0].permanentModifier, 2);
   assert.equal(restoredFirst.skills[0].temporaryModifier, -1);
   assert.equal(restoredFirst.state.currentHp, 28);
+  assert.equal(restoredFirst.state.currentReputation, 4);
+  assert.equal(restoredFirst.state.reputationNotes, "Известен в Блавикене");
   assert.equal(restoredFirst.abilities[0].name, "Знак Квен");
   assert.equal(restoredFirst.equipment.items[0].name, "Медальон");
   assert.equal(restoredSecond.equipment.items.length, 0);
@@ -259,6 +308,15 @@ test("copying a character preserves its data and assigns independent persistent 
   original.skills.push({ id: "skill-1", name: "Магические познания", attribute: "INT", rank: 8 });
   original.abilities.push({ id: "ability-1", name: "Телепортация", description: "Способность" });
   original.equipment.items.push(inventoryItem("gear-1", "Посох", 1, 1.2, "catalog-staff"));
+  original.equipment.items.push({ id: "gear-armor", itemId: null, name: "Кожаная куртка", quantity: 1, unitWeightKg: 2, customCategory: "armor", armorEv: 1, conditionNotes: "Потёрта" });
+  original.equipment.items.push({ id: "gear-shield", itemId: null, name: "Дорожный щит", quantity: 1, unitWeightKg: 3, customCategory: "shield", armorEv: null, conditionNotes: "" });
+  original.equipment.combat.weapons.push({ id: "combat-weapon", slot: "primary", inventoryEntryId: "gear-1", name: "Посох", reliability: "8", conditionNotes: "" });
+  original.equipment.combat.armorByZone.torso.inventoryEntryId = "gear-armor";
+  original.equipment.combat.armorByZone.leftArm.inventoryEntryId = "gear-armor";
+  original.equipment.combat.armorByZone.rightArm.inventoryEntryId = "gear-armor";
+  original.equipment.combat.shield.inventoryEntryId = "gear-shield";
+  original.state.wounds.push({ id: "wound-1", location: "torso", title: "Ушиб", description: "", status: "active" });
+  original.magic.entries.push({ id: "magic-1", kind: "sign", name: "Квен", catalogRef: { type: "recipe", id: "recipe-quen", name: "Квен" }, cost: "2", effect: "Щит", range: "", duration: "", time: "", difficulty: "", components: "", notes: "" });
   original.lifePath.outcomes.push({ id: "outcome-1", type: "Событие", description: "Встреча", source: "Аретуза" });
 
   const copy = CharacterStore.copyCharacter(original, "Йеннифэр (копия)");
@@ -269,6 +327,18 @@ test("copying a character preserves its data and assigns independent persistent 
   assert.notEqual(copy.lifePath.outcomes[0].id, original.lifePath.outcomes[0].id);
   assert.equal(copy.personal.name, "Йеннифэр (копия)");
   assert.equal(copy.equipment.items[0].itemId, "catalog-staff");
+  assert.notEqual(copy.state.wounds[0].id, original.state.wounds[0].id);
+  assert.notEqual(copy.magic.entries[0].id, original.magic.entries[0].id);
+  assert.equal(copy.magic.entries[0].catalogRef.id, "recipe-quen");
+  const copiedArmorId = copy.equipment.items.find(item => item.name === "Кожаная куртка").id;
+  assert.notEqual(copiedArmorId, "gear-armor");
+  assert.equal(copy.equipment.combat.armorByZone.torso.inventoryEntryId, copiedArmorId);
+  assert.equal(copy.equipment.combat.armorByZone.leftArm.inventoryEntryId, copiedArmorId);
+  assert.equal(copy.equipment.combat.armorByZone.rightArm.inventoryEntryId, copiedArmorId);
+  assert.notEqual(copy.equipment.combat.weapons[0].id, original.equipment.combat.weapons[0].id);
+  assert.equal(copy.equipment.combat.weapons[0].inventoryEntryId, copy.equipment.items[0].id);
+  assert.equal(copy.equipment.combat.shield.inventoryEntryId, copy.equipment.items.find(item => item.name === "Дорожный щит").id);
+  assert.equal(copy.equipment.items.find(item => item.name === "Кожаная куртка").conditionNotes, "Потёрта");
   assert.equal(copy.notes, original.notes);
 });
 
@@ -323,6 +393,28 @@ test("backup JSON validates and rejects ambiguous character IDs", () => {
   ];
   assert.throws(() => CharacterStore.parseImport(duplicateOutcomeId), /Повторяется ID последствия/);
   assert.throws(() => CharacterStore.parseImport({ format: CharacterStore.FORMAT, schemaVersion: 999, characters: [] }), /новее поддерживаемого/);
+});
+
+test("combat and magic references reject missing inventory entries and duplicate equipment links", () => {
+  const character = CharacterStore.createCharacter("Проверка связей");
+  character.equipment.items.push(inventoryItem("weapon-row", "Меч", 1, 1, "catalog-sword"));
+  character.equipment.items.push(inventoryItem("armor-row", "Куртка", 1, 2));
+  character.equipment.combat.weapons.push({ id: "weapon-main", slot: "primary", inventoryEntryId: "weapon-row", name: "Меч", reliability: "8", conditionNotes: "" });
+  character.equipment.combat.armorByZone.torso.inventoryEntryId = "armor-row";
+  character.magic.entries.push({ id: "magic-link", kind: "spell", name: "Знак", catalogRef: { type: "recipe", id: "recipe-sign", name: "Знак" } });
+  assert.equal(CharacterStore.migrateStore({ ...CharacterStore.createStore(), activeCharacterId: character.characterId, characters: [character] }).characters[0].magic.entries[0].catalogRef.id, "recipe-sign");
+
+  character.equipment.combat.armorByZone.torso.inventoryEntryId = "deleted-row";
+  assert.throws(() => CharacterStore.migrateStore({ ...CharacterStore.createStore(), activeCharacterId: character.characterId, characters: [character] }), /отсутствует в инвентаре/);
+  character.equipment.combat.armorByZone.torso.inventoryEntryId = "armor-row";
+  character.equipment.combat.weapons.push({ id: "weapon-backup", slot: "backup", inventoryEntryId: "weapon-row", name: "Меч", reliability: "8", conditionNotes: "" });
+  assert.throws(() => CharacterStore.migrateStore({ ...CharacterStore.createStore(), activeCharacterId: character.characterId, characters: [character] }), /Повторяется предмет экипировки/);
+  character.equipment.combat.weapons[1].inventoryEntryId = null;
+  character.equipment.combat.weapons[1].slot = "primary";
+  assert.throws(() => CharacterStore.migrateStore({ ...CharacterStore.createStore(), activeCharacterId: character.characterId, characters: [character] }), /Повторяется слот оружия/);
+  character.equipment.combat.weapons = character.equipment.combat.weapons.slice(0, 1);
+  character.equipment.combat.shield = null;
+  assert.equal(CharacterStore.migrateStore({ ...CharacterStore.createStore(), activeCharacterId: character.characterId, characters: [character] }).characters[0].equipment.combat.shield, null);
 });
 
 test("legacy inventory backup imports as an additional character", () => {

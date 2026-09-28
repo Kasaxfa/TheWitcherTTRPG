@@ -66,6 +66,38 @@ test("load penalties apply per full 5 kg and stop at the lift limit", () => {
   assert.equal(unknown.load.penalty, null);
 });
 
+test("armor EV and encumbrance update attribute-based skills and magic skills", () => {
+  const character = characterWith(6, 7, 8);
+  character.attributes.REF = 7;
+  character.attributes.DEX = 6;
+  character.skills.push(
+    { id: "dodge", catalogId: "dodge-evade", name: "Уклонение", attribute: "REF", rank: 1 },
+    { id: "spell", catalogId: "spellcasting", name: "Сотворение заклинаний", attribute: "WILL", rank: 2 },
+  );
+  const derived = Rules.deriveCharacter(character, { carriedWeightKg: 70, armorEv: 3 });
+  assert.equal(derived.equipmentAdjustedAttributes.REF, 2);
+  assert.equal(derived.equipmentAdjustedAttributes.DEX, 1);
+  assert.equal(derived.equipmentAdjustedAttributes.SPD, 6);
+  assert.equal(derived.skills.find(skill => skill.id === "dodge").total, 3);
+  assert.equal(derived.skills.find(skill => skill.id === "dodge").equipmentPenalty, 5);
+  assert.equal(derived.skills.find(skill => skill.id === "spell").total, 6);
+  assert.equal(derived.skills.find(skill => skill.id === "spell").armorPenalty, 3);
+});
+
+test("unknown armor EV is shown as unknown rather than treated as zero", () => {
+  const character = characterWith(6, 7, 8);
+  character.attributes.REF = 7;
+  character.skills.push(
+    { id: "dodge", catalogId: "dodge-evade", name: "Уклонение", attribute: "REF", rank: 1 },
+    { id: "hex", catalogId: "hexing", name: "Наведение порчи", attribute: "WILL", rank: 2 },
+  );
+  const derived = Rules.deriveCharacter(character, { armorEv: null, unknownArmorEvCount: 1 });
+  assert.equal(derived.equipmentAdjustedAttributes.REF, null);
+  assert.equal(derived.skills.find(skill => skill.id === "dodge").total, null);
+  assert.equal(derived.skills.find(skill => skill.id === "hex").total, null);
+  assert.equal(derived.armor.unknownCount, 1);
+});
+
 test("values outside verified tables remain unknown instead of being extrapolated", () => {
   const character = characterWith(14, 14, 8);
   const derived = Rules.deriveCharacter(character);

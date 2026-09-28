@@ -647,6 +647,95 @@ kbd { padding: 1px 6px 2px; border: 1px solid var(--line); border-radius: 4px; c
   .generated-path-heading, .profession-tree-heading { align-items: flex-start; }
 }
 
+/* Character session tools: wounds, equipment slots, magic notes, and catalog links. */
+.catalog-inline-link, .inventory-catalog-link {
+  display: inline-flex;
+  width: fit-content;
+  align-items: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--teal-strong);
+  cursor: pointer;
+  font: inherit;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-color: var(--accent-line);
+  text-underline-offset: 2px;
+}
+.catalog-inline-link:hover, .inventory-catalog-link:hover { color: var(--teal); text-decoration-color: currentColor; }
+.ingredient-tag.catalog-inline-link { width: auto; padding: 4px 8px; text-decoration: none; }
+.related-recipe-links { display: grid; gap: 8px; margin-top: 14px; padding-top: 11px; border-top: 1px solid var(--divider); }
+.related-recipe-links summary { color: var(--teal-strong); cursor: pointer; font-size: 11px; font-weight: 650; }
+.related-recipe-links > div { display: flex; flex-wrap: wrap; gap: 8px 14px; }
+.combat-zone-list, .character-entry-list { display: grid; gap: 8px; }
+.combat-zone-row, .combat-weapon-row, .combat-shield-row, .wound-entry, .magic-entry {
+  min-width: 0;
+  padding: 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+.combat-zone-row {
+  display: grid;
+  grid-template-columns: minmax(75px,.55fr) minmax(170px,1.2fr) minmax(95px,.7fr) minmax(140px,1fr) minmax(145px,.9fr) auto;
+  align-items: end;
+  gap: 9px;
+}
+.combat-zone-row > strong { align-self: center; color: var(--text); font-size: 12px; }
+.combat-zone-meta { align-self: center; color: var(--muted); font-size: 10px; line-height: 1.5; }
+.armor-ev-summary { margin: 10px 0 0; }
+.combat-weapon-row, .combat-shield-row { display: grid; grid-template-columns: minmax(100px,.5fr) minmax(170px,1fr) minmax(145px,.8fr) auto; align-items: end; gap: 9px; }
+.combat-entry-wide { grid-column: 1 / -1; }
+.wound-entry-fields { display: grid; grid-template-columns: minmax(110px,.65fr) minmax(150px,1fr) minmax(110px,.65fr) 32px; align-items: end; gap: 9px; }
+.wound-entry-description { grid-column: 1 / -1; }
+.magic-entry { display: grid; gap: 10px; }
+.magic-entry-heading { display: flex; align-items: end; gap: 9px; }
+.magic-entry-heading .field:first-child { flex: .45; }
+.magic-entry-heading .field.grow { flex: 1; }
+.magic-entry-fields { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 9px; }
+.magic-entry-wide { grid-column: 1 / -1; }
+.magic-entry-fields textarea { width: 100%; min-height: 62px; padding: 8px; border: 1px solid var(--line); border-radius: 7px; outline: none; background: var(--panel); color: var(--text); font: 12px/1.5 var(--sans); resize: vertical; }
+.magic-entry-fields textarea:focus { border-color: var(--teal); box-shadow: 0 0 0 3px var(--focus-ring); }
+.inventory-row { grid-template-columns: minmax(0,1fr) 70px 92px minmax(100px,1fr) 62px 72px 30px; }
+.inventory-condition { min-width: 0; }
+.inventory-ev { min-width: 0; }
+.inventory-no-ev { color: var(--faint); text-align: center; font-size: 11px; }
+@media (max-width: 900px) {
+  .combat-zone-row { grid-template-columns: minmax(70px,.45fr) minmax(150px,1fr) minmax(85px,.55fr) minmax(125px,.8fr); }
+  .combat-zone-row .combat-zone-meta { grid-column: 2 / -1; }
+  .combat-weapon-row, .combat-shield-row { grid-template-columns: minmax(95px,.5fr) minmax(150px,1fr) minmax(125px,.8fr) 30px; }
+  .inventory-row { grid-template-columns: minmax(0,1fr) 62px 80px minmax(90px,1fr) 56px 65px 28px; gap: 7px; }
+}
+@media (max-width: 680px) {
+  .combat-zone-row { grid-template-columns: minmax(0,1fr) minmax(100px,.8fr); gap: 8px; }
+  .combat-zone-row > strong { grid-column: 1 / -1; }
+  .combat-zone-row .combat-zone-meta { grid-column: 1 / -1; }
+  .combat-weapon-row, .combat-shield-row { position: relative; grid-template-columns: minmax(0,1fr) 32px; gap: 8px; padding-top: 42px; }
+  .combat-weapon-row .field, .combat-shield-row .field { grid-column: 1 / -1; }
+  .combat-weapon-row .character-remove, .combat-shield-row .character-remove { position: absolute; top: 9px; right: 9px; }
+  .combat-entry-wide { grid-column: 1 / -1; }
+  .wound-entry-fields { grid-template-columns: minmax(0,1fr) minmax(90px,.65fr) 32px; gap: 8px; }
+  .wound-entry-fields .field:first-child { grid-column: 1; }
+  .wound-entry-fields .field.grow { grid-column: 1 / 3; grid-row: 2; }
+  .wound-entry-fields .field:nth-child(3) { grid-column: 2; grid-row: 1; }
+  .wound-entry-fields .character-remove { grid-column: 3; grid-row: 1; }
+  .wound-entry-description { grid-column: 1 / -1; }
+  .magic-entry-fields { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .magic-entry-wide { grid-column: 1 / -1; }
+  .magic-entry-heading { align-items: stretch; flex-wrap: wrap; }
+  .magic-entry-heading .field:first-child { flex: 1 1 120px; }
+  .magic-entry-heading .field.grow { flex: 2 1 180px; }
+  .inventory-row { grid-template-columns: minmax(0,1fr) 52px 72px 72px 28px; gap: 6px; padding: 8px; }
+  .inventory-row .inventory-item-name { grid-column: 1 / -1; }
+  .inventory-row .inventory-qty { grid-column: 1; grid-row: 2; }
+  .inventory-row .inventory-unit { grid-column: 2; grid-row: 2; }
+  .inventory-row .inventory-ev, .inventory-row .inventory-no-ev { grid-column: 3; grid-row: 2; }
+  .inventory-row .inventory-condition { grid-column: 1 / 4; grid-row: 3; }
+  .inventory-row .inventory-weight { grid-column: 1 / 4; grid-row: 4; text-align: left; }
+  .inventory-row .remove-item { grid-column: 5; grid-row: 2; }
+}
+
 /* Compact, always-open skill groups. */
 .skill-group-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); align-items: start; gap: 8px; }
 .skill-group-grid .skill-attribute-group { min-width: 0; margin: 0; border: 1px solid var(--line); border-radius: 8px; background: var(--panel-soft); }

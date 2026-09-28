@@ -35,7 +35,12 @@
       : ingredients.slice(0, 3).map(ingredient => escapeHtml(ingredient.name)).join(" · ") + (ingredients.length > 3 ? ` · +${ingredients.length - 3}` : "");
     const dc = recipe.dc ? `<span class="meta-pill"><strong>СЛ</strong>${escapeHtml(recipe.dc)}</span>` : "";
     const time = recipe.time ? `<span class="meta-pill time"><strong>Время</strong>${escapeHtml(recipe.time)}</span>` : "";
-    const outputs = (recipe.outputs || []).map(output => `${escapeHtml(output.name)}${output.quantity !== 1 ? ` ×${escapeHtml(output.quantity)}` : ""}`).join(", ");
+    const outputs = (recipe.outputs || []).map(output => {
+      const label = `${escapeHtml(output.name)}${output.quantity !== 1 ? ` ×${escapeHtml(output.quantity)}` : ""}`;
+      return output.itemId
+        ? `<button type="button" class="catalog-inline-link" data-open-catalog-item="${escapeHtml(output.itemId)}">${label}</button>`
+        : `<span>${label}</span>`;
+    }).join(" ");
     return `<details class="recipe-card" data-recipe-id="${escapeHtml(recipe.id)}">
       <summary class="recipe-summary"><span class="recipe-title-block"><span class="recipe-title">${escapeHtml(recipe.name)}</span></span>
         <span class="ingredient-preview">${preview || "Состав не указан"}</span>${dc}${time}<span class="card-arrow" aria-hidden="true">⌄</span></summary>
@@ -47,7 +52,12 @@
         ${recipe.surchargeCrowns !== null && recipe.surchargeCrowns !== undefined ? `<div><span class="detail-label">Доплата за изготовление</span><span class="detail-value">${numberText(recipe.surchargeCrowns)} кр.</span></div>` : ""}
         ${(recipe.outputs || []).length ? `<div class="full-width"><span class="detail-label">Результат</span><span class="detail-value">${outputs}</span></div>` : ""}
         ${recipe.type === "alchemy" ? `<div class="full-width"><span class="detail-label">Формула · символы ингредиентов</span>${formula(ingredients)}</div>` : ""}
-        <div class="full-width"><span class="detail-label">Компоненты</span><span class="ingredient-list">${ingredients.map(ingredient => `<span class="ingredient-tag">${escapeHtml(ingredient.name)}${ingredient.quantity ? ` ×${escapeHtml(ingredient.quantity)}` : ""}</span>`).join("") || `<span class="detail-value">Не указаны</span>`}</span></div>
+        <div class="full-width"><span class="detail-label">Компоненты · нажмите, чтобы открыть предмет</span><span class="ingredient-list">${ingredients.map(ingredient => {
+          const label = `${escapeHtml(ingredient.name)}${ingredient.quantity ? ` ×${escapeHtml(ingredient.quantity)}` : ""}`;
+          return ingredient.itemId
+            ? `<button type="button" class="ingredient-tag catalog-inline-link" data-open-catalog-item="${escapeHtml(ingredient.itemId)}">${label}</button>`
+            : `<span class="ingredient-tag">${label}</span>`;
+        }).join("") || `<span class="detail-value">Не указаны</span>`}</span></div>
       </div></div>
     </details>`;
   }
@@ -103,8 +113,11 @@
     const attributes = item.attributes?.length ? `<div class="detail-block"><span class="detail-label">Характеристики</span><div class="attribute-list">${item.attributes.map(attribute => `<div class="attribute-row"><span>${escapeHtml(attribute.label)}</span><strong>${fieldValue(attribute.value, attribute.unit)}</strong></div>`).join("")}</div></div>` : "";
     const effects = item.effects?.length ? `<div class="detail-block"><span class="detail-label">Эффекты</span>${item.effects.map(effect => `<p>${escapeHtml(effect.text)}${effect.duration ? ` · ${escapeHtml(effect.duration)}` : ""}</p>`).join("")}</div>` : "";
     const description = item.description ? `<div class="detail-block"><span class="detail-label">Описание</span><p>${escapeHtml(item.description)}</p></div>` : "";
+    const related = recipes.filter(recipe => (recipe.ingredients || []).some(entry => entry.itemId === item.id)
+      || (recipe.outputs || []).some(entry => entry.itemId === item.id));
+    const relatedRecipes = related.length ? `<details class="related-recipe-links"><summary>Связанные рецепты и чертежи</summary><div>${related.map(recipe => `<button type="button" class="catalog-inline-link" data-open-recipe="${escapeHtml(recipe.id)}">${escapeHtml(recipe.name)} · ${recipe.type === "alchemy" ? "Алхимия" : "Ремесло"}</button>`).join("")}</div></details>` : "";
     return `<details class="item-card" data-item-id="${escapeHtml(item.id)}"><summary class="item-summary"><span class="item-name">${escapeHtml(item.name)}</span><span class="card-arrow" aria-hidden="true">⌄</span><span class="item-kind">${escapeHtml(item.typeLabel)}</span><span class="item-quick-meta">${quick.join("") || "Сведения о весе и цене отсутствуют"}</span></summary>
-      <div class="item-details">${description}${narrative}${attributes}${effects}</div></details>`;
+      <div class="item-details">${description}${narrative}${attributes}${effects}${relatedRecipes}</div></details>`;
   }
 
   function setItemFilterOptions(select, placeholder, values) {
@@ -180,7 +193,19 @@
     const catalogItem = itemId ? itemById.get(itemId) : null;
     const name = String(raw.name || catalogItem?.name || "").trim().slice(0, 120);
     if (!name) return null;
-    return { id: String(raw.id || createEntryId()).slice(0, 120), itemId, name, quantity, unitWeightKg: unitWeight, custom: !itemId };
+    const armorEv = raw.armorEv === null || raw.armorEv === "" || raw.armorEv === undefined ? null : Number(raw.armorEv);
+    if (armorEv !== null && (!Number.isFinite(armorEv) || armorEv < 0 || armorEv > 100)) return null;
+    return {
+      id: String(raw.id || createEntryId()).slice(0, 120),
+      itemId,
+      name,
+      quantity,
+      unitWeightKg: unitWeight,
+      conditionNotes: String(raw.conditionNotes ?? "").slice(0, 2000),
+      armorEv,
+      customCategory: itemId ? "" : ["other", "weapon", "armor", "shield"].includes(raw.customCategory) ? raw.customCategory : "other",
+      custom: !itemId,
+    };
   }
 
   let persistenceReady = true;
@@ -344,23 +369,42 @@
     $("#inventory-list").innerHTML = inventory.items.map(entry => {
       const total = entry.unitWeightKg === null ? "Вес не указан" : `${numberText(entry.unitWeightKg * entry.quantity)} кг`;
       const kind = entry.custom ? "Свой предмет" : itemById.get(entry.itemId)?.typeLabel || "Предмет из каталога";
+      const armorRelated = combatItemAllowed(entry, "armor");
+      const catalogEv = catalogAttribute(combatInventoryItem(entry), "encumbrance");
+      const itemName = entry.itemId
+        ? `<button type="button" class="inventory-catalog-link" data-open-catalog-item="${escapeHtml(entry.itemId)}">${escapeHtml(entry.name)}</button>`
+        : escapeHtml(entry.name);
       return `<div class="inventory-row" data-entry-id="${escapeHtml(entry.id)}">
-        <div class="inventory-item-name">${escapeHtml(entry.name)}<span class="inventory-subline">${escapeHtml(kind)}</span></div>
+        <div class="inventory-item-name">${itemName}<span class="inventory-subline">${escapeHtml(kind)}</span></div>
         <label class="sr-only" for="qty-${escapeHtml(entry.id)}">Количество: ${escapeHtml(entry.name)}</label><input id="qty-${escapeHtml(entry.id)}" class="inventory-input inventory-qty" data-field="quantity" type="number" min="0.1" step="0.1" value="${escapeHtml(entry.quantity)}" aria-label="Количество: ${escapeHtml(entry.name)}">
         <label class="sr-only" for="wt-${escapeHtml(entry.id)}">Вес за единицу в килограммах: ${escapeHtml(entry.name)}</label><input id="wt-${escapeHtml(entry.id)}" class="inventory-input inventory-unit" data-field="unitWeightKg" type="number" min="0" step="0.1" value="${entry.unitWeightKg === null ? "" : escapeHtml(entry.unitWeightKg)}" placeholder="Вес, кг" aria-label="Вес за единицу: ${escapeHtml(entry.name)}">
+        <label class="sr-only" for="condition-${escapeHtml(entry.id)}">Состояние: ${escapeHtml(entry.name)}</label><input id="condition-${escapeHtml(entry.id)}" class="inventory-input inventory-condition" data-field="conditionNotes" maxlength="2000" value="${escapeHtml(entry.conditionNotes || "")}" placeholder="Состояние" aria-label="Состояние: ${escapeHtml(entry.name)}">
+        ${armorRelated ? `<label class="sr-only" for="ev-${escapeHtml(entry.id)}">Переопределить EV брони: ${escapeHtml(entry.name)}</label><input id="ev-${escapeHtml(entry.id)}" class="inventory-input inventory-ev" data-field="armorEv" type="number" min="0" max="100" step="1" value="${entry.armorEv === null || entry.armorEv === undefined ? "" : escapeHtml(entry.armorEv)}" placeholder="EV ${catalogEv === null ? "?" : escapeHtml(catalogEv)}" aria-label="Переопределить EV брони: ${escapeHtml(entry.name)}">` : `<span class="inventory-no-ev">—</span>`}
         <span class="inventory-weight">${total}</span><button class="remove-item" type="button" data-remove="${escapeHtml(entry.id)}" aria-label="Удалить ${escapeHtml(entry.name)}">×</button></div>`;
     }).join("");
     $("#inventory-empty").hidden = inventory.items.length > 0;
     renderCharacterDerived();
+    renderCharacterCombatEquipment();
   }
 
-  function addInventoryEntry(entry) {
-    const existing = entry.itemId && inventory.items.find(item => item.itemId === entry.itemId);
+  function addInventoryEntry(entry, separate = false) {
+    const existing = !separate && entry.itemId && inventory.items.find(item => item.itemId === entry.itemId);
     if (existing) {
       existing.quantity += entry.quantity;
       if (entry.unitWeightKg !== null) existing.unitWeightKg = entry.unitWeightKg;
     } else inventory.items.push(entry);
     saveInventory("Инвентарь сохранён в этом браузере.");
+  }
+
+  function unlinkInventoryEntry(entryId) {
+    const combat = activeCharacter().equipment.combat;
+    for (const slot of Object.values(combat.armorByZone)) {
+      if (slot.inventoryEntryId === entryId) slot.inventoryEntryId = null;
+    }
+    for (const weapon of combat.weapons) {
+      if (weapon.inventoryEntryId === entryId) weapon.inventoryEntryId = null;
+    }
+    if (combat.shield?.inventoryEntryId === entryId) combat.shield.inventoryEntryId = null;
   }
 
   const attributeLabels = {
@@ -380,10 +424,30 @@
   function activeDerivedValues() {
     const character = activeCharacter();
     const weight = inventoryWeight(character);
+    const armor = armorLoadoutStats(character);
     return window.CharacterRules.deriveCharacter(character, {
       carriedWeightKg: weight.knownKg,
       unknownWeightCount: weight.unknownCount,
+      armorEv: armor.ev,
+      unknownArmorEvCount: armor.unknownCount,
     });
+  }
+
+  function armorLoadoutStats(character = activeCharacter()) {
+    const combat = character.equipment?.combat;
+    if (!combat?.armorByZone) return { ev: 0, knownEv: 0, unknownCount: 0, itemCount: 0 };
+    const wornIds = [...new Set(Object.values(combat.armorByZone).map(slot => slot.inventoryEntryId).filter(Boolean))];
+    const worn = wornIds.map(id => character.equipment.items.find(entry => entry.id === id)).filter(Boolean);
+    let knownEv = 0;
+    let unknownCount = 0;
+    for (const entry of worn) {
+      const catalogValue = catalogAttribute(entry.itemId ? itemById.get(entry.itemId) : null, "encumbrance");
+      const raw = entry.armorEv ?? catalogValue;
+      const ev = raw === null || raw === undefined || raw === "" ? null : Number(raw);
+      if (!Number.isFinite(ev) || ev < 0) unknownCount += 1;
+      else knownEv += ev;
+    }
+    return { ev: unknownCount ? null : knownEv, knownEv, unknownCount, itemCount: worn.length };
   }
 
   function renderCharacterStatus(derived) {
@@ -407,7 +471,11 @@
     renderCharacterStatus(derived);
     renderSkillTotals(derived);
     document.querySelectorAll("[data-attribute-total]").forEach(output => {
-      output.textContent = valueOrDash(derived.attributes[output.dataset.attributeTotal]?.total);
+      const code = output.dataset.attributeTotal;
+      const total = ["REF", "DEX", "SPD"].includes(code)
+        ? derived.equipmentAdjustedAttributes?.[code]
+        : derived.attributes[code]?.total;
+      output.textContent = valueOrDash(total);
     });
     const entries = [
       ["Физическая основа", valueOrDash(derived.physicalBasis)],
@@ -443,6 +511,7 @@
     if (derived.physicalBasis !== null && !derived.physicalBasisSupported) notes.push(`Физическая основа B=${derived.physicalBasis}: в проверенной таблице нет строки для этого значения.`);
     if (derived.meleeDamageBonus === null && derived.attributes.BODY.total !== null) notes.push(`Тел=${numberText(derived.attributes.BODY.total)}: значение урона отсутствует в проверенной таблице.`);
     if (derived.load.status === "over-lift-limit") notes.push("Штрафы за перегруз здесь не вычисляются: вес выше предела подъёма, указанного для Тел.");
+    if (derived.armor.unknownCount) notes.push(`EV брони неизвестно для ${derived.armor.unknownCount} надетых предметов: штрафы к Реа, Лвк и магическим навыкам не рассчитаны полностью.`);
     $("#character-derived-note").hidden = notes.length === 0;
     $("#character-derived-note").textContent = notes.join(" ");
   }
@@ -696,6 +765,8 @@
     });
     if (tab === "inventory") renderInventory();
     if (tab === "development") renderCharacterAdvancement();
+    if (tab === "combat") renderCharacterCombatEquipment();
+    if (tab === "abilities") renderCharacterMagic();
     if (focusTab) button.focus();
     if (updateHash && activePage === "characters") history.replaceState(null, "", `#characters/${tab}`);
   }
@@ -839,6 +910,9 @@
         const parts = [];
         if (skill?.racialBonus) parts.push(`раса ${signed(skill.racialBonus)}`);
         if (skill?.originBonus) parts.push(`родина ${signed(skill.originBonus)}`);
+        if (skill?.equipmentPenalty) parts.push(`снаряжение −${skill.equipmentPenalty}`);
+        if (skill?.armorPenalty) parts.push(`броня −${skill.armorPenalty}`);
+        if (skill?.armorPenalty === null) parts.push("EV не учтено");
         bonus.textContent = parts.join(" · ");
       }
     });
@@ -855,6 +929,232 @@
       <textarea data-ability-field="description" maxlength="20000" rows="2" placeholder="Описание или заметка" aria-label="Описание способности">${escapeHtml(ability.description)}</textarea>
       <button class="character-remove" type="button" data-remove-ability="${escapeHtml(ability.id)}" aria-label="Удалить способность">×</button>
     </div>`).join("");
+  }
+
+  const bodyZoneLabels = {
+    head: "Голова", torso: "Туловище", rightArm: "Правая рука", leftArm: "Левая рука",
+    rightLeg: "Правая нога", leftLeg: "Левая нога", other: "Другая зона",
+  };
+  const magicKindLabels = {
+    spell: "Заклинание", sign: "Знак", invocation: "Инвокация", hex: "Порча",
+    ritual: "Ритуал", alchemy: "Алхимия", other: "Другое",
+  };
+
+  function catalogAttribute(item, code) {
+    return item?.attributes?.find(attribute => attribute.code === code)?.value ?? null;
+  }
+
+  function magicCatalogRefLabel(reference) {
+    if (!reference) return "";
+    const kind = reference.type === "recipe" ? "Рецепт" : "Предмет";
+    return `${kind} · ${reference.name || (reference.type === "recipe" ? recipes.find(recipe => recipe.id === reference.id)?.name : itemById.get(reference.id)?.name) || "Сохранённая запись"}`;
+  }
+
+  function magicCatalogInputValue(reference) {
+    if (!reference) return "";
+    const name = reference.name || (reference.type === "recipe" ? recipes.find(entry => entry.id === reference.id)?.name : itemById.get(reference.id)?.name) || "Сохранённая запись";
+    const duplicateCount = [...recipes, ...items].filter(entry => normalize(entry.name) === normalize(name)).length;
+    return `${magicCatalogRefLabel(reference)}${duplicateCount > 1 ? ` [${reference.id}]` : ""}`;
+  }
+
+  function findMagicCatalogRef(value) {
+    const normalizedValue = normalize(value);
+    if (!normalizedValue) return null;
+    const prefixed = /^(рецепт|предмет)\s*·\s*/i.exec(String(value).trim());
+    let name = prefixed ? String(value).trim().slice(prefixed[0].length) : String(value).trim();
+    const idSuffix = /\s+\[([^\]]+)\]$/.exec(name);
+    if (idSuffix) name = name.slice(0, idSuffix.index).trim();
+    const type = prefixed?.[1].toLocaleLowerCase("ru-RU") === "рецепт" ? "recipe"
+      : prefixed ? "item" : null;
+    const matches = [
+      ...(type === null || type === "recipe" ? recipes.filter(entry => normalize(entry.name) === normalize(name) && (!idSuffix || entry.id === idSuffix[1])).map(entry => ({ type: "recipe", id: entry.id, name: entry.name })) : []),
+      ...(type === null || type === "item" ? items.filter(entry => normalize(entry.name) === normalize(name) && (!idSuffix || entry.id === idSuffix[1])).map(entry => ({ type: "item", id: entry.id, name: entry.name })) : []),
+    ];
+    return matches.length === 1 ? matches[0] : null;
+  }
+
+  function magicCatalogOptions() {
+    const candidates = [
+      ...recipes.map(entry => ({ type: "recipe", id: entry.id, name: entry.name })),
+      ...items.map(entry => ({ type: "item", id: entry.id, name: entry.name })),
+    ];
+    const counts = new Map();
+    candidates.forEach(entry => counts.set(normalize(entry.name), (counts.get(normalize(entry.name)) || 0) + 1));
+    return candidates.map(entry => {
+      const prefix = entry.type === "recipe" ? "Рецепт" : "Предмет";
+      const value = counts.get(normalize(entry.name)) > 1 ? `${prefix} · ${entry.name} [${entry.id}]` : entry.name;
+      return `<option value="${escapeHtml(value)}" label="${prefix}"></option>`;
+    }).join("");
+  }
+
+  function renderMagicEntries() {
+    const list = $("#character-magic-entries");
+    const magic = activeCharacter().magic;
+    $("#character-magic-catalog-options").innerHTML = magicCatalogOptions();
+    if (!magic.entries.length) {
+      list.innerHTML = `<p class="character-empty">Известные магические способности и алхимические формулы пока не добавлены.</p>`;
+      return;
+    }
+    list.innerHTML = magic.entries.map(entry => {
+      const linked = entry.catalogRef
+        ? `<button type="button" class="catalog-inline-link" data-open-catalog-reference="${escapeHtml(entry.catalogRef.type)}" data-catalog-reference-id="${escapeHtml(entry.catalogRef.id)}">Открыть связанный каталог: ${escapeHtml(magicCatalogRefLabel(entry.catalogRef))}</button>`
+        : "";
+      return `<article class="magic-entry" data-magic-entry-id="${escapeHtml(entry.id)}">
+        <div class="magic-entry-heading"><label class="field">Тип<select data-magic-field="kind">${Object.entries(magicKindLabels).map(([value, label]) => `<option value="${value}"${entry.kind === value ? " selected" : ""}>${label}</option>`).join("")}</select></label><label class="field grow">Название<input data-magic-field="name" maxlength="200" value="${escapeHtml(entry.name)}" placeholder="Название способности"></label><button class="character-remove" type="button" data-remove-magic-entry="${escapeHtml(entry.id)}" aria-label="Удалить способность">×</button></div>
+        <label class="field">Связать с каталогом <input data-magic-catalog-search list="character-magic-catalog-options" value="${escapeHtml(magicCatalogInputValue(entry.catalogRef))}" placeholder="Начните вводить название рецепта или предмета" title="Если одинаковые названия есть у рецепта или предмета, выберите запись с нужной пометкой"></label>
+        ${linked}
+        <div class="magic-entry-fields">
+          <label class="field">Стоимость<input data-magic-field="cost" maxlength="500" value="${escapeHtml(entry.cost)}" placeholder="По правилам"></label>
+          <label class="field">Дальность<input data-magic-field="range" maxlength="500" value="${escapeHtml(entry.range)}"></label>
+          <label class="field">Длительность<input data-magic-field="duration" maxlength="500" value="${escapeHtml(entry.duration)}"></label>
+          <label class="field">Время<input data-magic-field="time" maxlength="500" value="${escapeHtml(entry.time)}"></label>
+          <label class="field">СЛ<input data-magic-field="difficulty" maxlength="200" value="${escapeHtml(entry.difficulty)}"></label>
+          <label class="field">Компоненты<input data-magic-field="components" maxlength="2000" value="${escapeHtml(entry.components)}"></label>
+          <label class="field magic-entry-wide">Эффект<textarea data-magic-field="effect" maxlength="20000" rows="3">${escapeHtml(entry.effect)}</textarea></label>
+          <label class="field magic-entry-wide">Заметки<textarea data-magic-field="notes" maxlength="4000" rows="2">${escapeHtml(entry.notes)}</textarea></label>
+        </div>
+      </article>`;
+    }).join("");
+  }
+
+  function renderCharacterMagic() {
+    const character = activeCharacter();
+    const profession = window.CharacterSkills.findCharacterProfession(character);
+    const professionSupportsMagic = ["witcher", "priest", "mage"].includes(profession?.id);
+    const visible = professionSupportsMagic || character.magic.entries.length > 0;
+    $("#character-magic-panel").hidden = !visible;
+    $("#character-magic-note").textContent = professionSupportsMagic
+      ? "Поля зависят от выбранной профессии. Значения и эффекты вводятся по книге; неподтверждённые расчёты не выполняются."
+      : "Эта профессия не получает магические поля автоматически; сохранённые записи оставлены доступными для ручного ведения.";
+    renderMagicEntries();
+  }
+
+  function renderCharacterWounds() {
+    const wounds = activeCharacter().state.wounds;
+    const list = $("#character-wounds");
+    if (!wounds.length) {
+      list.innerHTML = `<p class="character-empty">Ранения не записаны.</p>`;
+      return;
+    }
+    const statuses = { active: "Активно", treated: "Лечится", healed: "Залечено" };
+    list.innerHTML = wounds.map(wound => `<article class="wound-entry" data-wound-id="${escapeHtml(wound.id)}">
+      <div class="wound-entry-fields">
+        <label class="field">Зона<select data-wound-field="location">${Object.entries(bodyZoneLabels).map(([value, label]) => `<option value="${value}"${wound.location === value ? " selected" : ""}>${label}</option>`).join("")}</select></label>
+        <label class="field grow">Название<input data-wound-field="title" maxlength="200" value="${escapeHtml(wound.title)}" placeholder="Например, перелом"></label>
+        <label class="field">Статус<select data-wound-field="status">${Object.entries(statuses).map(([value, label]) => `<option value="${value}"${wound.status === value ? " selected" : ""}>${label}</option>`).join("")}</select></label>
+        <button class="character-remove" type="button" data-remove-wound="${escapeHtml(wound.id)}" aria-label="Удалить ранение">×</button>
+        <label class="field wound-entry-description">Последствия и заметки<textarea data-wound-field="description" maxlength="4000" rows="2">${escapeHtml(wound.description)}</textarea></label>
+      </div>
+    </article>`).join("");
+  }
+
+  function combatInventoryItem(entry) {
+    return entry.itemId ? itemById.get(entry.itemId) : null;
+  }
+
+  function isShieldEquipment(entry) {
+    const item = combatInventoryItem(entry);
+    return normalize(catalogAttribute(item, "armor_region") || "").includes("щит") || entry.customCategory === "shield";
+  }
+
+  function combatItemAllowed(entry, kind) {
+    const item = combatInventoryItem(entry);
+    if (kind === "weapon") return item?.type === "weapon" || entry.customCategory === "weapon";
+    if (kind === "armor") return (item?.type === "armor" && !isShieldEquipment(entry)) || entry.customCategory === "armor";
+    return (item?.type === "armor" && isShieldEquipment(entry)) || entry.customCategory === "shield";
+  }
+
+  function armorCoversZone(entry, zone) {
+    if (entry.customCategory === "armor") return true;
+    const region = normalize(catalogAttribute(combatInventoryItem(entry), "armor_region") || "");
+    const matches = {
+      head: region.includes("голов"),
+      torso: region.includes("туловищ"),
+      rightArm: region.includes("рук"),
+      leftArm: region.includes("рук"),
+      rightLeg: region.includes("ног"),
+      leftLeg: region.includes("ног"),
+    };
+    return Boolean(matches[zone]);
+  }
+
+  function combatItemOptions(kind, selectedId, zone = "") {
+    const combat = activeCharacter().equipment.combat;
+    const assignedWeaponIds = kind === "weapon"
+      ? new Set(combat.weapons.filter(weapon => weapon.inventoryEntryId && weapon.inventoryEntryId !== selectedId).map(weapon => weapon.inventoryEntryId))
+      : new Set();
+    const options = activeCharacter().equipment.items.filter(entry => combatItemAllowed(entry, kind)
+      && (kind !== "armor" || armorCoversZone(entry, zone))
+      && (!assignedWeaponIds.has(entry.id) || entry.id === selectedId));
+    return `<option value="">Не выбрано</option>${options.map(entry => {
+      const catalogItem = combatInventoryItem(entry);
+      const category = catalogItem?.typeLabel || ({ weapon: "Оружие", armor: "Броня", shield: "Щит" }[entry.customCategory] || "Свой предмет");
+      const quantity = entry.quantity > 1 ? ` ×${numberText(entry.quantity)}` : "";
+      return `<option value="${escapeHtml(entry.id)}"${entry.id === selectedId ? " selected" : ""}>${escapeHtml(entry.name)}${quantity} · ${escapeHtml(category)}</option>`;
+    }).join("")}`;
+  }
+
+  function combatCatalogLink(entry) {
+    if (!entry?.itemId || !itemById.has(entry.itemId)) return "";
+    return `<button type="button" class="catalog-inline-link" data-open-catalog-item="${escapeHtml(entry.itemId)}">Карточка каталога</button>`;
+  }
+
+  function renderCharacterCombatEquipment() {
+    const character = activeCharacter();
+    const equipment = character.equipment;
+    const combat = equipment.combat;
+    const armorZones = Object.entries(bodyZoneLabels).filter(([key]) => key !== "other");
+    $("#character-armor-zones").innerHTML = armorZones.map(([zone, label]) => {
+      const slot = combat.armorByZone[zone];
+      const owned = equipment.items.find(entry => entry.id === slot.inventoryEntryId);
+      const catalogItem = combatInventoryItem(owned || {});
+      const baseSP = catalogAttribute(catalogItem, "armor_rating");
+      const catalogEv = catalogAttribute(catalogItem, "encumbrance");
+      const ev = owned?.armorEv ?? catalogEv;
+      return `<div class="combat-zone-row" data-armor-zone="${zone}">
+        <strong>${label}</strong>
+        <label class="field">Броня<select data-armor-zone-item>${combatItemOptions("armor", slot.inventoryEntryId, zone)}</select></label>
+        <label class="field">Текущая SP<input data-armor-zone-field="currentSP" type="number" min="0" step="1" value="${slot.currentSP ?? ""}" placeholder="${baseSP ?? "—"}"></label>
+        <label class="field">Повреждение<input data-armor-zone-field="damage" maxlength="2000" value="${escapeHtml(slot.damage)}" placeholder="Не указано"></label>
+        <span class="combat-zone-meta">${baseSP === null ? "SP из каталога: —" : `Базовая SP: ${escapeHtml(baseSP)}`} · EV: ${ev === null ? "—" : escapeHtml(ev)}</span>${combatCatalogLink(owned)}
+      </div>`;
+    }).join("");
+    const armorStats = armorLoadoutStats(character);
+    $("#character-armor-ev").textContent = `Суммарная скованность EV: ${armorStats.unknownCount ? `${numberText(armorStats.knownEv)} + ?` : numberText(armorStats.ev)}. Штраф к Реа/Лвк и магическим навыкам применяется автоматически.`;
+    $("#character-combat-weapons").innerHTML = combat.weapons.length ? combat.weapons.map(weapon => {
+      const owned = equipment.items.find(entry => entry.id === weapon.inventoryEntryId);
+      const item = combatInventoryItem(owned || {});
+      const reliability = catalogAttribute(item, "reliability") ?? weapon.reliability ?? "—";
+      const statFields = [
+        ["Точность", "accuracy"], ["Урон", "damage"], ["Тип урона", "damage_type"],
+        ["Руки", "hands"], ["Дальность", "range"], ["Усиления", "enhancement_slots"],
+        ["Скрытность", "concealment"],
+      ].map(([label, code]) => [label, catalogAttribute(item, code)]).filter(([, value]) => value !== null && value !== undefined && value !== "");
+      return `<article class="combat-weapon-row" data-combat-weapon-id="${escapeHtml(weapon.id)}">
+        <label class="field">Слот<select data-combat-weapon-field="slot"><option value="primary"${weapon.slot === "primary" ? " selected" : ""}>Основное</option><option value="backup"${weapon.slot === "backup" ? " selected" : ""}>Запасное</option></select></label>
+        <label class="field grow">Предмет<select data-combat-weapon-field="inventoryEntryId">${combatItemOptions("weapon", weapon.inventoryEntryId)}</select></label>
+        <label class="field">Надёжность<input data-combat-weapon-field="reliability" maxlength="200" value="${escapeHtml(weapon.reliability || reliability)}" placeholder="${escapeHtml(reliability)}"></label>
+        <span class="combat-zone-meta combat-entry-wide">${statFields.map(([label, value]) => `${escapeHtml(label)}: ${escapeHtml(value)}`).join(" · ") || "Характеристики доступны в карточке предмета."}${owned?.conditionNotes ? ` · Состояние: ${escapeHtml(owned.conditionNotes)}` : ""}</span>
+        ${combatCatalogLink(owned)}<button class="character-remove" type="button" data-remove-combat-weapon="${escapeHtml(weapon.id)}" aria-label="Удалить слот оружия">×</button>
+      </article>`;
+    }).join("") : `<p class="character-empty">Оружие не назначено.</p>`;
+    $("#add-character-combat-weapon").disabled = combat.weapons.length >= 2;
+    if (combat.shield === null) {
+      $("#add-character-shield").hidden = false;
+      $("#character-combat-shield").innerHTML = `<p class="character-empty">Щит не назначен.</p>`;
+    } else {
+      $("#add-character-shield").hidden = true;
+      const shield = combat.shield;
+      const owned = equipment.items.find(entry => entry.id === shield.inventoryEntryId);
+      const shieldReliability = catalogAttribute(combatInventoryItem(owned || {}), "reliability");
+      $("#character-combat-shield").innerHTML = `<article class="combat-shield-row">
+        <label class="field grow">Щит<select data-shield-field="inventoryEntryId">${combatItemOptions("shield", shield.inventoryEntryId)}</select></label>
+        <label class="field">Текущая SP<input data-shield-field="currentSP" type="number" min="0" step="1" value="${shield.currentSP ?? ""}" placeholder="по каталогу"></label>
+        <label class="field">Повреждение<input data-shield-field="damage" maxlength="2000" value="${escapeHtml(shield.damage)}"></label>
+        <span class="combat-zone-meta combat-entry-wide">${shieldReliability === null ? "" : `Надёжность по каталогу: ${escapeHtml(shieldReliability)}`}${owned?.conditionNotes ? ` · Состояние: ${escapeHtml(owned.conditionNotes)}` : ""}</span>
+        ${combatCatalogLink(owned)}<button class="character-remove" type="button" data-remove-character-shield aria-label="Убрать щит">×</button>
+      </article>`;
+    }
   }
 
   function renderLifePathOutcomes() {
@@ -1038,6 +1338,9 @@
     renderProfessionTree(character);
     renderCharacterAdvancement();
     renderAbilityRows();
+    renderCharacterMagic();
+    renderCharacterWounds();
+    renderCharacterCombatEquipment();
     renderLifePathOutcomes();
     renderCharacterDerived();
     showCharacterTab(activeCharacterTab, false);
@@ -1650,7 +1953,64 @@
     history.replaceState(null, "", `#${page}${page === "characters" && requestedTab ? `/${requestedTab}` : ""}`);
   }
 
+  function openCatalogItem(itemId) {
+    const id = resolveItemId(itemId);
+    const item = itemById.get(id);
+    if (!item) return;
+    $("#item-search").value = item.name;
+    $("#item-type-filter").value = "";
+    $("#item-availability-filter").value = "";
+    $("#item-group-filter").value = "";
+    $("#item-equipment-category-filter").value = "";
+    updateItemFilters();
+    renderItems();
+    showPage("items");
+    const card = [...document.querySelectorAll(".item-card")].find(entry => entry.dataset.itemId === id);
+    if (card) {
+      card.open = true;
+      card.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
+
+  function openCatalogRecipe(recipeId) {
+    const recipe = recipes.find(entry => entry.id === recipeId);
+    if (!recipe) return;
+    $("#recipe-domain").value = recipe.type === "alchemy" ? "alchemy" : "craft";
+    $("#craft-type-filter").value = recipe.type === "alchemy" ? "" : recipe.type;
+    $("#tier-filter").value = "";
+    updateRecipeFilters();
+    $("#craft-category-filter").value = recipe.category || "";
+    $("#search").value = recipe.name;
+    renderRecipes();
+    showPage("recipes");
+    const card = [...document.querySelectorAll(".recipe-card")].find(entry => entry.dataset.recipeId === recipeId);
+    if (card) {
+      card.open = true;
+      card.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }
+
   document.querySelectorAll(".nav-item").forEach(button => button.addEventListener("click", () => showPage(button.dataset.page)));
+  document.addEventListener("click", event => {
+    const itemButton = event.target.closest("[data-open-catalog-item]");
+    const recipeButton = event.target.closest("[data-open-recipe]");
+    const catalogReferenceButton = event.target.closest("[data-open-catalog-reference]");
+    if (itemButton) {
+      event.preventDefault();
+      event.stopPropagation();
+      openCatalogItem(itemButton.dataset.openCatalogItem);
+    } else if (recipeButton) {
+      event.preventDefault();
+      event.stopPropagation();
+      openCatalogRecipe(recipeButton.dataset.openRecipe);
+    } else if (catalogReferenceButton) {
+      event.preventDefault();
+      event.stopPropagation();
+      const type = catalogReferenceButton.dataset.openCatalogReference;
+      if (type === "recipe") openCatalogRecipe(catalogReferenceButton.dataset.catalogReferenceId);
+      else if (type === "item") openCatalogItem(catalogReferenceButton.dataset.catalogReferenceId);
+    }
+  });
   document.querySelectorAll("[data-character-tab]").forEach(button => {
     button.addEventListener("click", () => showCharacterTab(button.dataset.characterTab));
   });
@@ -1761,8 +2121,9 @@
       }
     } else if (numberControl) {
       const value = numberControl.value === "" ? null : Number(numberControl.value);
-      if (value !== null && (!Number.isFinite(value) || value < 0 || value > 100000)) return;
       const [section, key] = numberControl.dataset.characterNumber.split(".");
+      const minimum = section === "magic" && key === "vigorModifier" ? -100000 : 0;
+      if (value !== null && (!Number.isFinite(value) || value < minimum || value > 100000)) return;
       activeCharacter()[section][key] = value;
     } else if (linesControl) {
       const [section, key] = linesControl.dataset.characterLines.split(".");
@@ -1776,6 +2137,185 @@
 
   $("#character-form").addEventListener("input", updateCharacterFromForm);
   $("#character-form").addEventListener("change", updateCharacterFromForm);
+  $("#start-character-session").addEventListener("click", () => {
+    const luck = window.CharacterRules.calculateAttributes(activeCharacter()).LUCK.total;
+    if (luck === null || luck < 0) {
+      setSaveMessage("Сначала укажите характеристику Удачи.", true);
+      return;
+    }
+    activeCharacter().state.currentLuck = luck;
+    renderCharacterEditor();
+    persistStore(`Новая сессия начата. Удача восстановлена до ${numberText(luck)}.`);
+  });
+  $("#add-character-wound").addEventListener("click", () => {
+    activeCharacter().state.wounds.push({ id: createEntryId(), location: "other", title: "", description: "", status: "active" });
+    renderCharacterWounds();
+    persistStore("Добавлено ранение.");
+    [...$("#character-wounds").querySelectorAll('[data-wound-field="title"]')].at(-1)?.focus();
+  });
+  $("#character-wounds").addEventListener("input", event => {
+    const control = event.target.closest("[data-wound-field]");
+    const wound = activeCharacter().state.wounds.find(entry => entry.id === control?.closest("[data-wound-id]")?.dataset.woundId);
+    if (!control || !wound) return;
+    wound[control.dataset.woundField] = control.value;
+    persistStore("Ранение обновлено.", false);
+  });
+  $("#character-wounds").addEventListener("change", event => {
+    const control = event.target.closest("[data-wound-field]");
+    const wound = activeCharacter().state.wounds.find(entry => entry.id === control?.closest("[data-wound-id]")?.dataset.woundId);
+    if (!control || !wound) return;
+    wound[control.dataset.woundField] = control.value;
+    persistStore("Ранение обновлено.");
+  });
+  $("#character-wounds").addEventListener("click", event => {
+    const button = event.target.closest("[data-remove-wound]");
+    if (!button) return;
+    activeCharacter().state.wounds = activeCharacter().state.wounds.filter(wound => wound.id !== button.dataset.removeWound);
+    renderCharacterWounds();
+    persistStore("Ранение удалено.");
+  });
+  $("#add-character-combat-weapon").addEventListener("click", () => {
+    const weapons = activeCharacter().equipment.combat.weapons;
+    if (weapons.length >= 2) return;
+    const slot = weapons.some(weapon => weapon.slot === "primary") ? "backup" : "primary";
+    weapons.push({ id: createEntryId(), slot, inventoryEntryId: null, name: "", reliability: "" });
+    renderCharacterCombatEquipment();
+    persistStore("Добавлен слот оружия.");
+  });
+  $("#character-combat-weapons").addEventListener("input", updateCombatEquipmentFromControl);
+  $("#character-combat-weapons").addEventListener("change", updateCombatEquipmentFromControl);
+  $("#character-combat-weapons").addEventListener("click", event => {
+    const button = event.target.closest("[data-remove-combat-weapon]");
+    if (!button) return;
+    const combat = activeCharacter().equipment.combat;
+    combat.weapons = combat.weapons.filter(weapon => weapon.id !== button.dataset.removeCombatWeapon);
+    renderCharacterCombatEquipment();
+    renderCharacterDerived();
+    persistStore("Слот оружия удалён.");
+  });
+  $("#character-armor-zones").addEventListener("input", updateCombatEquipmentFromControl);
+  $("#character-armor-zones").addEventListener("change", updateCombatEquipmentFromControl);
+  $("#add-character-shield").addEventListener("click", () => {
+    const combat = activeCharacter().equipment.combat;
+    if (combat.shield !== null) return;
+    combat.shield = { inventoryEntryId: null, currentSP: null, damage: "" };
+    renderCharacterCombatEquipment();
+    persistStore("Добавлен слот щита.");
+  });
+  $("#character-combat-shield").addEventListener("input", updateCombatEquipmentFromControl);
+  $("#character-combat-shield").addEventListener("change", updateCombatEquipmentFromControl);
+  $("#character-combat-shield").addEventListener("click", event => {
+    if (!event.target.closest("[data-remove-character-shield]")) return;
+    activeCharacter().equipment.combat.shield = null;
+    renderCharacterCombatEquipment();
+    renderCharacterDerived();
+    persistStore("Щит убран из боевого снаряжения.");
+  });
+  function updateCombatEquipmentFromControl(event) {
+    const target = event.target;
+    const character = activeCharacter();
+    const armorRow = target.closest("[data-armor-zone]");
+    if (armorRow) {
+      const slot = character.equipment.combat.armorByZone[armorRow.dataset.armorZone];
+      if (!slot) return;
+      if (target.matches("[data-armor-zone-item]")) {
+        slot.inventoryEntryId = target.value || null;
+        const entry = character.equipment.items.find(item => item.id === slot.inventoryEntryId);
+        const catalog = combatInventoryItem(entry || {});
+        const baseSP = catalogAttribute(catalog, "armor_rating");
+        slot.currentSP = baseSP === null || baseSP === "" ? null : Number(baseSP);
+        slot.damage = "";
+      } else {
+        const field = target.dataset.armorZoneField;
+        if (!field) return;
+        if (field === "currentSP") {
+          const value = target.value === "" ? null : Number(target.value);
+          if (value !== null && (!Number.isFinite(value) || value < 0)) return;
+          slot.currentSP = value;
+        } else slot[field] = target.value;
+      }
+      if (event.type === "change") {
+        renderCharacterCombatEquipment();
+        renderCharacterDerived();
+      }
+      persistStore("Броня по зонам обновлена.", event.type === "change");
+      return;
+    }
+    const weaponRow = target.closest("[data-combat-weapon-id]");
+    if (weaponRow) {
+      const weapon = character.equipment.combat.weapons.find(entry => entry.id === weaponRow.dataset.combatWeaponId);
+      const field = target.dataset.combatWeaponField;
+      if (!weapon || !field) return;
+      if (field === "slot" && character.equipment.combat.weapons.some(entry => entry.id !== weapon.id && entry.slot === target.value)) {
+        setSaveMessage(target.value === "primary" ? "Основное оружие уже назначено." : "Запасное оружие уже назначено.", true);
+        renderCharacterCombatEquipment();
+        return;
+      }
+      if (field === "inventoryEntryId") {
+        if (target.value && character.equipment.combat.weapons.some(entry => entry.id !== weapon.id && entry.inventoryEntryId === target.value)) {
+          setSaveMessage("Этот предмет уже назначен другому слоту оружия.", true);
+          renderCharacterCombatEquipment();
+          return;
+        }
+        weapon.inventoryEntryId = target.value || null;
+        const entry = character.equipment.items.find(item => item.id === weapon.inventoryEntryId);
+        const item = combatInventoryItem(entry || {});
+        weapon.name = entry?.name || "";
+        weapon.reliability = String(catalogAttribute(item, "reliability") ?? "");
+      } else weapon[field] = target.value;
+      if (event.type === "change") {
+        renderCharacterCombatEquipment();
+        renderCharacterDerived();
+      }
+      persistStore("Оружие обновлено.", event.type === "change");
+      return;
+    }
+    const shieldControl = target.closest("[data-shield-field]");
+    if (shieldControl && character.equipment.combat.shield) {
+      const shield = character.equipment.combat.shield;
+      const field = shieldControl.dataset.shieldField;
+      if (field === "inventoryEntryId") shield.inventoryEntryId = shieldControl.value || null;
+      else if (field === "currentSP") {
+        const value = shieldControl.value === "" ? null : Number(shieldControl.value);
+        if (value !== null && (!Number.isFinite(value) || value < 0)) return;
+        shield.currentSP = value;
+      } else shield[field] = shieldControl.value;
+      if (event.type === "change") renderCharacterCombatEquipment();
+      persistStore("Щит обновлён.", event.type === "change");
+    }
+  }
+  $("#add-character-magic-entry").addEventListener("click", () => {
+    activeCharacter().magic.entries.push({ id: createEntryId(), kind: "spell", name: "", catalogRef: null, cost: "", effect: "", range: "", duration: "", time: "", difficulty: "", components: "", notes: "" });
+    renderMagicEntries();
+    persistStore("Добавлена магическая запись.");
+    [...$("#character-magic-entries").querySelectorAll('[data-magic-field="name"]')].at(-1)?.focus();
+  });
+  $("#character-magic-entries").addEventListener("input", updateMagicEntryFromControl);
+  $("#character-magic-entries").addEventListener("change", updateMagicEntryFromControl);
+  $("#character-magic-entries").addEventListener("click", event => {
+    const button = event.target.closest("[data-remove-magic-entry]");
+    if (!button) return;
+    activeCharacter().magic.entries = activeCharacter().magic.entries.filter(entry => entry.id !== button.dataset.removeMagicEntry);
+    renderMagicEntries();
+    persistStore("Магическая запись удалена.");
+  });
+  function updateMagicEntryFromControl(event) {
+    const target = event.target;
+    const entry = activeCharacter().magic.entries.find(value => value.id === target.closest("[data-magic-entry-id]")?.dataset.magicEntryId);
+    if (!entry) return;
+    if (target.matches("[data-magic-catalog-search]")) {
+      const reference = findMagicCatalogRef(target.value);
+      entry.catalogRef = reference;
+      if (reference && !entry.name.trim()) entry.name = reference.name;
+      if (event.type === "change") renderMagicEntries();
+      persistStore("Связь с каталогом обновлена.", event.type === "change");
+      return;
+    }
+    const field = target.dataset.magicField;
+    if (!field) return;
+    entry[field] = target.value;
+    persistStore("Магическая запись обновлена.", event.type === "change");
+  }
   $("#character-development-panel").addEventListener("click", event => {
     const applyButton = event.target.closest("#apply-character-improvements");
     const cancelButton = event.target.closest("#cancel-character-improvements");
@@ -2140,13 +2680,14 @@
     const weightRaw = $("#inventory-unit-weight").value;
     const unitWeightKg = weightRaw === "" ? null : Number(weightRaw);
     if (!item || !Number.isFinite(quantity) || quantity <= 0 || (unitWeightKg !== null && (!Number.isFinite(unitWeightKg) || unitWeightKg < 0))) return;
-    addInventoryEntry({ id: createEntryId(), itemId: item.id, name: item.name, quantity, unitWeightKg, custom: false });
+    addInventoryEntry({ id: createEntryId(), itemId: item.id, name: item.name, quantity, unitWeightKg, conditionNotes: "", armorEv: null, customCategory: "", custom: false }, $("#inventory-separate-entry").checked);
     event.target.reset();
     selectedInventoryItemId = null;
     closeInventorySuggestions();
     $("#inventory-search-help").textContent = "";
     $("#inventory-quantity").value = "1";
     $("#inventory-unit-weight").value = "";
+    $("#inventory-separate-entry").checked = false;
   });
   $("#add-custom-item").addEventListener("submit", event => {
     event.preventDefault();
@@ -2155,7 +2696,7 @@
     const weightRaw = $("#custom-item-weight").value;
     const unitWeightKg = weightRaw === "" ? null : Number(weightRaw);
     if (!name || !Number.isFinite(quantity) || quantity <= 0 || (unitWeightKg !== null && (!Number.isFinite(unitWeightKg) || unitWeightKg < 0))) return;
-    addInventoryEntry({ id: createEntryId(), itemId: null, name, quantity, unitWeightKg, custom: true });
+    addInventoryEntry({ id: createEntryId(), itemId: null, name, quantity, unitWeightKg, conditionNotes: "", armorEv: null, customCategory: $("#custom-item-category").value, custom: true });
     event.target.reset();
     $("#custom-item-quantity").value = "1";
   });
@@ -2175,21 +2716,29 @@
       const value = Number(input.value);
       if (!Number.isFinite(value) || value <= 0) { input.value = entry.quantity; return; }
       entry.quantity = value;
-    } else {
+    } else if (input.dataset.field === "unitWeightKg") {
       const value = input.value === "" ? null : Number(input.value);
       if (value !== null && (!Number.isFinite(value) || value < 0)) { input.value = entry.unitWeightKg ?? ""; return; }
       entry.unitWeightKg = value;
+    } else if (input.dataset.field === "conditionNotes") {
+      entry.conditionNotes = input.value.slice(0, 2000);
+    } else if (input.dataset.field === "armorEv") {
+      const value = input.value === "" ? null : Number(input.value);
+      if (value !== null && (!Number.isFinite(value) || value < 0 || value > 100)) { input.value = entry.armorEv ?? ""; return; }
+      entry.armorEv = value;
     }
     saveInventory("Изменения сохранены.");
   });
   $("#inventory-list").addEventListener("click", event => {
     const button = event.target.closest("[data-remove]");
     if (!button) return;
+    unlinkInventoryEntry(button.dataset.remove);
     inventory.items = inventory.items.filter(item => item.id !== button.dataset.remove);
     saveInventory("Предмет удалён.");
   });
   $("#clear-inventory").addEventListener("click", () => {
     if (!inventory.items.length || !window.confirm("Удалить все предметы из инвентаря?")) return;
+    inventory.items.forEach(item => unlinkInventoryEntry(item.id));
     inventory.items = [];
     saveInventory("Инвентарь очищен.");
   });
