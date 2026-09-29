@@ -6,11 +6,14 @@
   <meta name="theme-color" content="#f5f7f6">
   <meta name="description" content="Рецепты, предметы и личный инвентарь для НРИ Ведьмак.">
   <title>Кодекс ремесленника — Ведьмак НРИ</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <script>
     try {
       if (localStorage.getItem("witcher-workshop-theme") === "dark") {
         document.documentElement.dataset.theme = "dark";
-        document.querySelector('meta[name="theme-color"]').content = "#141c1e";
+        document.querySelector('meta[name="theme-color"]').content = "#1b1e2b";
       }
     } catch (_) { /* Сайт доступен и при отключённом хранилище. */ }
   </script>
@@ -23,6 +26,8 @@
   <script src="./character-profession-trees.js" defer></script>
   <script src="./character-advancement.js" defer></script>
   <script src="./character-creation.js" defer></script>
+  <script src="./catalog-filters.js" defer></script>
+  <script src="./catalog-ui.js" defer></script>
   <script src="./app.js" defer></script>
 </head>
 <body>
@@ -31,20 +36,53 @@
       <span class="brand-mark" aria-hidden="true">✦</span>
       <span>Кодекс <b>ремесленника</b></span>
     </a>
+    <nav class="section-nav" aria-label="Разделы">
+      <button class="nav-item active" data-page="recipes" aria-current="page"><span class="nav-icon">⌕</span>Рецепты</button>
+      <button class="nav-item" data-page="items"><span class="nav-icon">◇</span>Предметы</button>
+      <button class="nav-item" data-page="characters"><span class="nav-icon">♙</span>Персонажи</button>
+    </nav>
     <div class="topbar-actions">
-      <div class="edition-note">НРИ «Ведьмак» <span>·</span> справочник по книге правил</div>
+      <div class="edition-note">НРИ «Ведьмак»</div>
       <button id="theme-toggle" class="theme-toggle" type="button" aria-label="Включить тёмную тему" aria-pressed="false" title="Включить тёмную тему"><span class="theme-icon" aria-hidden="true">☾</span><span class="theme-label">Тёмная тема</span></button>
     </div>
   </header>
 
   <main id="top" class="layout">
-    <aside class="sidebar" aria-label="Разделы сайта">
-      <div class="sidebar-label">Мастерская</div>
-      <nav class="section-nav" aria-label="Разделы">
-        <button class="nav-item active" data-page="recipes" aria-current="page"><span class="nav-icon">⌕</span>Рецепты</button>
-        <button class="nav-item" data-page="items"><span class="nav-icon">◇</span>Предметы</button>
-        <button class="nav-item" data-page="characters"><span class="nav-icon">♙</span>Персонажи</button>
-      </nav>
+    <aside class="sidebar" aria-label="Фильтры каталога и разделы листа персонажа">
+      <div class="context-panel" data-page-context="recipes">
+        <div class="context-heading">Поиск рецепта</div>
+        <div class="controls recipe-controls">
+          <label class="searchbox"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Название или компонент…" autocomplete="off" aria-label="Поиск по рецептам"><kbd>/</kbd></label>
+          <div class="context-filter-group"><span>Направления</span><label class="select-wrap"><span class="sr-only">Раздел рецептов</span><select id="recipe-domain"><option value="alchemy">Алхимия</option><option value="craft">Ремесло</option></select></label></div>
+          <label class="select-wrap" id="craft-type-wrap" hidden><span class="sr-only">Категория ремесла</span><select id="craft-type-filter"><option value="">Всё ремесло</option><option value="weapon">Оружие</option><option value="armor">Броня</option><option value="material">Материалы</option></select></label>
+          <label class="select-wrap" id="craft-category-wrap" hidden><span class="sr-only">Подкатегория ремесла</span><select id="craft-category-filter"><option value="">Любая подкатегория</option></select></label>
+          <label class="select-wrap"><span class="context-control-label">Уровень мастера</span><select id="tier-filter"><option value="">Все уровни</option><option value="Новичок">Новичок</option><option value="Подмастерье">Подмастерье</option><option value="Мастер">Мастер</option><option value="Великий мастер">Великий мастер</option></select></label>
+          <button class="clear-button" id="clear-filters" type="button">Сбросить</button>
+        </div>
+      </div>
+      <div class="context-panel" data-page-context="items" hidden>
+        <div class="context-heading">Поиск предмета</div>
+        <div class="controls item-controls" aria-label="Поиск и фильтры предметов">
+          <label class="searchbox"><span aria-hidden="true">⌕</span><input id="item-search" type="search" placeholder="Название или свойство…" autocomplete="off" aria-label="Поиск по названию, описанию и свойствам предметов"><kbd>/</kbd></label>
+          <label class="select-wrap"><span class="sr-only">Тип предмета</span><select id="item-type-filter"><option value="">Все предметы</option><option value="ingredient">Ингредиенты</option><option value="alchemical">Алхимические средства</option><option value="equipment">Снаряжение</option><option value="transport">Скакуны и транспорт</option><option value="material">Материалы</option><option value="weapon">Оружие</option><option value="armor">Броня</option></select></label>
+          <label class="select-wrap" id="item-availability-wrap" hidden><span class="sr-only">Доступность ингредиента</span><select id="item-availability-filter"><option value="">Любая доступность</option></select></label>
+          <label class="select-wrap" id="item-group-wrap" hidden><span class="sr-only">Алхимическая группа ингредиента</span><select id="item-group-filter"><option value="">Любая группа</option></select></label>
+          <label class="select-wrap" id="item-equipment-category-wrap" hidden><span class="sr-only">Категория снаряжения</span><select id="item-equipment-category-filter"><option value="">Всё снаряжение</option></select></label>
+          <button class="clear-button" id="clear-item-filters" type="button">Сбросить</button>
+        </div>
+      </div>
+      <div class="context-panel character-context-panel" data-page-context="character-editor" hidden>
+        <div class="context-heading">Лист персонажа</div>
+        <nav class="character-tabs" role="tablist" aria-label="Разделы листа персонажа" aria-orientation="vertical">
+          <button id="character-tab-sheet" class="character-tab active" type="button" role="tab" aria-selected="true" aria-controls="character-sheet-panel" tabindex="0" data-character-tab="sheet">Основная информация</button>
+          <button id="character-tab-inventory" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-inventory-panel" tabindex="-1" data-character-tab="inventory">Инвентарь</button>
+          <button id="character-tab-abilities" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-abilities-panel" tabindex="-1" data-character-tab="abilities">Способности</button>
+          <button id="character-tab-combat" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-combat-panel" tabindex="-1" data-character-tab="combat">Бой</button>
+          <button id="character-tab-background" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-background-panel" tabindex="-1" data-character-tab="background">Предыстория</button>
+          <button id="character-tab-notes" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-notes-panel" tabindex="-1" data-character-tab="notes">Заметки</button>
+          <button id="character-tab-development" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-development-panel" tabindex="-1" data-character-tab="development">Развитие</button>
+        </nav>
+      </div>
     </aside>
 
     <div class="workspace">
@@ -52,36 +90,38 @@
         <div class="workspace-head">
           <div>
             <div class="eyebrow"><span class="eyebrow-line"></span>Архив мастерской</div>
-            <h1 id="recipe-title">Алхимия</h1>
-            <p class="intro" id="recipe-intro">Формулы алхимических средств и их состав.</p>
+            <h1 id="recipe-title">Рецепты</h1>
+            <p class="intro" id="recipe-intro">Формулы алхимических средств и чертежи ремесла.</p>
           </div>
         </div>
-        <div class="controls recipe-controls">
-          <label class="searchbox"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Название или компонент…" autocomplete="off" aria-label="Поиск по рецептам"><kbd>/</kbd></label>
-          <label class="select-wrap"><span class="sr-only">Раздел рецептов</span><select id="recipe-domain"><option value="alchemy">Алхимия</option><option value="craft">Ремесло</option></select></label>
-          <label class="select-wrap" id="craft-type-wrap" hidden><span class="sr-only">Категория ремесла</span><select id="craft-type-filter"><option value="">Всё ремесло</option><option value="weapon">Оружие</option><option value="armor">Броня</option><option value="material">Материалы</option></select></label>
-          <label class="select-wrap" id="craft-category-wrap" hidden><span class="sr-only">Подкатегория ремесла</span><select id="craft-category-filter"><option value="">Любая подкатегория</option></select></label>
-          <label class="select-wrap"><span class="sr-only">Уровень ремесла</span><select id="tier-filter"><option value="">Любой уровень</option><option value="Новичок">Новичок</option><option value="Подмастерье">Подмастерье</option><option value="Мастер">Мастер</option><option value="Великий мастер">Великий мастер</option></select></label>
-          <button class="clear-button" id="clear-filters" type="button">Сбросить</button>
+        <div class="catalog-columns">
+          <section class="catalog-results" aria-label="Результаты поиска рецептов">
+            <div class="catalog-pane-heading"><span>Результаты</span></div>
+            <div id="recipe-list" class="recipe-list" aria-live="polite"></div>
+            <div id="recipe-empty" class="empty-state" hidden><div class="empty-glyph">⌕</div><h2>Ничего не найдено</h2><p>Измените запрос или сбросьте фильтры.</p></div>
+          </section>
+          <section id="recipe-detail" class="catalog-detail" aria-label="Карточка выбранного рецепта" aria-live="polite">
+            <button type="button" class="mobile-detail-back" data-catalog-back="recipes">← К результатам</button>
+            <div id="recipe-detail-content"></div>
+          </section>
         </div>
-        <div id="recipe-list" class="recipe-list" aria-live="polite"></div>
-        <div id="recipe-empty" class="empty-state" hidden><div class="empty-glyph">⌕</div><h2>Ничего не найдено</h2><p>Измените запрос или сбросьте фильтры.</p></div>
       </section>
 
       <section id="items-page" class="page-view" aria-labelledby="items-title" hidden>
         <div class="workspace-head">
           <div><div class="eyebrow"><span class="eyebrow-line"></span>Каталог</div><h1 id="items-title">Предметы</h1><p class="intro">Ингредиенты, алхимия, снаряжение, материалы, оружие, броня и транспорт.</p></div>
         </div>
-        <div class="controls item-controls" aria-label="Поиск и фильтры предметов">
-          <label class="searchbox"><span aria-hidden="true">⌕</span><input id="item-search" type="search" placeholder="Название, описание или свойство…" autocomplete="off" aria-label="Поиск по названию, описанию и свойствам предметов"><kbd>/</kbd></label>
-          <label class="select-wrap"><span class="sr-only">Тип предмета</span><select id="item-type-filter"><option value="">Все предметы</option><option value="ingredient">Ингредиенты</option><option value="alchemical">Алхимические средства</option><option value="equipment">Снаряжение</option><option value="transport">Скакуны и транспорт</option><option value="material">Материалы</option><option value="weapon">Оружие</option><option value="armor">Броня</option></select></label>
-          <label class="select-wrap" id="item-availability-wrap" hidden><span class="sr-only">Доступность ингредиента</span><select id="item-availability-filter"><option value="">Любая доступность</option></select></label>
-          <label class="select-wrap" id="item-group-wrap" hidden><span class="sr-only">Алхимическая группа ингредиента</span><select id="item-group-filter"><option value="">Любая группа</option></select></label>
-          <label class="select-wrap" id="item-equipment-category-wrap" hidden><span class="sr-only">Категория снаряжения</span><select id="item-equipment-category-filter"><option value="">Всё снаряжение</option></select></label>
-          <button class="clear-button" id="clear-item-filters" type="button">Сбросить</button>
+        <div class="catalog-columns">
+          <section class="catalog-results" aria-label="Результаты поиска предметов">
+            <div class="catalog-pane-heading"><span>Результаты</span></div>
+            <div id="item-list" class="item-list" aria-live="polite"></div>
+            <div id="item-empty" class="empty-state" hidden><div class="empty-glyph">⌕</div><h2>Предметы не найдены</h2><p>Попробуйте изменить запрос или тип.</p></div>
+          </section>
+          <section id="item-detail" class="catalog-detail" aria-label="Карточка выбранного предмета" aria-live="polite">
+            <button type="button" class="mobile-detail-back" data-catalog-back="items">← К результатам</button>
+            <div id="item-detail-content"></div>
+          </section>
         </div>
-        <div id="item-list" class="item-list" aria-live="polite"></div>
-        <div id="item-empty" class="empty-state" hidden><div class="empty-glyph">⌕</div><h2>Предметы не найдены</h2><p>Попробуйте изменить запрос или тип.</p></div>
       </section>
 
       <section id="characters-page" class="page-view" aria-labelledby="characters-title" hidden>
@@ -111,15 +151,6 @@
               <div class="character-identity-summary"><span id="character-sheet-race">Раса не указана</span><span id="character-sheet-profession">Профессия не указана</span></div>
             </div>
           </div>
-          <nav class="character-tabs" role="tablist" aria-label="Разделы листа персонажа">
-            <button id="character-tab-sheet" class="character-tab active" type="button" role="tab" aria-selected="true" aria-controls="character-sheet-panel" tabindex="0" data-character-tab="sheet">Лист</button>
-            <button id="character-tab-combat" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-combat-panel" tabindex="-1" data-character-tab="combat">Бой</button>
-            <button id="character-tab-inventory" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-inventory-panel" tabindex="-1" data-character-tab="inventory">Инвентарь</button>
-            <button id="character-tab-background" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-background-panel" tabindex="-1" data-character-tab="background">Предыстория</button>
-            <button id="character-tab-abilities" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-abilities-panel" tabindex="-1" data-character-tab="abilities">Способности</button>
-            <button id="character-tab-development" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-development-panel" tabindex="-1" data-character-tab="development">Развитие</button>
-            <button id="character-tab-notes" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-notes-panel" tabindex="-1" data-character-tab="notes">Заметки</button>
-          </nav>
           <form id="character-form" class="character-form" autocomplete="off">
             <section id="character-sheet-panel" class="character-tab-panel" role="tabpanel" aria-labelledby="character-tab-sheet" data-character-tab-panel="sheet">
           <section class="character-status-summary" aria-label="Текущее состояние персонажа">

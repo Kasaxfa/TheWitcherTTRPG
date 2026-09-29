@@ -12,6 +12,8 @@
   let activePage = "recipes";
   let characterViewMode = "library";
   let activeCharacterTab = "sheet";
+  let selectedRecipeId = null;
+  let selectedItemId = null;
   let renameTargetCharacterId = null;
   let characterCreationDraft = null;
 
@@ -35,38 +37,87 @@
       : ingredients.slice(0, 3).map(ingredient => escapeHtml(ingredient.name)).join(" · ") + (ingredients.length > 3 ? ` · +${ingredients.length - 3}` : "");
     const dc = recipe.dc ? `<span class="meta-pill"><strong>СЛ</strong>${escapeHtml(recipe.dc)}</span>` : "";
     const time = recipe.time ? `<span class="meta-pill time"><strong>Время</strong>${escapeHtml(recipe.time)}</span>` : "";
+    return `<button type="button" class="recipe-card recipe-summary${selectedRecipeId === recipe.id ? " is-selected" : ""}" data-recipe-id="${escapeHtml(recipe.id)}" aria-pressed="${selectedRecipeId === recipe.id}">
+      <span class="recipe-title-block"><span class="recipe-title">${escapeHtml(recipe.name)}</span><span class="recipe-kind">${recipe.type === "alchemy" ? "Алхимия" : "Ремесло"}</span></span>
+      <span class="ingredient-preview">${preview || "Состав не указан"}</span>${dc}${time}</button>`;
+  }
+
+  function recipeDetail(recipe) {
+    const ingredients = recipe.ingredients || [];
     const outputs = (recipe.outputs || []).map(output => {
       const label = `${escapeHtml(output.name)}${output.quantity !== 1 ? ` ×${escapeHtml(output.quantity)}` : ""}`;
       return output.itemId
         ? `<button type="button" class="catalog-inline-link" data-open-catalog-item="${escapeHtml(output.itemId)}">${label}</button>`
         : `<span>${label}</span>`;
     }).join(" ");
-    return `<details class="recipe-card" data-recipe-id="${escapeHtml(recipe.id)}">
-      <summary class="recipe-summary"><span class="recipe-title-block"><span class="recipe-title">${escapeHtml(recipe.name)}</span></span>
-        <span class="ingredient-preview">${preview || "Состав не указан"}</span>${dc}${time}<span class="card-arrow" aria-hidden="true">⌄</span></summary>
-      <div class="recipe-details"><div class="detail-grid">
-        <div><span class="detail-label">Уровень</span><span class="detail-value">${escapeHtml(recipe.tier || "—")}</span></div>
-        ${recipe.dc ? `<div><span class="detail-label">Сложность изготовления</span><span class="detail-value">${escapeHtml(recipe.dc)}</span></div>` : ""}
-        ${recipe.time ? `<div><span class="detail-label">Время</span><span class="detail-value">${escapeHtml(recipe.time)}</span></div>` : ""}
-        ${recipe.priceCrowns !== null && recipe.priceCrowns !== undefined ? `<div><span class="detail-label">Цена</span><span class="detail-value">${numberText(recipe.priceCrowns)} кр.</span></div>` : ""}
-        ${recipe.surchargeCrowns !== null && recipe.surchargeCrowns !== undefined ? `<div><span class="detail-label">Доплата за изготовление</span><span class="detail-value">${numberText(recipe.surchargeCrowns)} кр.</span></div>` : ""}
-        ${(recipe.outputs || []).length ? `<div class="full-width"><span class="detail-label">Результат</span><span class="detail-value">${outputs}</span></div>` : ""}
-        ${recipe.type === "alchemy" ? `<div class="full-width"><span class="detail-label">Формула · символы ингредиентов</span>${formula(ingredients)}</div>` : ""}
-        <div class="full-width"><span class="detail-label">Компоненты · нажмите, чтобы открыть предмет</span><span class="ingredient-list">${ingredients.map(ingredient => {
-          const label = `${escapeHtml(ingredient.name)}${ingredient.quantity ? ` ×${escapeHtml(ingredient.quantity)}` : ""}`;
-          return ingredient.itemId
-            ? `<button type="button" class="ingredient-tag catalog-inline-link" data-open-catalog-item="${escapeHtml(ingredient.itemId)}">${label}</button>`
-            : `<span class="ingredient-tag">${label}</span>`;
-        }).join("") || `<span class="detail-value">Не указаны</span>`}</span></div>
-      </div></div>
-    </details>`;
+    const componentRows = ingredients.map(ingredient => {
+      const label = `${escapeHtml(ingredient.name)}${ingredient.quantity ? ` ×${escapeHtml(ingredient.quantity)}` : ""}`;
+      return ingredient.itemId
+        ? `<button type="button" class="ingredient-tag catalog-inline-link" data-open-catalog-item="${escapeHtml(ingredient.itemId)}">${label}</button>`
+        : `<span class="ingredient-tag">${label}</span>`;
+    }).join("") || `<span class="detail-value">Не указаны</span>`;
+    const outputEffects = (recipe.outputs || []).flatMap(output => {
+      const item = output.itemId ? itemById.get(resolveItemId(output.itemId)) : null;
+      return (item?.effects || []).map(effect => `<p>${escapeHtml(effect.text)}${effect.duration ? ` · ${escapeHtml(effect.duration)}` : ""}</p>`)
+        .concat(item?.details?.effect ? `<p>${escapeHtml(item.details.effect)}</p>` : []);
+    });
+    return `<div class="catalog-detail-inner">
+      <div class="catalog-detail-kicker">${recipe.type === "alchemy" ? "Алхимический рецепт" : "Ремесленный чертёж"}</div>
+      <h2>${escapeHtml(recipe.name)}</h2><p class="catalog-detail-subtitle">Рецепт для изготовления</p>
+      <div class="catalog-detail-divider"></div>
+      <div class="detail-label">Параметры</div><div class="recipe-detail-metrics">
+        <div class="recipe-metric"><span>Сложность</span><strong>СЛ ${escapeHtml(recipe.dc || "—")}</strong></div>
+        <div class="recipe-metric"><span>Время</span><strong>${escapeHtml(recipe.time || "—")}</strong></div>
+        <div class="recipe-metric"><span>Уровень</span><strong>${escapeHtml(recipe.tier || "—")}</strong></div>
+      </div>
+      <div class="detail-block"><span class="detail-label">Компоненты</span><div class="ingredient-list">${componentRows}</div></div>
+      ${recipe.type === "alchemy" ? `<div class="detail-block"><span class="detail-label">Формула · символы ингредиентов</span>${formula(ingredients)}</div>` : ""}
+      ${outputEffects.length ? `<div class="detail-block"><span class="detail-label">Эффект</span>${outputEffects.join("")}</div>` : ""}
+      ${(recipe.outputs || []).length ? `<div class="detail-block"><span class="detail-label">Результат</span><div class="ingredient-list">${outputs}</div></div>` : ""}
+      ${recipe.priceCrowns !== null && recipe.priceCrowns !== undefined ? `<div class="detail-block"><span class="detail-label">Цена</span><p>${numberText(recipe.priceCrowns)} кр.</p></div>` : ""}
+      ${recipe.surchargeCrowns !== null && recipe.surchargeCrowns !== undefined ? `<div class="detail-block"><span class="detail-label">Доплата за изготовление</span><p>${numberText(recipe.surchargeCrowns)} кр.</p></div>` : ""}
+    </div>`;
+  }
+
+  function syncCatalogRowSelection(list, selectedId, idAttribute) {
+    list.querySelectorAll(`[${idAttribute}]`).forEach(button => {
+      const selected = button.getAttribute(idAttribute) === selectedId;
+      button.classList.toggle("is-selected", selected);
+      button.setAttribute("aria-pressed", String(selected));
+    });
+  }
+
+  function openMobileCatalogDetail(kind) {
+    if (!window.matchMedia("(max-width: 820px)").matches) return;
+    const { listId, detailId } = window.CatalogUi.catalogViewIds(kind);
+    const columns = $(`#${listId}`).closest(".catalog-columns");
+    columns.classList.add("mobile-detail-open");
+    const detail = $(`#${detailId}`);
+    detail.scrollIntoView({ behavior: "smooth", block: "start" });
+    detail.querySelector(".mobile-detail-back").focus({ preventScroll: true });
+  }
+
+  function returnToCatalogResults(kind) {
+    const { listId } = window.CatalogUi.catalogViewIds(kind);
+    const columns = $(`#${listId}`).closest(".catalog-columns");
+    columns.classList.remove("mobile-detail-open");
+    const list = $(`#${listId}`);
+    const selectedId = kind === "recipes" ? selectedRecipeId : selectedItemId;
+    const idAttribute = kind === "recipes" ? "data-recipe-id" : "data-item-id";
+    requestAnimationFrame(() => {
+      const selected = [...list.querySelectorAll(`[${idAttribute}]`)]
+        .find(button => button.getAttribute(idAttribute) === selectedId);
+      selected?.focus({ preventScroll: true });
+      selected?.scrollIntoView({ block: "nearest" });
+    });
+    list.closest(".catalog-results").scrollIntoView({ behavior: "smooth", block: "start" });
   }
 
   function updateRecipeFilters() {
     const craft = $("#recipe-domain").value === "craft";
     const type = $("#craft-type-filter").value;
     $("#craft-type-wrap").hidden = !craft;
-    $("#recipe-title").textContent = craft ? "Ремесло" : "Алхимия";
+    $("#recipe-title").textContent = "Рецепты";
     $("#recipe-intro").textContent = craft ? "Чертежи оружия, брони и материалов." : "Формулы алхимических средств и их состав.";
     const categories = craft && type
       ? [...new Set(recipes.filter(recipe => recipe.type === type).map(recipe => recipe.category).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ru"))
@@ -92,8 +143,14 @@
       const text = normalize([recipe.name, recipe.category, recipe.tier, ...(recipe.ingredients || []).map(ingredient => ingredient.name)].join(" "));
       return !query || text.includes(query);
     });
+    if (!visible.some(recipe => recipe.id === selectedRecipeId)) selectedRecipeId = visible[0]?.id || null;
     $("#recipe-list").innerHTML = visible.map(recipeCard).join("");
     $("#recipe-empty").hidden = visible.length > 0;
+    const detail = $("#recipe-detail");
+    detail.hidden = visible.length === 0;
+    $("#recipe-detail-content").innerHTML = visible.length ? recipeDetail(visible.find(recipe => recipe.id === selectedRecipeId)) : "";
+    detail.closest(".catalog-columns").classList.toggle("is-empty", visible.length === 0);
+    if (!visible.length) detail.closest(".catalog-columns").classList.remove("mobile-detail-open");
   }
 
   function fieldValue(value, unit) {
@@ -105,6 +162,10 @@
     const quick = [];
     if (item.weightKg !== null) quick.push(`<span><strong>Вес</strong> ${numberText(item.weightKg)} кг</span>`);
     if (item.costCrowns !== null) quick.push(`<span><strong>Цена</strong> ${numberText(item.costCrowns)} кр.</span>`);
+    return `<button type="button" class="item-card item-summary${selectedItemId === item.id ? " is-selected" : ""}" data-item-id="${escapeHtml(item.id)}" aria-pressed="${selectedItemId === item.id}"><span class="item-name">${escapeHtml(item.name)}</span><span class="item-kind">${escapeHtml(item.typeLabel)}</span><span class="item-quick-meta">${quick.join("") || "Сведения о весе и цене отсутствуют"}</span></button>`;
+  }
+
+  function itemDetail(item) {
     const details = item.details || {};
     const narrative = Object.entries(details).filter(([, value]) => value !== null && value !== "").map(([key, value]) => {
       const labels = { where_found: "Где найти", availability: "Доступность", acquisition_method: "Где найти", alchemy_group: "Группа", effect: "Эффект", duration: "Длительность", toxicity: "Токсичность", application: "Применение", notes: "Примечание" };
@@ -115,9 +176,12 @@
     const description = item.description ? `<div class="detail-block"><span class="detail-label">Описание</span><p>${escapeHtml(item.description)}</p></div>` : "";
     const related = recipes.filter(recipe => (recipe.ingredients || []).some(entry => entry.itemId === item.id)
       || (recipe.outputs || []).some(entry => entry.itemId === item.id));
-    const relatedRecipes = related.length ? `<details class="related-recipe-links"><summary>Связанные рецепты и чертежи</summary><div>${related.map(recipe => `<button type="button" class="catalog-inline-link" data-open-recipe="${escapeHtml(recipe.id)}">${escapeHtml(recipe.name)} · ${recipe.type === "alchemy" ? "Алхимия" : "Ремесло"}</button>`).join("")}</div></details>` : "";
-    return `<details class="item-card" data-item-id="${escapeHtml(item.id)}"><summary class="item-summary"><span class="item-name">${escapeHtml(item.name)}</span><span class="card-arrow" aria-hidden="true">⌄</span><span class="item-kind">${escapeHtml(item.typeLabel)}</span><span class="item-quick-meta">${quick.join("") || "Сведения о весе и цене отсутствуют"}</span></summary>
-      <div class="item-details">${description}${narrative}${attributes}${effects}${relatedRecipes}</div></details>`;
+    const relatedRecipes = related.length ? `<div class="detail-block"><span class="detail-label">Связанные рецепты и чертежи</span><div class="related-recipe-links">${related.map(recipe => `<button type="button" class="catalog-inline-link" data-open-recipe="${escapeHtml(recipe.id)}">${escapeHtml(recipe.name)} · ${recipe.type === "alchemy" ? "Алхимия" : "Ремесло"}</button>`).join("")}</div></div>` : "";
+    const quick = [];
+    if (item.weightKg !== null) quick.push(`<div class="recipe-metric"><span>Вес</span><strong>${numberText(item.weightKg)} кг</strong></div>`);
+    if (item.costCrowns !== null) quick.push(`<div class="recipe-metric"><span>Цена</span><strong>${numberText(item.costCrowns)} кр.</strong></div>`);
+    return `<div class="catalog-detail-inner"><div class="catalog-detail-kicker">${escapeHtml(item.typeLabel)}</div><h2>${escapeHtml(item.name)}</h2>
+      ${quick.length ? `<div class="item-detail-metrics">${quick.join("")}</div>` : ""}${description}${narrative}${attributes}${effects}${relatedRecipes}</div>`;
   }
 
   function setItemFilterOptions(select, placeholder, values) {
@@ -127,8 +191,9 @@
   }
 
   function updateItemFilters() {
-    const isIngredient = $("#item-type-filter").value === "ingredient";
-    const isEquipment = $("#item-type-filter").value === "equipment";
+    const type = $("#item-type-filter").value;
+    const isIngredient = type === "ingredient";
+    const isEquipment = type === "equipment";
     const ingredients = items.filter(item => item.type === "ingredient");
     const availabilities = [...new Set(ingredients.map(item => item.details?.availability).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ru"));
     const groups = [...new Set(ingredients.map(item => item.details?.alchemy_group).filter(Boolean))].sort((a, b) => a.localeCompare(b, "ru"));
@@ -136,6 +201,18 @@
       .flatMap(item => item.attributes || [])
       .filter(attribute => attribute.code === "equipment_category")
       .map(attribute => attribute.value))].sort((a, b) => a.localeCompare(b, "ru"));
+    const normalized = window.CatalogFilters.normalizeItemFilters(type, {
+      availability: $("#item-availability-filter").value,
+      group: $("#item-group-filter").value,
+      equipmentCategory: $("#item-equipment-category-filter").value,
+    }, {
+      availability: isIngredient && availabilities.length >= 2,
+      group: isIngredient && groups.length >= 2,
+      equipmentCategory: isEquipment && equipmentCategories.length >= 2,
+    });
+    $("#item-availability-filter").value = normalized.availability;
+    $("#item-group-filter").value = normalized.group;
+    $("#item-equipment-category-filter").value = normalized.equipmentCategory;
     setItemFilterOptions($("#item-availability-filter"), "Любая доступность", availabilities);
     setItemFilterOptions($("#item-group-filter"), "Любая группа", groups);
     setItemFilterOptions($("#item-equipment-category-filter"), "Всё снаряжение", equipmentCategories);
@@ -164,8 +241,14 @@
       ].join(" "));
       return terms.every(term => searchable.includes(term));
     });
+    if (!visible.some(item => item.id === selectedItemId)) selectedItemId = visible[0]?.id || null;
     $("#item-list").innerHTML = visible.map(itemCard).join("");
     $("#item-empty").hidden = visible.length > 0;
+    const detail = $("#item-detail");
+    detail.hidden = visible.length === 0;
+    $("#item-detail-content").innerHTML = visible.length ? itemDetail(visible.find(item => item.id === selectedItemId)) : "";
+    detail.closest(".catalog-columns").classList.toggle("is-empty", visible.length === 0);
+    if (!visible.length) detail.closest(".catalog-columns").classList.remove("mobile-detail-open");
     $("#clear-item-filters").disabled = !$("#item-search").value && !type && !availability && !group && !equipmentCategory;
   }
 
@@ -771,6 +854,16 @@
     $("#character-library").hidden = false;
     $("#character-editor").hidden = true;
     renderCharacterLibrary();
+    syncShellContext();
+  }
+
+  function syncShellContext() {
+    const editorActive = activePage === "characters" && characterViewMode === "editor";
+    document.querySelectorAll("[data-page-context]").forEach(panel => {
+      panel.hidden = panel.dataset.pageContext !== (editorActive ? "character-editor" : activePage);
+    });
+    $("#top").classList.toggle("is-character-library", activePage === "characters" && !editorActive);
+    $("#top").classList.toggle("is-character-editor", editorActive);
   }
 
   function showCharacterTab(tab, updateHash = true, focusTab = false) {
@@ -804,6 +897,7 @@
     characterViewMode = "editor";
     $("#character-library").hidden = true;
     $("#character-editor").hidden = false;
+    syncShellContext();
     renderCharacterEditor();
     showCharacterTab("sheet");
     renderInventory();
@@ -1667,6 +1761,7 @@
     characterViewMode = "editor";
     $("#character-library").hidden = true;
     $("#character-editor").hidden = false;
+    syncShellContext();
     closeCharacterCreation();
     renderCharacterEditor();
     showCharacterTab("sheet");
@@ -1885,6 +1980,7 @@
       characterViewMode = "editor";
       $("#character-library").hidden = true;
       $("#character-editor").hidden = false;
+      syncShellContext();
       renderCharacterLibrary();
       renderCharacterEditor();
       renderInventory();
@@ -1999,6 +2095,7 @@
       requestedTab = tabName || requestedTab;
     }
     if (!sections[page]) return;
+    if (page !== activePage) document.querySelectorAll(".catalog-columns.mobile-detail-open").forEach(columns => columns.classList.remove("mobile-detail-open"));
     activePage = page;
     if (page === "characters" && requestedTab && characterViewMode === "library" && persistenceReady) {
       openCharacter(activeCharacter().characterId);
@@ -2010,6 +2107,7 @@
       button.classList.toggle("active", active);
       if (active) button.setAttribute("aria-current", "page"); else button.removeAttribute("aria-current");
     });
+    syncShellContext();
     if (page === "characters" && requestedTab) showCharacterTab(requestedTab, false);
     document.title = `${sections[page]} — Кодекс ремесленника`;
     history.replaceState(null, "", `#${page}${page === "characters" && requestedTab ? `/${requestedTab}` : ""}`);
@@ -2020,6 +2118,7 @@
     const item = itemById.get(id);
     if (!item) return;
     $("#item-search").value = item.name;
+    selectedItemId = id;
     $("#item-type-filter").value = "";
     $("#item-availability-filter").value = "";
     $("#item-group-filter").value = "";
@@ -2027,11 +2126,7 @@
     updateItemFilters();
     renderItems();
     showPage("items");
-    const card = [...document.querySelectorAll(".item-card")].find(entry => entry.dataset.itemId === id);
-    if (card) {
-      card.open = true;
-      card.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
+    openMobileCatalogDetail("items");
   }
 
   function openCatalogRecipe(recipeId) {
@@ -2043,17 +2138,35 @@
     updateRecipeFilters();
     $("#craft-category-filter").value = recipe.category || "";
     $("#search").value = recipe.name;
+    selectedRecipeId = recipe.id;
     renderRecipes();
     showPage("recipes");
-    const card = [...document.querySelectorAll(".recipe-card")].find(entry => entry.dataset.recipeId === recipeId);
-    if (card) {
-      card.open = true;
-      card.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
+    openMobileCatalogDetail("recipes");
   }
 
   document.querySelectorAll(".nav-item").forEach(button => button.addEventListener("click", () => showPage(button.dataset.page)));
+  $("#recipe-list").addEventListener("click", event => {
+    const button = event.target.closest("[data-recipe-id]");
+    if (!button) return;
+    selectedRecipeId = button.dataset.recipeId;
+    syncCatalogRowSelection($("#recipe-list"), selectedRecipeId, "data-recipe-id");
+    $("#recipe-detail-content").innerHTML = recipeDetail(recipes.find(recipe => recipe.id === selectedRecipeId));
+    openMobileCatalogDetail("recipes");
+  });
+  $("#item-list").addEventListener("click", event => {
+    const button = event.target.closest("[data-item-id]");
+    if (!button) return;
+    selectedItemId = button.dataset.itemId;
+    syncCatalogRowSelection($("#item-list"), selectedItemId, "data-item-id");
+    $("#item-detail-content").innerHTML = itemDetail(items.find(item => item.id === selectedItemId));
+    openMobileCatalogDetail("items");
+  });
   document.addEventListener("click", event => {
+    const backButton = event.target.closest("[data-catalog-back]");
+    if (backButton) {
+      returnToCatalogResults(backButton.dataset.catalogBack);
+      return;
+    }
     const itemButton = event.target.closest("[data-open-catalog-item]");
     const recipeButton = event.target.closest("[data-open-recipe]");
     const catalogReferenceButton = event.target.closest("[data-open-catalog-reference]");
@@ -2088,13 +2201,13 @@
     }
   });
   $("[role='tablist'][aria-label='Разделы листа персонажа']").addEventListener("keydown", event => {
-    if (!["ArrowLeft", "ArrowRight", "Home", "End"].includes(event.key)) return;
+    if (!["ArrowUp", "ArrowDown", "Home", "End"].includes(event.key)) return;
     const tabs = [...document.querySelectorAll("[data-character-tab]")];
     const currentIndex = tabs.indexOf(document.activeElement);
     if (currentIndex < 0) return;
     event.preventDefault();
     const nextIndex = event.key === "Home" ? 0 : event.key === "End" ? tabs.length - 1
-      : (currentIndex + (event.key === "ArrowRight" ? 1 : -1) + tabs.length) % tabs.length;
+      : (currentIndex + (event.key === "ArrowDown" ? 1 : -1) + tabs.length) % tabs.length;
     showCharacterTab(tabs[nextIndex].dataset.characterTab, true, true);
   });
 
@@ -2653,6 +2766,7 @@
       characterViewMode = "library";
       $("#character-library").hidden = false;
       $("#character-editor").hidden = true;
+      syncShellContext();
       renderCharacterLibrary();
       renderCharacterEditor();
       renderInventory();
@@ -2686,9 +2800,12 @@
   $("#item-group-filter").addEventListener("change", renderItems);
   $("#item-equipment-category-filter").addEventListener("change", renderItems);
   $("#clear-item-filters").addEventListener("click", () => {
+    const cleared = window.CatalogFilters.clearItemFilters();
     $("#item-search").value = "";
-    $("#item-type-filter").value = "";
-    $("#item-equipment-category-filter").value = "";
+    $("#item-type-filter").value = cleared.type;
+    $("#item-availability-filter").value = cleared.availability;
+    $("#item-group-filter").value = cleared.group;
+    $("#item-equipment-category-filter").value = cleared.equipmentCategory;
     updateItemFilters();
     renderItems();
     $("#item-search").focus();
