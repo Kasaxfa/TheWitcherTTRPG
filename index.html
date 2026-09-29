@@ -113,6 +113,7 @@
           </div>
           <nav class="character-tabs" role="tablist" aria-label="Разделы листа персонажа">
             <button id="character-tab-sheet" class="character-tab active" type="button" role="tab" aria-selected="true" aria-controls="character-sheet-panel" tabindex="0" data-character-tab="sheet">Лист</button>
+            <button id="character-tab-combat" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-combat-panel" tabindex="-1" data-character-tab="combat">Бой</button>
             <button id="character-tab-inventory" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-inventory-panel" tabindex="-1" data-character-tab="inventory">Инвентарь</button>
             <button id="character-tab-background" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-background-panel" tabindex="-1" data-character-tab="background">Предыстория</button>
             <button id="character-tab-abilities" class="character-tab" type="button" role="tab" aria-selected="false" aria-controls="character-abilities-panel" tabindex="-1" data-character-tab="abilities">Способности</button>
@@ -142,8 +143,11 @@
               <label class="field">Текущие ПЗ · ввод<input data-character-number="state.currentHp" type="number" min="0" step="1"></label>
               <label class="field">Текущая Выносливость · ввод<input data-character-number="state.currentSta" type="number" min="0" step="1"></label>
               <label class="field">Текущая Удача · ввод<input data-character-number="state.currentLuck" type="number" min="0" step="1"></label>
+              <label class="field">Репутация · ввод<input data-character-number="state.currentReputation" type="number" min="0" step="1"></label>
             </div>
+            <button class="button secondary session-start-button" id="start-character-session" type="button">Начать сессию · восстановить Удачу</button>
             <label class="field block-field">Состояния и ранения<textarea id="character-conditions" rows="3" placeholder="Каждое состояние — с новой строки"></textarea></label>
+            <label class="field block-field">Заметки о репутации<input data-character-path="state.reputationNotes" maxlength="4000" placeholder="За что персонажа знают в округе"></label>
           </fieldset>          <fieldset class="character-panel">
             <legend>Производные показатели</legend>
             <p class="character-panel-hint">Расчёт по правилам; непроверенные диапазоны остаются неизвестными.</p>
@@ -160,6 +164,30 @@
             <button class="button secondary" id="add-character-skill" type="button">Добавить собственный навык</button>
             
           </fieldset>
+            </section>
+            <section id="character-combat-panel" class="character-tab-panel" role="tabpanel" aria-labelledby="character-tab-combat" data-character-tab-panel="combat" hidden>
+              <fieldset class="character-panel">
+                <legend>Ранения</legend>
+                <p class="character-panel-hint">Записывайте локализацию и последствия. Эффекты ранений не применяются автоматически.</p>
+                <div id="character-wounds" class="character-entry-list" aria-live="polite"></div>
+                <button class="button secondary" id="add-character-wound" type="button">Добавить ранение</button>
+              </fieldset>
+              <fieldset class="character-panel">
+                <legend>Броня по зонам</legend>
+                <p class="character-panel-hint">Выберите предмет из инвентаря. Прочность и повреждение — состояние этого персонажа; механические эффекты брони показываются в каталоге.</p>
+                <div id="character-armor-zones" class="combat-zone-list" aria-live="polite"></div>
+                <p id="character-armor-ev" class="character-panel-hint armor-ev-summary"></p>
+              </fieldset>
+              <fieldset class="character-panel">
+                <legend>Оружие</legend>
+                <div id="character-combat-weapons" class="character-entry-list" aria-live="polite"></div>
+                <button class="button secondary" id="add-character-combat-weapon" type="button">Добавить оружие из инвентаря</button>
+              </fieldset>
+              <fieldset class="character-panel">
+                <legend>Щит</legend>
+                <div id="character-combat-shield" class="character-entry-list" aria-live="polite"></div>
+                <button class="button secondary" id="add-character-shield" type="button">Добавить щит из инвентаря</button>
+              </fieldset>
             </section>
             <section id="character-background-panel" class="character-tab-panel" role="tabpanel" aria-labelledby="character-tab-background" data-character-tab-panel="background" hidden>
           <fieldset class="character-panel">
@@ -207,6 +235,20 @@
                 <legend>Дерево профессии</legend>
                 <div id="character-profession-tree" class="profession-tree-list" aria-live="polite"></div>
               </fieldset>
+              <fieldset class="character-panel" id="character-magic-panel">
+                <legend>Магические ресурсы и способности</legend>
+                <p id="character-magic-note" class="character-panel-hint"></p>
+                <div class="character-field-grid magic-resource-grid">
+                  <label class="field">Энергия · базовое значение<input data-character-number="magic.energyBase" type="number" min="0" step="1"></label>
+                  <label class="field">Энергия · сейчас<input data-character-number="magic.energyCurrent" type="number" min="0" step="1"></label>
+                  <label class="field">Сила магии · ввод<input data-character-number="magic.vigor" type="number" min="0" step="1"></label>
+                  <label class="field">Модификатор силы магии<input data-character-number="magic.vigorModifier" type="number" step="1"></label>
+                  <label class="field">Фокус<input data-character-number="magic.focus" type="number" min="0" step="1"></label>
+                </div>
+                <div id="character-magic-entries" class="character-entry-list" aria-live="polite"></div>
+                <button class="button secondary" id="add-character-magic-entry" type="button">Добавить известную способность</button>
+                <datalist id="character-magic-catalog-options"></datalist>
+              </fieldset>
           <fieldset class="character-panel">
             <legend>Способности</legend>
             <div id="character-abilities" class="character-entry-list"></div>
@@ -245,7 +287,7 @@
           <div><div class="eyebrow"><span class="eyebrow-line"></span>Лист персонажа</div><h1 id="inventory-title">Инвентарь</h1><p class="intro">Снаряжение персонажа: <strong id="inventory-character-name">Персонаж 1</strong>.</p></div>
         </div>
         <div class="inventory-summary">
-          <label class="capacity-field">Грузоподъёмность, ручной предел <span><input id="capacity-input" type="number" min="0" step="0.1" inputmode="decimal" placeholder="по Тел" aria-label="Ручной предел грузоподъёмности в килограммах"> кг</span></label>
+          <label class="capacity-field">Грузоподъёмность по Тел <span><output id="capacity-readout" aria-label="Расчётная грузоподъёмность">—</output> кг</span></label>
           <div class="weight-readout"><strong id="weight-total">0 кг</strong><span id="weight-caption">из 0 кг</span></div>
           <div class="weight-track" role="progressbar" aria-label="Загрузка грузоподъёмности" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><span id="weight-progress"></span></div>
           <p id="weight-warning" class="inline-warning" hidden></p>
@@ -260,15 +302,17 @@
             <span id="inventory-search-help" class="sr-only" role="status" aria-live="polite"></span>
           </div>
           <label class="field">Количество<input id="inventory-quantity" type="number" min="0.1" step="0.1" value="1" required></label>
-          <label class="field">Вес за шт., кг<input id="inventory-unit-weight" type="number" min="0" step="0.1" placeholder="из каталога"></label>
+          <label class="field">Вес за шт., кг<input id="inventory-unit-weight" type="number" min="0" step="0.01" placeholder="из каталога"></label>
+          <label class="field inventory-separate-option"><input id="inventory-separate-entry" type="checkbox"><span>Отдельная запись</span></label>
           <button class="button primary add-button" type="submit">Добавить</button>
         </form>
         <details class="custom-item-details">
           <summary>Добавить свой предмет, которого нет в каталоге</summary>
           <form id="add-custom-item" class="add-inventory-item custom-form">
             <label class="field grow">Название<input id="custom-item-name" maxlength="120" required></label>
+            <label class="field">Тип<select id="custom-item-category"><option value="other">Другое</option><option value="weapon">Оружие</option><option value="armor">Броня</option><option value="shield">Щит</option></select></label>
             <label class="field">Количество<input id="custom-item-quantity" type="number" min="0.1" step="0.1" value="1" required></label>
-            <label class="field">Вес за шт., кг<input id="custom-item-weight" type="number" min="0" step="0.1" placeholder="неизвестен"></label>
+            <label class="field">Вес за шт., кг<input id="custom-item-weight" type="number" min="0" step="0.01" placeholder="неизвестен"></label>
             <button class="button secondary add-button" type="submit">Добавить</button>
           </form>
         </details>

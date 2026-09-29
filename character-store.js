@@ -9,15 +9,32 @@
   "use strict";
 
   const FORMAT = "witcher-workshop-characters";
-  const SCHEMA_VERSION = 7;
+  const SCHEMA_VERSION = 9;
   const STORAGE_KEY = "witcher-workshop-characters-v1";
   const LEGACY_INVENTORY_KEY = "witcher-workshop-inventory-v1";
   const RULES_VERSION = "witcher-core-russian-errata-v5";
   const ATTRIBUTES = ["INT", "REF", "DEX", "BODY", "SPD", "EMP", "CRA", "WILL", "LUCK"];
   const ATTRIBUTE_SET = new Set(ATTRIBUTES);
+  const BODY_ZONES = ["head", "torso", "rightArm", "leftArm", "rightLeg", "leftLeg"];
+  const WOUND_STATUSES = new Set(["active", "treated", "healed"]);
+  const MAGIC_KINDS = new Set(["spell", "sign", "invocation", "hex", "ritual", "alchemy", "other"]);
+  const MAGIC_CATALOG_TYPES = new Set(["item", "recipe"]);
+  const CUSTOM_EQUIPMENT_CATEGORIES = new Set(["other", "weapon", "armor", "shield"]);
 
   function createAttributeModifiers() {
     return Object.fromEntries(ATTRIBUTES.map(attribute => [attribute, { permanent: 0, temporary: 0 }]));
+  }
+
+  function createCombatEquipment() {
+    return {
+      armorByZone: Object.fromEntries(BODY_ZONES.map(zone => [zone, { inventoryEntryId: null, currentSP: null, damage: "" }])),
+      weapons: [],
+      shield: { inventoryEntryId: null, currentSP: null, damage: "" },
+    };
+  }
+
+  function createMagic() {
+    return { energyBase: null, energyCurrent: null, vigor: null, vigorModifier: null, focus: null, entries: [] };
   }
 
   function makeId() {
@@ -84,6 +101,7 @@
       attributeModifiers: createAttributeModifiers(),
       skills: [],
       professionSkillChoices: {},
+      professionLanguageChoices: {},
       professionTrees: {},
       creation: {},
       development: { earnedPoints: 0, availablePoints: 0, draft: { attributes: {}, skills: {}, professionAbilities: {} } },
@@ -91,12 +109,16 @@
         currentHp: null,
         currentSta: null,
         currentLuck: null,
+        currentReputation: null,
+        reputationNotes: "",
         conditions: [],
+        wounds: [],
       },
       abilities: [],
+      magic: createMagic(),
       equipment: {
-        capacityKg: null,
         items: [],
+        combat: createCombatEquipment(),
       },
       notes: "",
     };
@@ -122,7 +144,98 @@
     const quantity = optionalNumber(raw.quantity, `Снаряжение «${name}», количество`, { min: Number.MIN_VALUE });
     if (quantity === null) throw new Error(`Снаряжение «${name}»: не указано количество.`);
     const unitWeightKg = optionalNumber(raw.unitWeightKg, `Снаряжение «${name}», вес`, { min: 0 });
-    return { ...raw, id, itemId, name, quantity, unitWeightKg, custom: itemId === null };
+    const conditionNotes = boundedString(String(raw.conditionNotes ?? ""), `Снаряжение «${name}», состояние`, 2000);
+    const armorEv = optionalNumber(raw.armorEv ?? null, `Снаряжение «${name}», EV брони`, { min: 0, max: 100 });
+    const customCategory = itemId === null ? String(raw.customCategory ?? "other") : "";
+    if (itemId === null && !CUSTOM_EQUIPMENT_CATEGORIES.has(customCategory)) throw new Error(`Снаряжение «${name}»: неизвестный тип собственного предмета.`);
+    return { ...raw, id, itemId, name, quantity, unitWeightKg, conditionNotes, armorEv, customCategory, custom: itemId === null };
+  }
+
+  function normalizeInventoryReference(value, label, inventoryIds, allowEmpty = true) {
+    if (value === null || value === undefined || value === "") {
+      if (allowEmpty) return null;
+      throw new Error(`${label}: выберите предмет из инвентаря.`);
+    }
+    const id = boundedString(String(value), label, 160, false);
+    if (!inventoryIds.has(id)) throw new Error(`${label}: связанный предмет отсутствует в инвентаре.`);
+    return id;
+  }
+
+  function normalizeCombatEquipment(raw, inventoryItems) {
+    if (!isObject(raw)) throw new Error("Боевые слоты снаряжения должны быть объектом.");
+    const inventoryIds = new Set(inventoryItems.map(item => item.id));
+    const armorRaw = raw.armorByZone ?? {};
+    if (!isObject(armorRaw)) throw new Error("Броня по зонам должна быть объектом.");
+    const armorByZone = {};
+    for (const zone of BODY_ZONES) {
+      const source = armorRaw[zone] ?? {};
+      if (!isObject(source)) throw new Error(`Броня в зоне «${zone}» должна быть объектом.`);
+      armorByZone[zone] = {
+        inventoryEntryId: normalizeInventoryReference(source.inventoryEntryId, `Броня в зоне «${zone}»`, inventoryIds),
+        currentSP: optionalNumber(source.currentSP ?? null, `Текущая прочность брони в зоне «${zone}»`, { min: 0, max: 100000 }),
+        damage: boundedString(String(source.damage ?? ""), `Повреждение брони в зоне «${zone}»`, 2000),
+      };
+    }
+    if (!Array.isArray(raw.weapons ?? [])) throw new Error("Оружие в боевой экипировке должно быть списком.");
+    const weapons = (raw.weapons ?? []).map((weapon, index) => {
+      if (!isObject(weapon)) throw new Error(`Оружие в боевой экипировке ${index + 1} должно быть объектом.`);
+      const slot = boundedString(String(weapon.slot || "backup"), `Оружие ${index + 1}, слот`, 20, false);
+      if (!new Set(["primary", "backup"]).has(slot)) throw new Error(`Оружие ${index + 1}: неизвестный слот.`);
+      const name = boundedString(String(weapon.name ?? ""), `Оружие ${index + 1}, название`, 200);
+      return {
+        ...weapon,
+        id: boundedString(String(weapon.id || makeId()), `Оружие ${index + 1}, ID`, 160, false),
+        slot,
+        inventoryEntryId: normalizeInventoryReference(weapon.inventoryEntryId, `Оружие ${index + 1}`, inventoryIds),
+        name,
+        reliability: boundedString(String(weapon.reliability ?? ""), `Оружие ${index + 1}, надёжность`, 200),
+      };
+    });
+    ensureUnique(weapons, weapon => weapon.id, "ID оружия");
+    ensureUnique(weapons.filter(weapon => weapon.inventoryEntryId), weapon => weapon.inventoryEntryId, "предмет экипировки в слотах оружия");
+    ensureUnique(weapons, weapon => weapon.slot, "слот оружия");
+    if (weapons.length > 2) throw new Error("На листе можно указать только основное и запасное оружие.");
+    const shieldRaw = raw.shield === null ? null : raw.shield ?? {};
+    if (shieldRaw !== null && !isObject(shieldRaw)) throw new Error("Щит должен быть объектом или null.");
+    const shield = shieldRaw === null ? null : {
+      ...shieldRaw,
+      inventoryEntryId: normalizeInventoryReference(shieldRaw.inventoryEntryId, "Щит", inventoryIds),
+      currentSP: optionalNumber(shieldRaw.currentSP ?? null, "Текущая прочность щита", { min: 0, max: 100000 }),
+      damage: boundedString(String(shieldRaw.damage ?? ""), "Повреждение щита", 2000),
+    };
+    return { ...raw, armorByZone, weapons, shield };
+  }
+
+  function normalizeMagic(raw) {
+    if (!isObject(raw)) throw new Error("Магические ресурсы персонажа должны быть объектом.");
+    const magic = { ...createMagic(), ...raw };
+    for (const key of ["energyBase", "energyCurrent", "vigor", "vigorModifier", "focus"]) {
+      magic[key] = optionalNumber(magic[key], `Магический ресурс «${key}»`, { min: key === "vigorModifier" ? -100000 : 0, max: 100000 });
+    }
+    if (!Array.isArray(magic.entries)) throw new Error("Изученные способности должны быть списком.");
+    magic.entries = magic.entries.map((entry, index) => {
+      if (!isObject(entry)) throw new Error(`Магическая способность ${index + 1} должна быть объектом.`);
+      const kind = boundedString(String(entry.kind || "other"), `Магическая способность ${index + 1}, тип`, 20, false);
+      if (!MAGIC_KINDS.has(kind)) throw new Error(`Магическая способность ${index + 1}: неизвестный тип.`);
+      const fields = {};
+      for (const [key, max] of Object.entries({ name: 200, cost: 500, effect: 20000, range: 500, duration: 500, time: 500, difficulty: 200, components: 2000, notes: 4000 })) {
+        fields[key] = boundedString(String(entry[key] ?? ""), `Магическая способность ${index + 1}, ${key}`, max);
+      }
+      let catalogRef = null;
+      if (entry.catalogRef !== null && entry.catalogRef !== undefined && entry.catalogRef !== "") {
+        if (!isObject(entry.catalogRef)) throw new Error(`Магическая способность ${index + 1}: ссылка на каталог имеет неверный формат.`);
+        const type = boundedString(String(entry.catalogRef.type || ""), `Магическая способность ${index + 1}, тип каталога`, 20, false);
+        if (!MAGIC_CATALOG_TYPES.has(type)) throw new Error(`Магическая способность ${index + 1}: неизвестный тип ссылки на каталог.`);
+        catalogRef = {
+          type,
+          id: boundedString(String(entry.catalogRef.id || ""), `Магическая способность ${index + 1}, ID каталога`, 160, false),
+          name: boundedString(String(entry.catalogRef.name ?? ""), `Магическая способность ${index + 1}, название в каталоге`, 200),
+        };
+      }
+      return { ...entry, ...fields, id: boundedString(String(entry.id || makeId()), `Магическая способность ${index + 1}, ID`, 160, false), kind, catalogRef };
+    });
+    ensureUnique(magic.entries, entry => entry.id, "ID магической способности");
+    return magic;
   }
 
   function normalizeCharacter(raw, index) {
@@ -138,7 +251,8 @@
     const attributeModifiersRaw = raw.attributeModifiers ?? {};
     const stateRaw = raw.state ?? {};
     const equipmentRaw = raw.equipment ?? {};
-    if (!isObject(personalRaw) || !isObject(lifePathRaw) || !isObject(attributesRaw) || !isObject(attributeModifiersRaw) || !isObject(stateRaw) || !isObject(equipmentRaw)) {
+    const magicRaw = raw.magic ?? defaults.magic;
+    if (!isObject(personalRaw) || !isObject(lifePathRaw) || !isObject(attributesRaw) || !isObject(attributeModifiersRaw) || !isObject(stateRaw) || !isObject(equipmentRaw) || !isObject(magicRaw)) {
       throw new Error(`Персонаж ${index + 1}: личные данные, характеристики, состояние и снаряжение должны быть объектами.`);
     }
 
@@ -211,6 +325,7 @@
     }
 
     if (!Array.isArray(raw.skills ?? [])) throw new Error(`Персонаж ${index + 1}: навыки должны быть массивом.`);
+    const knownLanguages = new Set((initialSkillCatalog || globalThis.CharacterSkills)?.LANGUAGES?.map(language => language.id) || ["common", "elder-speech", "dwarven"]);
     const skills = (raw.skills ?? []).map((skill, skillIndex) => {
       if (!isObject(skill)) throw new Error(`Навык ${skillIndex + 1}: ожидался объект.`);
       const name = boundedString(String(skill.name || ""), `Навык ${skillIndex + 1}, название`, 200).trim();
@@ -221,9 +336,15 @@
       const rank = optionalNumber(skill.rank, `Навык «${name}», значение`, { min: 0, max: 1000 });
       const permanentModifier = optionalNumber(skill.permanentModifier ?? 0, `Навык «${name}», постоянное изменение`, { min: -1000, max: 1000 }) ?? 0;
       const temporaryModifier = optionalNumber(skill.temporaryModifier ?? 0, `Навык «${name}», временное изменение`, { min: -1000, max: 1000 }) ?? 0;
-      return { ...skill, id: boundedString(String(skill.id || makeId()), `Навык «${name}», ID`, 160, false), name, attribute, rank, permanentModifier, temporaryModifier };
+      if (skill.languageId !== undefined && skill.languageId !== null && !knownLanguages.has(skill.languageId)) {
+        throw new Error(`Навык «${name}»: неизвестный ID языка.`);
+      }
+      const nativeBonus = optionalNumber(skill.nativeBonus ?? 0, `Навык «${name}», бонус родного языка`, { min: 0, max: 8 }) ?? 0;
+      if (![0, 8].includes(nativeBonus) || (nativeBonus > 0 && !skill.languageId)) throw new Error(`Навык «${name}»: неверный бонус родного языка.`);
+      return { ...skill, id: boundedString(String(skill.id || makeId()), `Навык «${name}», ID`, 160, false), name, attribute, rank, permanentModifier, temporaryModifier, nativeBonus };
     });
     ensureUnique(skills, item => item.id, "ID навыка");
+    ensureUnique(skills.filter(skill => skill.languageId), item => item.languageId, "ID языка");
 
     const professionSkillChoicesRaw = raw.professionSkillChoices ?? {};
     if (!isObject(professionSkillChoicesRaw)) throw new Error(`Профессиональные навыки персонажа ${index + 1} должны быть объектом.`);
@@ -234,6 +355,20 @@
       professionSkillChoices[professionId] = choices.map((choice, choiceIndex) =>
         boundedString(choice, `Выбор навыка профессии «${professionId}», запись ${choiceIndex + 1}`, 120, false));
       ensureUnique(professionSkillChoices[professionId], value => value, `ID выбранного навыка профессии «${professionId}»`);
+    }
+
+    const professionLanguageChoicesRaw = raw.professionLanguageChoices ?? {};
+    if (!isObject(professionLanguageChoicesRaw)) throw new Error(`Языки профессиональных навыков персонажа ${index + 1} должны быть объектом.`);
+    const professionLanguageChoices = {};
+    for (const [professionId, choices] of Object.entries(professionLanguageChoicesRaw)) {
+      boundedString(professionId, `Профессия в выборе языков персонажа ${index + 1}`, 120, false);
+      if (!Array.isArray(choices)) throw new Error(`Выбор языков профессии «${professionId}» должен быть списком.`);
+      professionLanguageChoices[professionId] = choices.map((choice, choiceIndex) => {
+        const languageId = boundedString(choice, `Выбор языка профессии «${professionId}», запись ${choiceIndex + 1}`, 120, false);
+        if (!knownLanguages.has(languageId)) throw new Error(`Выбран неизвестный язык «${languageId}» для профессии «${professionId}».`);
+        return languageId;
+      });
+      ensureUnique(professionLanguageChoices[professionId], value => value, `ID выбранного языка профессии «${professionId}»`);
     }
 
     const professionTreesRaw = raw.professionTrees ?? {};
@@ -280,7 +415,7 @@
           if (!ATTRIBUTE_SET.has(key) || attributes[key] === null || Number(attributes[key]) + count > 10) throw new Error(`Черновик содержит недопустимое улучшение характеристики «${key}».`);
         } else if (group === "skills") {
           const skill = skills.find(entry => entry.id === key);
-          if (!skill || Number(skill.rank ?? 0) + count > 10) throw new Error(`Черновик содержит недопустимое улучшение навыка «${key}».`);
+          if (!skill || Number(skill.rank ?? 0) + Number(skill.nativeBonus ?? 0) + count > 10) throw new Error(`Черновик содержит недопустимое улучшение навыка «${key}».`);
         } else {
           const match = /^([a-z0-9-]+):([ABC]):([012])$/i.exec(key);
           const ranks = match && professionTrees[match[1]]?.branches?.[match[2]];
@@ -316,7 +451,7 @@
     for (const [skillId, count] of Object.entries(draft.skills)) {
       const skill = skills.find(entry => entry.id === skillId);
       const definition = skill?.catalogId && skillCatalog?.SKILLS?.find(entry => entry.id === skill.catalogId);
-      const cost = rankCost(Number(skill?.rank ?? 0), count, definition?.doubleCost ? 2 : 1);
+      const cost = rankCost(Number(skill?.rank ?? 0) + Number(skill?.nativeBonus ?? 0), count, definition?.doubleCost ? 2 : 1);
       if (cost === null) throw new Error(`Черновик навыка «${skillId}» содержит неверные ранги.`);
       reservedPoints += cost;
     }
@@ -331,9 +466,27 @@
     const development = { earnedPoints, availablePoints, draft };
 
     const state = { ...defaults.state, ...stateRaw };
-    for (const key of ["currentHp", "currentSta", "currentLuck"]) state[key] = optionalNumber(state[key], `Состояние «${key}»`, { min: 0, max: 100000 });
+    for (const key of ["currentHp", "currentSta", "currentLuck", "currentReputation"]) state[key] = optionalNumber(state[key] ?? null, `Состояние «${key}»`, { min: 0, max: 100000 });
+    state.reputationNotes = boundedString(String(state.reputationNotes ?? ""), "Заметки о репутации", 4000);
     if (!Array.isArray(state.conditions)) throw new Error(`Персонаж ${index + 1}: состояния должны быть массивом.`);
     state.conditions = state.conditions.map((condition, conditionIndex) => boundedString(condition, `Состояние ${conditionIndex + 1}`, 2000, false).trim());
+    if (!Array.isArray(state.wounds ?? [])) throw new Error(`Персонаж ${index + 1}: ранения должны быть списком.`);
+    state.wounds = (state.wounds ?? []).map((wound, woundIndex) => {
+      if (!isObject(wound)) throw new Error(`Ранение ${woundIndex + 1}: ожидался объект.`);
+      const location = boundedString(String(wound.location || "other"), `Ранение ${woundIndex + 1}, зона`, 20, false);
+      if (!new Set([...BODY_ZONES, "other"]).has(location)) throw new Error(`Ранение ${woundIndex + 1}: неизвестная зона тела.`);
+      const status = boundedString(String(wound.status || "active"), `Ранение ${woundIndex + 1}, состояние`, 20, false);
+      if (!WOUND_STATUSES.has(status)) throw new Error(`Ранение ${woundIndex + 1}: неизвестный статус.`);
+      return {
+        ...wound,
+        id: boundedString(String(wound.id || makeId()), `Ранение ${woundIndex + 1}, ID`, 160, false),
+        location,
+        title: boundedString(String(wound.title ?? ""), `Ранение ${woundIndex + 1}, название`, 200),
+        description: boundedString(String(wound.description ?? ""), `Ранение ${woundIndex + 1}, описание`, 4000),
+        status,
+      };
+    });
+    ensureUnique(state.wounds, wound => wound.id, "ID ранения");
 
     if (!Array.isArray(raw.abilities ?? [])) throw new Error(`Персонаж ${index + 1}: способности должны быть массивом.`);
     const abilities = (raw.abilities ?? []).map((ability, abilityIndex) => {
@@ -344,10 +497,13 @@
     });
     ensureUnique(abilities, item => item.id, "ID способности");
 
-    const capacityKg = optionalNumber(equipmentRaw.capacityKg, "Грузоподъёмность", { min: 0 });
     if (!Array.isArray(equipmentRaw.items ?? [])) throw new Error(`Персонаж ${index + 1}: снаряжение должно быть массивом.`);
-    const equipment = { ...equipmentRaw, capacityKg, items: (equipmentRaw.items ?? []).map(normalizeEquipmentEntry) };
+    const equipmentItems = (equipmentRaw.items ?? []).map(normalizeEquipmentEntry);
+    const combatRaw = equipmentRaw.combat ?? createCombatEquipment();
+    const { capacityKg: _discardedCapacity, ...equipmentFields } = equipmentRaw;
+    const equipment = { ...equipmentFields, items: equipmentItems, combat: normalizeCombatEquipment(combatRaw, equipmentItems) };
     ensureUnique(equipment.items, item => item.id, "ID предмета инвентаря");
+    const magic = normalizeMagic(magicRaw);
 
     const name = boundedString(String(personal.name ?? ""), "Имя персонажа", 2000);
     const rulesVersion = boundedString(String(raw.rulesVersion ?? RULES_VERSION), "Версия правил", 200);
@@ -368,11 +524,13 @@
       attributeModifiers,
       skills,
       professionSkillChoices,
+      professionLanguageChoices,
       professionTrees,
       creation,
       development,
       state,
       abilities,
+      magic,
       equipment,
       notes,
     };
@@ -396,7 +554,24 @@
     copy.updatedAt = now;
     for (const entry of copy.skills) entry.id = makeId();
     for (const entry of copy.abilities) entry.id = makeId();
-    for (const entry of copy.equipment.items) entry.id = makeId();
+    for (const wound of copy.state.wounds) wound.id = makeId();
+    for (const entry of copy.magic.entries) entry.id = makeId();
+    const inventoryIdMap = new Map();
+    for (const entry of copy.equipment.items) {
+      const previousId = entry.id;
+      entry.id = makeId();
+      inventoryIdMap.set(previousId, entry.id);
+    }
+    for (const slot of Object.values(copy.equipment.combat.armorByZone)) {
+      if (slot.inventoryEntryId) slot.inventoryEntryId = inventoryIdMap.get(slot.inventoryEntryId) || null;
+    }
+    for (const weapon of copy.equipment.combat.weapons) {
+      weapon.id = makeId();
+      if (weapon.inventoryEntryId) weapon.inventoryEntryId = inventoryIdMap.get(weapon.inventoryEntryId) || null;
+    }
+    if (copy.equipment.combat.shield?.inventoryEntryId) {
+      copy.equipment.combat.shield.inventoryEntryId = inventoryIdMap.get(copy.equipment.combat.shield.inventoryEntryId) || null;
+    }
     for (const entry of copy.lifePath.outcomes) entry.id = makeId();
     if (copy.lifePath.generated) {
       const relativeIdMap = new Map();
@@ -476,6 +651,34 @@
         },
       })),
     }),
+    7: raw => ({
+      ...raw,
+      schemaVersion: 8,
+      characters: raw.characters.map(character => ({
+        ...character,
+        schemaVersion: 8,
+        state: { ...(character.state ?? {}), currentReputation: character.state?.currentReputation ?? null, reputationNotes: character.state?.reputationNotes ?? "", wounds: character.state?.wounds ?? [] },
+        magic: character.magic ?? createMagic(),
+        equipment: {
+          ...(character.equipment ?? {}),
+          items: (character.equipment?.items ?? []).map(item => ({ ...item, conditionNotes: item.conditionNotes ?? "", armorEv: item.armorEv ?? null, customCategory: item.customCategory ?? (item.itemId ? "" : "other") })),
+          combat: character.equipment?.combat ?? createCombatEquipment(),
+        },
+      })),
+    }),
+    8: raw => ({
+      ...raw,
+      schemaVersion: 9,
+      characters: raw.characters.map(character => ({
+        ...character,
+        schemaVersion: 9,
+        professionLanguageChoices: character.professionLanguageChoices ?? {},
+        skills: (character.skills ?? []).map(skill => skill.catalogId === "language" && !skill.languageId
+          ? { ...skill, catalogId: null, legacyLanguage: true, name: skill.name || "Язык (старый общий навык)", source: "other", professionId: null, professionSkillId: null }
+          : skill),
+        equipment: Object.fromEntries(Object.entries(character.equipment ?? {}).filter(([key]) => key !== "capacityKg")),
+      })),
+    }),
   });
 
   function migrateStore(raw) {
@@ -508,7 +711,6 @@
     if (!isObject(raw) || Number(raw.version) !== 1 || !Array.isArray(raw.items)) {
       throw new Error("Старый инвентарь не соответствует формату версии 1.");
     }
-    const capacityKg = optionalNumber(raw.capacityKg, "Грузоподъёмность", { min: 0 });
     const items = raw.items.map((item, index) => {
       let result;
       try { result = cleanEntry(item, index); }
@@ -517,7 +719,7 @@
       return normalizeEquipmentEntry(result, index);
     });
     ensureUnique(items, item => item.id, "ID предмета инвентаря");
-    return { capacityKg, items };
+    return { items };
   }
 
   function load(storage, { cleanLegacyEntry = normalizeEquipmentEntry } = {}) {
@@ -541,7 +743,7 @@
       catch { throw new Error("Старый инвентарь не читается как JSON. Исходные данные оставлены на месте."); }
       const equipment = normalizeLegacyInventory(legacy, cleanLegacyEntry);
       const store = createStore("Персонаж 1");
-      store.characters[0].equipment = equipment;
+      store.characters[0].equipment = { ...equipment, combat: createCombatEquipment() };
       store.legacyInventoryBackup = clone(legacy);
       storage.setItem(STORAGE_KEY, JSON.stringify(store));
       return { store, migratedLegacyInventory: true, migratedSchemaVersion: false, legacyBackup: clone(legacy) };
@@ -569,7 +771,7 @@
     if (payload.format === "witcher-workshop-inventory" && Number(payload.version) === 1) {
       const equipment = normalizeLegacyInventory(payload, cleanLegacyEntry);
       const store = createStore("Персонаж из резервной копии");
-      store.characters[0].equipment = equipment;
+      store.characters[0].equipment = { ...equipment, combat: createCombatEquipment() };
       return { kind: "legacy-inventory", store };
     }
     throw new Error("Формат JSON не распознан.");

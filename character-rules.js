@@ -98,10 +98,11 @@
     if (attribute === null || attribute === undefined) return null;
     return attribute + (finiteNumber(skill.rank) ?? 0)
       + modifierValue(skill, "permanentModifier")
-      + modifierValue(skill, "temporaryModifier");
+      + modifierValue(skill, "temporaryModifier")
+      + (finiteNumber(skill.nativeBonus) ?? 0);
   }
 
-  function deriveCharacter(character, { carriedWeightKg = null, unknownWeightCount = 0 } = {}) {
+  function deriveCharacter(character, { carriedWeightKg = null, unknownWeightCount = 0, armorEv = 0, unknownArmorEvCount = 0 } = {}) {
     const attributes = calculateAttributes(character);
     const body = attributes.BODY.total;
     const will = attributes.WILL.total;
@@ -133,20 +134,52 @@
         ? total
         : Math.max(1, total - loadPenalty);
     }
+    const knownArmorEv = finiteNumber(armorEv);
+    const equipmentAdjustedAttributes = Object.fromEntries(ATTRIBUTE_CODES.map(code => [code, attributes[code].total]));
+    for (const code of ["REF", "DEX", "SPD"]) {
+      const base = attributes[code].total;
+      if (base === null) {
+        equipmentAdjustedAttributes[code] = null;
+        continue;
+      }
+      if ((code === "REF" || code === "DEX") && knownArmorEv === null) {
+        equipmentAdjustedAttributes[code] = null;
+        continue;
+      }
+      const penalty = (loadPenalty ?? 0) + ((code === "REF" || code === "DEX") ? knownArmorEv : 0);
+      equipmentAdjustedAttributes[code] = Math.max(1, base - penalty);
+    }
 
     const skills = (Array.isArray(character.skills) ? character.skills : []).map(skill => {
       const bonuses = skillBonuses(character, skill);
-      const baseTotal = calculateSkill(skill, attributes);
+      const attributeTotal = skill?.attribute && equipmentAdjustedAttributes[skill.attribute] !== undefined
+        ? equipmentAdjustedAttributes[skill.attribute]
+        : null;
+      const baseTotal = attributeTotal === null ? null : attributeTotal
+        + (finiteNumber(skill.rank) ?? 0)
+        + modifierValue(skill, "permanentModifier")
+        + modifierValue(skill, "temporaryModifier")
+        + (finiteNumber(skill.nativeBonus) ?? 0);
+      const nativeBonus = finiteNumber(skill.nativeBonus) ?? 0;
+      const magicSkill = ["spellcasting", "rituals", "hexing"].includes(skillCatalogId(skill));
+      const armorPenaltyUnknown = magicSkill && knownArmorEv === null;
+      const armorPenalty = magicSkill ? knownArmorEv : 0;
       return {
         id: skill.id,
         racialBonus: bonuses.racial,
         originBonus: bonuses.origin,
-        total: baseTotal === null ? null : baseTotal + bonuses.racial + bonuses.origin,
+        nativeBonus,
+        armorPenalty,
+        equipmentPenalty: skill.attribute && ["REF", "DEX", "SPD"].includes(skill.attribute)
+          ? (loadPenalty ?? 0) + (["REF", "DEX"].includes(skill.attribute) ? (knownArmorEv ?? 0) : 0)
+          : 0,
+        total: baseTotal === null || armorPenaltyUnknown ? null : baseTotal + bonuses.racial + bonuses.origin - (armorPenalty ?? 0),
       };
     });
 
     return {
       attributes,
+      equipmentAdjustedAttributes,
       skills,
       physicalBasis,
       physicalBasisSupported: basisSupported,
@@ -169,6 +202,10 @@
         carriedWeightKg: knownWeight,
         unknownWeightCount: Math.max(0, Number(unknownWeightCount) || 0),
         adjustedAttributes: loadAdjusted,
+      },
+      armor: {
+        ev: knownArmorEv,
+        unknownCount: Math.max(0, Number(unknownArmorEvCount) || 0),
       },
     };
   }

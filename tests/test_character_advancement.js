@@ -3,6 +3,7 @@ const test = require("node:test");
 const Advancement = require("../character-advancement.js");
 const CharacterStore = require("../character-store.js");
 const Trees = require("../character-profession-trees.js");
+const CharacterSkills = require("../character-skills.js");
 
 test("skill and attribute costs follow the advancement table and normal limits", () => {
   assert.equal(Advancement.skillUpgradeCost(0), 1);
@@ -15,6 +16,22 @@ test("skill and attribute costs follow the advancement table and normal limits",
   assert.equal(Advancement.attributeUpgradeCost(null), null);
   assert.equal(Advancement.attributeUpgradeCost(undefined), null);
   assert.equal(Advancement.attributeUpgradeCost(""), null);
+});
+
+test("the three language skills advance independently and each rank costs double", () => {
+  const character = CharacterStore.createCharacter("Языки");
+  character.personal.homeland = "Темерия";
+  CharacterSkills.initializeCharacterSkills(character);
+  const languages = character.skills.filter(skill => skill.languageId);
+  assert.equal(languages.length, 3);
+  Advancement.awardPoints(character, 20);
+  assert.equal(Advancement.stageSkillUpgrade(character, languages.find(skill => skill.languageId === "common").id, { doubleCost: true }).cost, 16);
+  assert.equal(Advancement.stageSkillUpgrade(character, languages.find(skill => skill.languageId === "elder-speech").id, { doubleCost: true }).cost, 2);
+  assert.equal(Advancement.stageSkillUpgrade(character, languages.find(skill => skill.languageId === "dwarven").id, { doubleCost: true }).cost, 2);
+  assert.equal(Advancement.applyDraft(character, Trees).appliedPoints, 20);
+  assert.ok(languages.every(skill => skill.rank === 1));
+  assert.equal(languages.find(skill => skill.languageId === "common").nativeBonus, 8);
+  assert.equal(Advancement.stageSkillUpgrade(character, languages.find(skill => skill.languageId === "common").id, { doubleCost: true }).ok, false);
 });
 
 test("skill upgrades stay pending until apply and rank-up cost escalates", () => {

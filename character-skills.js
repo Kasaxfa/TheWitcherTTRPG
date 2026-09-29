@@ -7,6 +7,11 @@
 
   const RACES = Object.freeze(["Человек", "Эльф", "Краснолюд", "Ведьмак"]);
   const GENDERS = Object.freeze(["Мужской", "Женский", "Другое"]);
+  const LANGUAGES = Object.freeze([
+    { id: "common", name: "Всеобщий" },
+    { id: "elder-speech", name: "Старшая Речь" },
+    { id: "dwarven", name: "Краснолюдский" },
+  ]);
 
   const SKILLS = Object.freeze([
     { id: "awareness", name: "Внимание", attribute: "INT" },
@@ -122,14 +127,65 @@
     return findProfession(character?.personal?.professionId) || findProfession(character?.personal?.profession);
   }
 
+  function languageForHomeland(homeland, origin = "") {
+    const place = String(homeland || "").toLocaleLowerCase("ru-RU").replace(/ё/g, "е");
+    const source = String(origin || "").toLocaleLowerCase("ru-RU");
+    if (/маха\s*кам|mahakam/.test(place)) return "dwarven";
+    if (/нильфгаард|nilfgaard|доль\s*блатанн|dol\s*blathanna|скеллиг|skellige/.test(place)) return "elder-speech";
+    if (source === "nilfgaard" || source === "elder") return "elder-speech";
+    if (source === "north") return "common";
+    if (/север|редани|каэдвен|темери|аэдирн|лири|риви|ковир|повисс|цидари|верден|цинтр|north/.test(place)) return "common";
+    return null;
+  }
+
+  function applyNativeLanguage(character) {
+    const homeland = character?.personal?.homeland || character?.lifePath?.generated?.homeland?.region || "";
+    const origin = character?.lifePath?.generated?.homeland?.origin || "";
+    const nativeLanguageId = languageForHomeland(homeland, origin);
+    for (const skill of character?.skills || []) {
+      if (skill.languageId) skill.nativeBonus = skill.languageId === nativeLanguageId ? 8 : 0;
+    }
+    return nativeLanguageId;
+  }
+
+  function ensureLanguageSkills(character) {
+    for (const skill of character.skills) {
+      if (skill.catalogId === "language" && !LANGUAGES.some(language => language.id === skill.languageId)) {
+        skill.legacyLanguage = true;
+      }
+    }
+    for (const language of LANGUAGES) {
+      let skill = character.skills.find(entry => entry.languageId === language.id);
+      if (!skill) {
+        skill = {
+          id: makeId(), catalogId: "language", languageId: language.id,
+          source: "general", name: `Язык: ${language.name}`, attribute: "INT", rank: 0,
+          permanentModifier: 0, temporaryModifier: 0, nativeBonus: 0,
+        };
+        character.skills.push(skill);
+      } else {
+        skill.catalogId = "language";
+        skill.name = `Язык: ${language.name}`;
+        skill.attribute = "INT";
+        skill.source ||= "general";
+        skill.rank ??= 0;
+        skill.permanentModifier ??= 0;
+        skill.temporaryModifier ??= 0;
+        skill.nativeBonus ??= 0;
+      }
+    }
+    applyNativeLanguage(character);
+  }
+
   function ensureGeneralSkills(character) {
     if (!Array.isArray(character.skills)) character.skills = [];
     for (const skill of character.skills) {
       const match = SKILLS.find(entry => entry.name === skill.name && entry.attribute === skill.attribute);
-      if (match && !skill.professionSkillId) skill.catalogId ||= match.id;
+      if (match && !skill.professionSkillId && !skill.legacyLanguage) skill.catalogId ||= match.id;
       if (!skill.source) skill.source = skill.catalogId ? "general" : "custom";
     }
     for (const definition of SKILLS) {
+      if (definition.id === "language") continue;
       let skill = character.skills.find(entry => entry.catalogId === definition.id && !entry.professionSkillId);
       if (!skill) {
         skill = character.skills.find(entry => entry.name === definition.name && entry.attribute === definition.attribute && !entry.professionSkillId);
@@ -146,9 +202,11 @@
         if (skill.rank === null || skill.rank === undefined) skill.rank = 0;
       }
     }
+    ensureLanguageSkills(character);
   }
 
   function getSkill(character, definition) {
+    if (definition.id === "language") return null;
     return character.skills.find(skill => skill.catalogId === definition.id && !skill.professionSkillId)
       || character.skills.find(skill => skill.name === definition.name && skill.attribute === definition.attribute && !skill.professionSkillId);
   }
@@ -176,11 +234,31 @@
     return skill;
   }
 
+  function professionLanguageRecord(character, language, profession) {
+    const skill = character.skills.find(entry => entry.languageId === language.id);
+    if (!skill) return null;
+    skill.catalogId = "language";
+    skill.source = "profession";
+    skill.professionId = profession.id;
+    skill.professionSkillId = `${profession.id}.language.${language.id}`;
+    skill.name = `Язык: ${language.name}`;
+    skill.attribute = "INT";
+    if (skill.rank === null || skill.rank === undefined || Number(skill.rank) < 1) skill.rank = 1;
+    skill.permanentModifier ??= 0;
+    skill.temporaryModifier ??= 0;
+    return skill;
+  }
+
   function applyProfession(character, professionId = character?.personal?.professionId) {
     const profession = findProfession(professionId);
     for (const skill of character.skills) {
       if (skill.source === "profession") {
-        skill.source = skill.catalogId && !skill.professionSkillId ? "general" : "other";
+        if (skill.languageId) {
+          skill.source = "general";
+          delete skill.professionSkillId;
+        } else {
+          skill.source = skill.catalogId && !skill.professionSkillId ? "general" : "other";
+        }
         skill.professionId = null;
       }
     }
@@ -204,11 +282,9 @@
       if (definition) professionSkillRecord(character, definition, profession);
     }
 
-    if (profession.languageChoices) {
-      const definition = BY_ID.get("language");
-      const displayName = `Язык (выберите ${profession.languageChoices})`;
-      const skill = professionSkillRecord(character, definition, profession, `${profession.id}.language`, displayName);
-      skill.specializationCount = profession.languageChoices;
+    for (const languageId of character.professionLanguageChoices?.[profession.id] || []) {
+      const language = LANGUAGES.find(entry => entry.id === languageId);
+      if (language) professionLanguageRecord(character, language, profession);
     }
 
     const choices = character.professionSkillChoices?.[profession.id] || [];
@@ -228,6 +304,19 @@
 
   function setProfession(character, professionId) {
     applyProfession(character, professionId);
+  }
+
+  function setProfessionLanguageChoices(character, professionId, selectedIds) {
+    const profession = findProfession(professionId);
+    if (!profession?.languageChoices) return { ok: false, message: "У этой профессии нет выбираемых языковых специализаций." };
+    const unique = [...new Set(selectedIds)];
+    if (unique.length !== selectedIds.length) return { ok: false, message: "Каждый язык можно выбрать только один раз." };
+    if (unique.length > profession.languageChoices) return { ok: false, message: `Профессия «${profession.name}» позволяет выбрать не больше ${profession.languageChoices} языка.` };
+    if (unique.some(id => !LANGUAGES.some(language => language.id === id))) return { ok: false, message: "Выбран неизвестный язык." };
+    character.professionLanguageChoices ||= {};
+    character.professionLanguageChoices[profession.id] = unique;
+    applyProfession(character, profession.id);
+    return { ok: true, selectedIds: unique };
   }
 
   function setProfessionChoices(character, professionId, selectedIds) {
@@ -255,8 +344,9 @@
   }
 
   return Object.freeze({
-    RACES, GENDERS, SKILLS, PROFESSIONS, COMBAT_SKILLS,
+    RACES, GENDERS, LANGUAGES, SKILLS, PROFESSIONS, COMBAT_SKILLS,
+    languageForHomeland, applyNativeLanguage,
     findProfession, findCharacterProfession, initializeCharacterSkills, setProfession,
-    setProfessionChoices, createCustomSkill, getProfessionSkillCount,
+    setProfessionChoices, setProfessionLanguageChoices, createCustomSkill, getProfessionSkillCount,
   });
 });
