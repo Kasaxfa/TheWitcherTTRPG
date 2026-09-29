@@ -9,6 +9,7 @@
   const escapeHtml = value => String(value ?? "").replace(/[&<>"']/g, character => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[character]);
   const normalize = value => String(value ?? "").toLocaleLowerCase("ru-RU").replaceAll("ё", "е");
   const numberText = value => new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(value);
+  const catalogView = window.CatalogView.createCatalogView({ recipes, alchemySymbols, itemById, resolveItemId, escapeHtml, numberText });
   let activePage = "recipes";
   let characterViewMode = "library";
   let activeCharacterTab = "sheet";
@@ -16,68 +17,6 @@
   let selectedItemId = null;
   let renameTargetCharacterId = null;
   let characterCreationDraft = null;
-
-  function formula(ingredients) {
-    const relevant = ingredients.filter(ingredient => alchemySymbols[ingredient.itemId]);
-    if (!relevant.length) return "";
-    const label = relevant.map(ingredient => `${alchemySymbols[ingredient.itemId].name}, ${ingredient.quantity} шт.`).join("; ");
-    const symbols = relevant.map(ingredient => {
-      const symbol = alchemySymbols[ingredient.itemId];
-      const count = Number(ingredient.quantity);
-      if (!Number.isInteger(count) || count < 1 || count > 30) return "";
-      return Array.from({ length: count }, () => `<svg class="alchemy-symbol" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="${escapeHtml(symbol.color)}"/><path d="${escapeHtml(symbol.path)}" fill="none" stroke="white" stroke-width="3.5" stroke-linejoin="round" stroke-linecap="round"/></svg>`).join("");
-    }).join("");
-    return `<span class="formula" role="img" aria-label="Формула: ${escapeHtml(label)}">${symbols}</span>`;
-  }
-
-  function recipeCard(recipe) {
-    const ingredients = recipe.ingredients || [];
-    const preview = recipe.type === "alchemy"
-      ? formula(ingredients)
-      : ingredients.slice(0, 3).map(ingredient => escapeHtml(ingredient.name)).join(" · ") + (ingredients.length > 3 ? ` · +${ingredients.length - 3}` : "");
-    const dc = recipe.dc ? `<span class="meta-pill"><strong>СЛ</strong>${escapeHtml(recipe.dc)}</span>` : "";
-    const time = recipe.time ? `<span class="meta-pill time"><strong>Время</strong>${escapeHtml(recipe.time)}</span>` : "";
-    return `<button type="button" class="recipe-card recipe-summary${selectedRecipeId === recipe.id ? " is-selected" : ""}" data-recipe-id="${escapeHtml(recipe.id)}" aria-pressed="${selectedRecipeId === recipe.id}">
-      <span class="recipe-title-block"><span class="recipe-title">${escapeHtml(recipe.name)}</span><span class="recipe-kind">${recipe.type === "alchemy" ? "Алхимия" : "Ремесло"}</span></span>
-      <span class="ingredient-preview">${preview || "Состав не указан"}</span>${dc}${time}</button>`;
-  }
-
-  function recipeDetail(recipe) {
-    const ingredients = recipe.ingredients || [];
-    const outputs = (recipe.outputs || []).map(output => {
-      const label = `${escapeHtml(output.name)}${output.quantity !== 1 ? ` ×${escapeHtml(output.quantity)}` : ""}`;
-      return output.itemId
-        ? `<button type="button" class="catalog-inline-link" data-open-catalog-item="${escapeHtml(output.itemId)}">${label}</button>`
-        : `<span>${label}</span>`;
-    }).join(" ");
-    const componentRows = ingredients.map(ingredient => {
-      const label = `${escapeHtml(ingredient.name)}${ingredient.quantity ? ` ×${escapeHtml(ingredient.quantity)}` : ""}`;
-      return ingredient.itemId
-        ? `<button type="button" class="ingredient-tag catalog-inline-link" data-open-catalog-item="${escapeHtml(ingredient.itemId)}">${label}</button>`
-        : `<span class="ingredient-tag">${label}</span>`;
-    }).join("") || `<span class="detail-value">Не указаны</span>`;
-    const outputEffects = (recipe.outputs || []).flatMap(output => {
-      const item = output.itemId ? itemById.get(resolveItemId(output.itemId)) : null;
-      return (item?.effects || []).map(effect => `<p>${escapeHtml(effect.text)}${effect.duration ? ` · ${escapeHtml(effect.duration)}` : ""}</p>`)
-        .concat(item?.details?.effect ? `<p>${escapeHtml(item.details.effect)}</p>` : []);
-    });
-    return `<div class="catalog-detail-inner">
-      <div class="catalog-detail-kicker">${recipe.type === "alchemy" ? "Алхимический рецепт" : "Ремесленный чертёж"}</div>
-      <h2>${escapeHtml(recipe.name)}</h2><p class="catalog-detail-subtitle">Рецепт для изготовления</p>
-      <div class="catalog-detail-divider"></div>
-      <div class="detail-label">Параметры</div><div class="recipe-detail-metrics">
-        <div class="recipe-metric"><span>Сложность</span><strong>СЛ ${escapeHtml(recipe.dc || "—")}</strong></div>
-        <div class="recipe-metric"><span>Время</span><strong>${escapeHtml(recipe.time || "—")}</strong></div>
-        <div class="recipe-metric"><span>Уровень</span><strong>${escapeHtml(recipe.tier || "—")}</strong></div>
-      </div>
-      <div class="detail-block"><span class="detail-label">Компоненты</span><div class="ingredient-list">${componentRows}</div></div>
-      ${recipe.type === "alchemy" ? `<div class="detail-block"><span class="detail-label">Формула · символы ингредиентов</span>${formula(ingredients)}</div>` : ""}
-      ${outputEffects.length ? `<div class="detail-block"><span class="detail-label">Эффект</span>${outputEffects.join("")}</div>` : ""}
-      ${(recipe.outputs || []).length ? `<div class="detail-block"><span class="detail-label">Результат</span><div class="ingredient-list">${outputs}</div></div>` : ""}
-      ${recipe.priceCrowns !== null && recipe.priceCrowns !== undefined ? `<div class="detail-block"><span class="detail-label">Цена</span><p>${numberText(recipe.priceCrowns)} кр.</p></div>` : ""}
-      ${recipe.surchargeCrowns !== null && recipe.surchargeCrowns !== undefined ? `<div class="detail-block"><span class="detail-label">Доплата за изготовление</span><p>${numberText(recipe.surchargeCrowns)} кр.</p></div>` : ""}
-    </div>`;
-  }
 
   function syncCatalogRowSelection(list, selectedId, idAttribute) {
     list.querySelectorAll(`[${idAttribute}]`).forEach(button => {
@@ -144,44 +83,13 @@
       return !query || text.includes(query);
     });
     if (!visible.some(recipe => recipe.id === selectedRecipeId)) selectedRecipeId = visible[0]?.id || null;
-    $("#recipe-list").innerHTML = visible.map(recipeCard).join("");
+    $("#recipe-list").innerHTML = visible.map(recipe => catalogView.recipeCard(recipe, selectedRecipeId)).join("");
     $("#recipe-empty").hidden = visible.length > 0;
     const detail = $("#recipe-detail");
     detail.hidden = visible.length === 0;
-    $("#recipe-detail-content").innerHTML = visible.length ? recipeDetail(visible.find(recipe => recipe.id === selectedRecipeId)) : "";
+    $("#recipe-detail-content").innerHTML = visible.length ? catalogView.recipeDetail(visible.find(recipe => recipe.id === selectedRecipeId)) : "";
     detail.closest(".catalog-columns").classList.toggle("is-empty", visible.length === 0);
     if (!visible.length) detail.closest(".catalog-columns").classList.remove("mobile-detail-open");
-  }
-
-  function fieldValue(value, unit) {
-    if (value === null || value === undefined || value === "") return "Не указано";
-    return `${escapeHtml(value)}${unit ? ` ${escapeHtml(unit)}` : ""}`;
-  }
-
-  function itemCard(item) {
-    const quick = [];
-    if (item.weightKg !== null) quick.push(`<span><strong>Вес</strong> ${numberText(item.weightKg)} кг</span>`);
-    if (item.costCrowns !== null) quick.push(`<span><strong>Цена</strong> ${numberText(item.costCrowns)} кр.</span>`);
-    return `<button type="button" class="item-card item-summary${selectedItemId === item.id ? " is-selected" : ""}" data-item-id="${escapeHtml(item.id)}" aria-pressed="${selectedItemId === item.id}"><span class="item-name">${escapeHtml(item.name)}</span><span class="item-kind">${escapeHtml(item.typeLabel)}</span><span class="item-quick-meta">${quick.join("") || "Сведения о весе и цене отсутствуют"}</span></button>`;
-  }
-
-  function itemDetail(item) {
-    const details = item.details || {};
-    const narrative = Object.entries(details).filter(([, value]) => value !== null && value !== "").map(([key, value]) => {
-      const labels = { where_found: "Где найти", availability: "Доступность", acquisition_method: "Где найти", alchemy_group: "Группа", effect: "Эффект", duration: "Длительность", toxicity: "Токсичность", application: "Применение", notes: "Примечание" };
-      return `<div class="detail-block"><span class="detail-label">${labels[key] || escapeHtml(key)}</span><p>${escapeHtml(value)}</p></div>`;
-    }).join("");
-    const attributes = item.attributes?.length ? `<div class="detail-block"><span class="detail-label">Характеристики</span><div class="attribute-list">${item.attributes.map(attribute => `<div class="attribute-row"><span>${escapeHtml(attribute.label)}</span><strong>${fieldValue(attribute.value, attribute.unit)}</strong></div>`).join("")}</div></div>` : "";
-    const effects = item.effects?.length ? `<div class="detail-block"><span class="detail-label">Эффекты</span>${item.effects.map(effect => `<p>${escapeHtml(effect.text)}${effect.duration ? ` · ${escapeHtml(effect.duration)}` : ""}</p>`).join("")}</div>` : "";
-    const description = item.description ? `<div class="detail-block"><span class="detail-label">Описание</span><p>${escapeHtml(item.description)}</p></div>` : "";
-    const related = recipes.filter(recipe => (recipe.ingredients || []).some(entry => entry.itemId === item.id)
-      || (recipe.outputs || []).some(entry => entry.itemId === item.id));
-    const relatedRecipes = related.length ? `<div class="detail-block"><span class="detail-label">Связанные рецепты и чертежи</span><div class="related-recipe-links">${related.map(recipe => `<button type="button" class="catalog-inline-link" data-open-recipe="${escapeHtml(recipe.id)}">${escapeHtml(recipe.name)} · ${recipe.type === "alchemy" ? "Алхимия" : "Ремесло"}</button>`).join("")}</div></div>` : "";
-    const quick = [];
-    if (item.weightKg !== null) quick.push(`<div class="recipe-metric"><span>Вес</span><strong>${numberText(item.weightKg)} кг</strong></div>`);
-    if (item.costCrowns !== null) quick.push(`<div class="recipe-metric"><span>Цена</span><strong>${numberText(item.costCrowns)} кр.</strong></div>`);
-    return `<div class="catalog-detail-inner"><div class="catalog-detail-kicker">${escapeHtml(item.typeLabel)}</div><h2>${escapeHtml(item.name)}</h2>
-      ${quick.length ? `<div class="item-detail-metrics">${quick.join("")}</div>` : ""}${description}${narrative}${attributes}${effects}${relatedRecipes}</div>`;
   }
 
   function setItemFilterOptions(select, placeholder, values) {
@@ -242,11 +150,11 @@
       return terms.every(term => searchable.includes(term));
     });
     if (!visible.some(item => item.id === selectedItemId)) selectedItemId = visible[0]?.id || null;
-    $("#item-list").innerHTML = visible.map(itemCard).join("");
+    $("#item-list").innerHTML = visible.map(item => catalogView.itemCard(item, selectedItemId)).join("");
     $("#item-empty").hidden = visible.length > 0;
     const detail = $("#item-detail");
     detail.hidden = visible.length === 0;
-    $("#item-detail-content").innerHTML = visible.length ? itemDetail(visible.find(item => item.id === selectedItemId)) : "";
+    $("#item-detail-content").innerHTML = visible.length ? catalogView.itemDetail(visible.find(item => item.id === selectedItemId)) : "";
     detail.closest(".catalog-columns").classList.toggle("is-empty", visible.length === 0);
     if (!visible.length) detail.closest(".catalog-columns").classList.remove("mobile-detail-open");
     $("#clear-item-filters").disabled = !$("#item-search").value && !type && !availability && !group && !equipmentCategory;
@@ -296,14 +204,14 @@
   let migrationNotice = "";
   let characterStore;
   try {
-    const loaded = window.CharacterStore.load(localStorage, { cleanLegacyEntry: cleanEntry });
+    const loaded = window.WitcherApi.loadCharacters(localStorage, { cleanLegacyEntry: cleanEntry });
     characterStore = loaded.store;
     if (loaded.migratedLegacyInventory) migrationNotice = "Старый инвентарь перенесён в «Персонаж 1». Исходный JSON сохранён для восстановления.";
     if (loaded.migratedSchemaVersion) migrationNotice = "Формат листа обновлён; исходная версия сохранена в резервной копии браузера.";
   } catch (error) {
     persistenceReady = false;
     persistenceError = error.message || "Не удалось проверить сохранение.";
-    characterStore = window.CharacterStore.createStore("Данные не загружены");
+    characterStore = window.WitcherApi.createCharacterStore("Данные не загружены");
   }
 
   function activeCharacter() {
@@ -335,8 +243,8 @@
     const write = () => {
       saveTimer = null;
       try {
-        activeCharacter().updatedAt = new Date().toISOString();
-        characterStore = window.CharacterStore.save(localStorage, characterStore);
+        window.WitcherApi.updateCharacterField(activeCharacter(), "updatedAt", new Date().toISOString());
+        characterStore = window.WitcherApi.saveCharacters(localStorage, characterStore);
         inventory = activeCharacter().equipment;
         const time = new Intl.DateTimeFormat("ru-RU", { hour: "2-digit", minute: "2-digit" }).format(new Date());
         setSaveMessage(`${message ? `${message} ` : ""}Сохранено локально в ${time}.`);
@@ -353,17 +261,12 @@
   }
 
   function saveInventory(message = "Изменения инвентаря сохранены.") {
-    activeCharacter().equipment = inventory;
     persistStore(message, true);
     renderInventory();
   }
 
   function inventoryWeight(character = activeCharacter()) {
-    const entries = character.equipment?.items || [];
-    return {
-      knownKg: entries.reduce((sum, entry) => sum + (entry.unitWeightKg === null ? 0 : entry.unitWeightKg * entry.quantity), 0),
-      unknownCount: entries.filter(entry => entry.unitWeightKg === null).length,
-    };
+    return window.WitcherApi.inventoryWeight(character);
   }
 
   const inventorySearchItems = items.filter(item => item.type !== "transport" && !alchemySymbols[item.id]);
@@ -429,7 +332,7 @@
   function renderInventory() {
     $("#inventory-character-name").textContent = activeCharacter().personal.name.trim() || "Без имени";
     const { knownKg: knownWeight, unknownCount } = inventoryWeight();
-    const derived = window.CharacterRules.deriveCharacter(activeCharacter(), { carriedWeightKg: knownWeight, unknownWeightCount: unknownCount });
+    const derived = window.WitcherApi.deriveCharacter(activeCharacter(), { carriedWeightKg: knownWeight, unknownWeightCount: unknownCount });
     const capacity = derived.encumbranceKg;
     $("#capacity-readout").textContent = capacity === null ? "—" : numberText(capacity);
     $("#weight-total").textContent = `${numberText(knownWeight)} кг${unknownCount ? " + ?" : ""}`;
@@ -471,23 +374,10 @@
   }
 
   function addInventoryEntry(entry, separate = false) {
-    const existing = !separate && entry.itemId && inventory.items.find(item => item.itemId === entry.itemId);
-    if (existing) {
-      existing.quantity += entry.quantity;
-      if (entry.unitWeightKg !== null) existing.unitWeightKg = entry.unitWeightKg;
-    } else inventory.items.push(entry);
+    const result = window.WitcherApi.addInventoryItem(activeCharacter(), entry, separate);
+    if (!result.ok) { setSaveMessage(result.message, true); return; }
+    inventory = activeCharacter().equipment;
     saveInventory("Инвентарь сохранён в этом браузере.");
-  }
-
-  function unlinkInventoryEntry(entryId) {
-    const combat = activeCharacter().equipment.combat;
-    for (const slot of Object.values(combat.armorByZone)) {
-      if (slot.inventoryEntryId === entryId) slot.inventoryEntryId = null;
-    }
-    for (const weapon of combat.weapons) {
-      if (weapon.inventoryEntryId === entryId) weapon.inventoryEntryId = null;
-    }
-    if (combat.shield?.inventoryEntryId === entryId) combat.shield.inventoryEntryId = null;
   }
 
   const attributeLabels = {
@@ -506,10 +396,9 @@
 
   function activeDerivedValues() {
     const character = activeCharacter();
-    window.CharacterSkills.applyNativeLanguage(character);
     const weight = inventoryWeight(character);
     const armor = armorLoadoutStats(character);
-    return window.CharacterRules.deriveCharacter(character, {
+    return window.WitcherApi.deriveCharacter(character, {
       carriedWeightKg: weight.knownKg,
       unknownWeightCount: weight.unknownCount,
       armorEv: armor.ev,
@@ -518,20 +407,7 @@
   }
 
   function armorLoadoutStats(character = activeCharacter()) {
-    const combat = character.equipment?.combat;
-    if (!combat?.armorByZone) return { ev: 0, knownEv: 0, unknownCount: 0, itemCount: 0 };
-    const wornIds = [...new Set(Object.values(combat.armorByZone).map(slot => slot.inventoryEntryId).filter(Boolean))];
-    const worn = wornIds.map(id => character.equipment.items.find(entry => entry.id === id)).filter(Boolean);
-    let knownEv = 0;
-    let unknownCount = 0;
-    for (const entry of worn) {
-      const catalogValue = catalogAttribute(entry.itemId ? itemById.get(entry.itemId) : null, "encumbrance");
-      const raw = entry.armorEv ?? catalogValue;
-      const ev = raw === null || raw === undefined || raw === "" ? null : Number(raw);
-      if (!Number.isFinite(ev) || ev < 0) unknownCount += 1;
-      else knownEv += ev;
-    }
-    return { ev: unknownCount ? null : knownEv, knownEv, unknownCount, itemCount: worn.length };
+    return window.WitcherApi.armorLoadoutStats(character, (itemId, attribute) => catalogAttribute(itemById.get(itemId), attribute));
   }
 
   function renderCharacterStatus(derived) {
@@ -620,53 +496,6 @@
     ["skills", "Навыки"],
   ];
 
-  function professionSkillDescriptors(draft = characterCreationDraft) {
-    const profession = window.CharacterSkills.findProfession(draft?.professionId);
-    if (!profession) return [];
-    const result = [{
-      key: `defining-${profession.id}`, name: profession.defining.name, attribute: profession.defining.attribute,
-      catalogId: null, doubleCost: false, defining: true,
-    }];
-    for (const skillId of profession.skills) {
-      const definition = window.CharacterSkills.SKILLS.find(skill => skill.id === skillId);
-      if (definition) result.push({ key: definition.id, ...definition });
-    }
-    for (const languageId of draft.professionLanguageChoices || []) {
-      const language = window.CharacterSkills.LANGUAGES.find(entry => entry.id === languageId);
-      if (language) result.push({
-        key: `${profession.id}.language.${language.id}`, catalogId: "language", languageId: language.id,
-        name: `Язык: ${language.name}`, attribute: "INT", doubleCost: true,
-      });
-    }
-    for (const skillId of draft.professionChoices || []) {
-      const definition = window.CharacterSkills.SKILLS.find(skill => skill.id === skillId);
-      if (definition) result.push({ key: definition.id, ...definition });
-    }
-    return result.map(skill => ({ ...skill, rank: draft.professionRanks[skill.key] ?? 1 }));
-  }
-
-  function startingGeneralSkills(draft = characterCreationDraft) {
-    const professionalIds = new Set(professionSkillDescriptors(draft).map(skill => skill.catalogId).filter(Boolean));
-    const general = window.CharacterSkills.SKILLS.filter(skill => skill.id !== "language" && !professionalIds.has(skill.id))
-      .map(skill => ({ ...skill, key: skill.id, rank: draft.generalRanks[skill.id] ?? 0 }));
-    return general;
-  }
-
-  function startingSkillCost(skill) { return skill.doubleCost ? 2 : 1; }
-  function startingSkillSpent(skills) { return skills.reduce((sum, skill) => sum + skill.rank * startingSkillCost(skill), 0); }
-
-  function creationGeneralBudget(draft = characterCreationDraft) {
-    if (!draft.attributes) return 0;
-    const raceTraits = window.CharacterCreation.RACE_TRAITS[draft.race] || {};
-    const getValue = code => {
-      const base = Number(draft.attributes[code] || 0);
-      const racial = Number(raceTraits.attributeModifiers?.[code] || 0);
-      const minimum = raceTraits.minimumAttributes?.[code] || 0;
-      return Math.max(minimum, base + racial);
-    };
-    return getValue("INT") + getValue("REF");
-  }
-
   function newCharacterCreationDraft() {
     return {
       step: "identity", race: "", professionId: "", age: "", name: "", backgroundMode: "", generatedLifePath: null,
@@ -695,9 +524,9 @@
     let body = "";
 
     if (draft.step === "identity") {
-      const professionOptions = window.CharacterSkills.PROFESSIONS.map(profession => `<option value="${profession.id}"${draft.professionId === profession.id ? " selected" : ""}>${escapeHtml(profession.name)}</option>`).join("");
+      const professionOptions = window.WitcherApi.professions.map(profession => `<option value="${profession.id}"${draft.professionId === profession.id ? " selected" : ""}>${escapeHtml(profession.name)}</option>`).join("");
       body = `<div class="creation-field-grid">
-        <label class="field">Раса<select data-creation-field="race"><option value="">Выберите расу</option>${window.CharacterSkills.RACES.map(race => `<option value="${escapeHtml(race)}"${draft.race === race ? " selected" : ""}>${escapeHtml(race)}</option>`).join("")}</select></label>
+        <label class="field">Раса<select data-creation-field="race"><option value="">Выберите расу</option>${window.WitcherApi.races.map(race => `<option value="${escapeHtml(race)}"${draft.race === race ? " selected" : ""}>${escapeHtml(race)}</option>`).join("")}</select></label>
         <label class="field">Профессия<select data-creation-field="profession"><option value="">Выберите профессию</option>${professionOptions}</select></label>
         <label class="field">Возраст<input data-creation-field="age" type="number" min="${draft.race === "Ведьмак" ? "50" : "1"}" max="260" step="1" value="${escapeHtml(draft.age)}" placeholder="Лет"></label>
         <label class="field">Имя персонажа <span class="field-optional">можно позже</span><input data-creation-field="name" maxlength="120" value="${escapeHtml(draft.name)}" placeholder="Персонаж ${characterStore.characters.length + 1}"></label>
@@ -718,52 +547,52 @@
     } else if (draft.step === "attributes") {
       const modeChoices = `<div class="creation-choice-grid compact"><button type="button" class="creation-choice${draft.attributeMode === "dice" ? " selected" : ""}" data-attribute-mode="dice"><strong>Броски 9d10</strong><span>Каждый результат 1 или 2 перебрасывается.</span></button><button type="button" class="creation-choice${draft.attributeMode === "points" ? " selected" : ""}" data-attribute-mode="points"><strong>Распределить очки</strong><span>Выберите пул 60, 70 или 80.</span></button></div>`;
       if (draft.attributeMode === "points") {
-        const attributes = draft.attributes || window.CharacterCreation.balancedAttributes(draft.attributePool);
-        const total = Object.values(attributes).reduce((sum, value) => sum + Number(value || 0), 0);
-        body = `${modeChoices}<label class="field creation-pool-field">Пул характеристик<select data-creation-field="attributePool">${window.CharacterCreation.POINT_BUY_POOLS.map(pool => `<option value="${pool}"${Number(draft.attributePool) === pool ? " selected" : ""}>${pool}</option>`).join("")}</select></label>
-          <div class="creation-budget-readout"><span>Распределено</span><strong id="creation-attribute-spent">${total} / ${draft.attributePool}</strong></div>
-          <div class="creation-stat-grid">${window.CharacterCreation.ATTRIBUTES.map(code => `<div class="creation-stat-row"><strong>${escapeHtml(attributeLabels[code])}<small>${shortAttribute(code)}</small></strong><button type="button" class="stepper-button" data-attribute-step="-1" data-attribute-code="${code}" aria-label="Уменьшить ${attributeLabels[code]}"${Number(attributes[code]) <= 1 ? " disabled" : ""}>−</button><input data-attribute-point="${code}" type="number" min="1" max="10" step="1" value="${escapeHtml(attributes[code])}" aria-label="${attributeLabels[code]}"><button type="button" class="stepper-button" data-attribute-step="1" data-attribute-code="${code}" aria-label="Увеличить ${attributeLabels[code]}"${Number(attributes[code]) >= 10 || total >= Number(draft.attributePool) ? " disabled" : ""}>＋</button></div>`).join("")}</div>
+        const creationModel = window.WitcherApi.creationView(draft);
+        const attributes = creationModel.attributes;
+        body = `${modeChoices}<label class="field creation-pool-field">Пул характеристик<select data-creation-field="attributePool">${window.WitcherApi.pointBuyPools.map(pool => `<option value="${pool}"${Number(draft.attributePool) === pool ? " selected" : ""}>${pool}</option>`).join("")}</select></label>
+          <div class="creation-budget-readout"><span>Распределено</span><strong id="creation-attribute-spent">${creationModel.attributeSpent} / ${creationModel.attributePool}</strong></div>
+          <div class="creation-stat-grid">${window.WitcherApi.attributeCodes.map(code => `<div class="creation-stat-row"><strong>${escapeHtml(attributeLabels[code])}<small>${shortAttribute(code)}</small></strong><button type="button" class="stepper-button" data-attribute-step="-1" data-attribute-code="${code}" aria-label="Уменьшить ${attributeLabels[code]}"${Number(attributes[code]) <= 1 ? " disabled" : ""}>−</button><input data-attribute-point="${code}" type="number" min="1" max="10" step="1" value="${escapeHtml(attributes[code])}" aria-label="${attributeLabels[code]}"><button type="button" class="stepper-button" data-attribute-step="1" data-attribute-code="${code}" aria-label="Увеличить ${attributeLabels[code]}"${!creationModel.canIncreaseAttribute[code] ? " disabled" : ""}>＋</button></div>`).join("")}</div>
           <p class="creation-rule-note">Базовое значение каждой характеристики должно быть 1–10. Расовые модификаторы учитываются отдельно в листе.</p>`;
       } else if (draft.attributeMode === "dice") {
         const rolls = draft.rolls || [];
         const assigned = Object.values(draft.diceAssignments).map(Number);
-        body = `${modeChoices}<p class="creation-rule-note">Назначьте каждому параметру один из девяти результатов. Каждый бросок можно использовать только один раз.</p><div class="creation-dice-grid">${window.CharacterCreation.ATTRIBUTES.map(code => `<label class="field">${escapeHtml(attributeLabels[code])} · ${shortAttribute(code)}<select data-dice-attribute="${code}"><option value="">Выберите результат</option>${rolls.map((value, rollIndex) => `<option value="${rollIndex}"${Number(draft.diceAssignments[code]) === rollIndex ? " selected" : ""}${assigned.includes(rollIndex) && Number(draft.diceAssignments[code]) !== rollIndex ? " disabled" : ""}>Бросок ${rollIndex + 1}: ${value}</option>`).join("")}</select></label>`).join("")}</div><div class="creation-rolls" aria-label="Результаты бросков">${rolls.map((value, index) => `<span>${index + 1}: <strong>${value}</strong></span>`).join("")}</div>`;
+        body = `${modeChoices}<p class="creation-rule-note">Назначьте каждому параметру один из девяти результатов. Каждый бросок можно использовать только один раз.</p><div class="creation-dice-grid">${window.WitcherApi.attributeCodes.map(code => `<label class="field">${escapeHtml(attributeLabels[code])} · ${shortAttribute(code)}<select data-dice-attribute="${code}"><option value="">Выберите результат</option>${rolls.map((value, rollIndex) => `<option value="${rollIndex}"${Number(draft.diceAssignments[code]) === rollIndex ? " selected" : ""}${assigned.includes(rollIndex) && Number(draft.diceAssignments[code]) !== rollIndex ? " disabled" : ""}>Бросок ${rollIndex + 1}: ${value}</option>`).join("")}</select></label>`).join("")}</div><div class="creation-rolls" aria-label="Результаты бросков">${rolls.map((value, index) => `<span>${index + 1}: <strong>${value}</strong></span>`).join("")}</div>`;
       } else body = `${modeChoices}<p class="creation-rule-note">Сначала выберите способ определения характеристик.</p>`;
     } else if (draft.step === "skills") {
-      const professional = professionSkillDescriptors(draft);
-      const profession = window.CharacterSkills.findProfession(draft.professionId);
-      const professionalExpected = 1 + profession.skills.length + (profession.languageChoices || 0) + (profession.choice?.requiredCount || 0);
-      const profSpent = startingSkillSpent(professional);
-      const general = startingGeneralSkills(draft);
-      const generalSpent = startingSkillSpent(general);
-      const generalBudget = creationGeneralBudget(draft);
+      const creationModel = window.WitcherApi.creationView(draft);
+      const professional = creationModel.professional;
+      const profession = window.WitcherApi.findProfession(draft.professionId);
+      const profSpent = creationModel.professionalSpent;
+      const general = creationModel.general;
+      const generalSpent = creationModel.generalSpent;
+      const generalBudget = creationModel.generalBudget;
       const professionChoiceHtml = profession?.choice ? `<fieldset class="creation-skill-choice"><legend>${escapeHtml(profession.choice.label)}</legend><p>Выберите ровно ${profession.choice.requiredCount} навыков, чтобы получить все профессиональные навыки.</p><div class="profession-choice-grid">${profession.choice.options.map(id => {
-        const skill = window.CharacterSkills.SKILLS.find(value => value.id === id);
+        const skill = window.WitcherApi.skillDefinitions.find(value => value.id === id);
         return skill ? `<label class="profession-choice-option"><input type="checkbox" data-creation-profession-choice="${id}"${draft.professionChoices.includes(id) ? " checked" : ""}><span>${escapeHtml(skill.name)}</span><small>${shortAttribute(skill.attribute)} · ${escapeHtml(attributeLabels[skill.attribute])}</small></label>` : "";
       }).join("")}</div></fieldset>` : "";
-      const professionLanguageHtml = profession?.languageChoices ? `<fieldset class="creation-skill-choice"><legend>Профессиональные языки</legend><p>Выберите ${profession.languageChoices} ${profession.languageChoices === 1 ? "язык" : "языка"}. Каждый язык будет отдельным навыком.</p><div class="profession-choice-grid">${window.CharacterSkills.LANGUAGES.map(language => `<label class="profession-choice-option"><input type="checkbox" data-creation-profession-language-choice="${language.id}"${draft.professionLanguageChoices.includes(language.id) ? " checked" : ""}><span>${escapeHtml(language.name)}</span><small>Инт · стоимость ×2</small></label>`).join("")}</div></fieldset>` : "";
-      const professionalHtml = professional.length === professionalExpected ? professional.map(skill => creationSkillRow(skill, "profession")).join("") : `<p class="character-empty">Выберите профессиональные навыки и языки выше.</p>`;
-      const generalHtml = window.CharacterStore.ATTRIBUTES.filter(code => !["SPD", "LUCK"].includes(code)).map(code => {
+      const professionLanguageHtml = profession?.languageChoices ? `<fieldset class="creation-skill-choice"><legend>Профессиональные языки</legend><p>Выберите ${profession.languageChoices} ${profession.languageChoices === 1 ? "язык" : "языка"}. Каждый язык будет отдельным навыком.</p><div class="profession-choice-grid">${window.WitcherApi.languages.map(language => `<label class="profession-choice-option"><input type="checkbox" data-creation-profession-language-choice="${language.id}"${draft.professionLanguageChoices.includes(language.id) ? " checked" : ""}><span>${escapeHtml(language.name)}</span><small>Инт · стоимость ×2</small></label>`).join("")}</div></fieldset>` : "";
+      const professionalHtml = creationModel.professionalComplete ? professional.map(skill => creationSkillRow(skill, "profession")).join("") : `<p class="character-empty">Выберите профессиональные навыки и языки выше.</p>`;
+      const generalHtml = window.WitcherApi.attributes.filter(code => !["SPD", "LUCK"].includes(code)).map(code => {
         const skills = general.filter(skill => skill.attribute === code);
         return skills.length ? `<details class="creation-skill-group" data-creation-skill-group="${code}"><summary>${escapeHtml(attributeLabels[code])} · ${shortAttribute(code)} <span>${skills.length} навыков</span></summary><div>${skills.map(skill => creationSkillRow(skill, "general")).join("")}</div></details>` : "";
       }).join("");
       const homeland = draft.backgroundMode === "random" ? draft.generatedLifePath?.homeland?.region : draft.homeland;
-      const nativeLanguageId = window.CharacterSkills.languageForHomeland(homeland, draft.generatedLifePath?.homeland?.origin || "");
-      const nativeLanguage = window.CharacterSkills.LANGUAGES.find(language => language.id === nativeLanguageId);
+      const nativeLanguageId = window.WitcherApi.languageForHomeland(homeland, draft.generatedLifePath?.homeland?.origin || "");
+      const nativeLanguage = window.WitcherApi.languages.find(language => language.id === nativeLanguageId);
       const homelandPrompt = draft.backgroundMode === "random"
         ? "Укажите родину в личных данных листа, если она не определена случайной предысторией."
         : "Укажите родину на шаге предыстории, чтобы применить бесплатный бонус +8.";
       const nativeLanguageNote = nativeLanguage
         ? `Родной язык: ${nativeLanguage.name} · +8 бесплатно, без расхода очков.`
         : `Родной язык не определён. ${homelandPrompt}`;
-      const languageSummary = window.CharacterSkills.LANGUAGES.map(language => {
+      const languageSummary = window.WitcherApi.languages.map(language => {
         const professional = draft.professionLanguageChoices.includes(language.id);
         const status = language.id === nativeLanguageId ? "родной · +8 бесплатно"
           : professional ? "профессиональный навык · ранг распределяется выше"
             : "доступен для прокачки за О.У.";
         return `<div class="creation-language-card${language.id === nativeLanguageId ? " is-native" : ""}"><strong>${escapeHtml(language.name)}</strong><span>${escapeHtml(status)}</span></div>`;
       }).join("");
-      body = `${professionChoiceHtml}${professionLanguageHtml}<div class="creation-skill-section"><div class="creation-budget-readout"><span>Профессиональные навыки · рейтинг не ниже 1, максимум 6 на создании</span><strong>${profSpent} / 44</strong></div><div class="creation-profession-skill-list">${professionalHtml}</div></div>
+      body = `${professionChoiceHtml}${professionLanguageHtml}<div class="creation-skill-section"><div class="creation-budget-readout"><span>Профессиональные навыки · рейтинг не ниже 1, максимум ${creationModel.maximumStartingRank} на создании</span><strong>${profSpent} / ${creationModel.professionalBudget}</strong></div><div class="creation-profession-skill-list">${professionalHtml}</div></div>
         <div class="creation-skill-section"><div class="creation-budget-readout"><span>Общие навыки · бюджет Инт + Реа</span><strong>${generalSpent} / ${generalBudget}</strong></div><p class="creation-rule-note">${nativeLanguageNote} Остаток общего бюджета можно не тратить. Языки развиваются отдельно; следующий ранг стоит вдвое дороже и не может превысить общий ранг 10.</p><div class="creation-language-grid">${languageSummary}</div>${generalHtml}</div>`;
     }
 
@@ -781,13 +610,13 @@
   }
 
   function creationSkillRow(skill, kind) {
-    const cost = startingSkillCost(skill);
-    const minimum = kind === "profession" ? 1 : 0;
+    const cost = skill.costPerRank;
+    const minimum = skill.minimumRank;
     return `<div class="creation-skill-row" data-creation-skill-row="${kind}.${escapeHtml(skill.key)}">
       <div><strong>${escapeHtml(skill.name)}</strong><small>${shortAttribute(skill.attribute)} · ${escapeHtml(attributeLabels[skill.attribute])}${skill.doubleCost ? " · стоимость ×2" : ""}${skill.defining ? " · определяющий" : ""}</small></div>
-      <button type="button" class="stepper-button" data-skill-step="-1" data-skill-kind="${kind}" data-skill-key="${escapeHtml(skill.key)}"${skill.rank <= minimum ? " disabled" : ""}>−</button>
-      <input data-skill-rank="${kind}.${escapeHtml(skill.key)}" type="number" min="${minimum}" max="6" step="1" value="${skill.rank}" aria-label="Рейтинг: ${escapeHtml(skill.name)}">
-      <button type="button" class="stepper-button" data-skill-step="1" data-skill-kind="${kind}" data-skill-key="${escapeHtml(skill.key)}"${skill.rank >= 6 ? " disabled" : ""}>＋</button>
+      <button type="button" class="stepper-button" data-skill-step="-1" data-skill-kind="${kind}" data-skill-key="${escapeHtml(skill.key)}"${!skill.canDecrease ? " disabled" : ""}>−</button>
+      <input data-skill-rank="${kind}.${escapeHtml(skill.key)}" type="number" min="${minimum}" max="${skill.maximumRank}" step="1" value="${skill.rank}" aria-label="Рейтинг: ${escapeHtml(skill.name)}">
+      <button type="button" class="stepper-button" data-skill-step="1" data-skill-kind="${kind}" data-skill-key="${escapeHtml(skill.key)}"${!skill.canIncrease ? " disabled" : ""}>＋</button>
       <span class="creation-skill-cost">${cost} оч. / ранг</span>
     </div>`;
   }
@@ -859,11 +688,7 @@
 
   function syncShellContext() {
     const editorActive = activePage === "characters" && characterViewMode === "editor";
-    document.querySelectorAll("[data-page-context]").forEach(panel => {
-      panel.hidden = panel.dataset.pageContext !== (editorActive ? "character-editor" : activePage);
-    });
-    $("#top").classList.toggle("is-character-library", activePage === "characters" && !editorActive);
-    $("#top").classList.toggle("is-character-editor", editorActive);
+    $("#top").dataset.view = editorActive ? "character-editor" : activePage === "characters" ? "character-library" : activePage;
   }
 
   function showCharacterTab(tab, updateHash = true, focusTab = false) {
@@ -892,8 +717,9 @@
     const character = characterStore.characters.find(value => value.characterId === characterId);
     if (!character) return;
     persistStore("", true);
-    characterStore.activeCharacterId = characterId;
+    window.WitcherApi.setActiveCharacter(characterStore, characterId);
     inventory = character.equipment;
+    const catalogChanged = window.WitcherApi.initializeCharacterSkills(character);
     characterViewMode = "editor";
     $("#character-library").hidden = true;
     $("#character-editor").hidden = false;
@@ -901,15 +727,15 @@
     renderCharacterEditor();
     showCharacterTab("sheet");
     renderInventory();
-    persistStore(`Открыт персонаж «${characterName(character)}».`);
+    persistStore(catalogChanged ? `Список навыков персонажа «${characterName(character)}» обновлён.` : `Открыт персонаж «${characterName(character)}».`);
   }
 
   function duplicateCharacter(characterId) {
     if (!persistenceReady) return;
     const source = characterStore.characters.find(character => character.characterId === characterId);
     if (!source) return;
-    const copy = window.CharacterStore.copyCharacter(source, uniqueCharacterName(`${source.personal.name.trim() || "Персонаж"} (копия)`));
-    characterStore.characters.push(copy);
+    const copy = window.WitcherApi.copyCharacter(source, uniqueCharacterName(`${source.personal.name.trim() || "Персонаж"} (копия)`));
+    window.WitcherApi.addCharacterToStore(characterStore, copy);
     openCharacter(copy.characterId);
     persistStore(`Создана копия «${characterName(copy)}».`);
   }
@@ -933,9 +759,9 @@
     if (!character) return;
     const name = characterName(character);
     if (!window.confirm(`Удалить «${name}» вместе с его листом и инвентарём?`)) return;
-    characterStore.characters = characterStore.characters.filter(value => value.characterId !== characterId);
-    if (characterStore.activeCharacterId === characterId) {
-      characterStore.activeCharacterId = characterStore.characters[0].characterId;
+    const removed = window.WitcherApi.removeCharacterFromStore(characterStore, characterId);
+    if (!removed.ok) return;
+    if (removed.activeCharacterId === characterStore.activeCharacterId && removed.character.characterId === characterId) {
       inventory = activeCharacter().equipment;
       renderCharacterEditor();
       renderInventory();
@@ -947,10 +773,9 @@
   function renderSkillRows() {
     const list = $("#character-skills");
     const character = activeCharacter();
-    const catalog = window.CharacterSkills;
-    const profession = catalog.findCharacterProfession(character);
+    const profession = window.WitcherApi.findCharacterProfession(character);
     const skillRow = skill => {
-      const definition = catalog.SKILLS.find(entry => entry.id === skill.catalogId);
+      const definition = window.WitcherApi.skillDefinitions.find(entry => entry.id === skill.catalogId);
       const fixed = Boolean(definition || skill.professionSkillId);
       const removable = skill.source === "custom" || skill.source === "other";
       const currentRank = Number.isInteger(skill.rank) ? skill.rank : 0;
@@ -963,7 +788,7 @@
         : '<label class="field skill-name-field">Навык<input data-skill-field="name" maxlength="120" value="' + escapeHtml(skill.name) + '" aria-label="Название навыка"></label>';
       const attributeControl = fixed ? '' :
         '<label class="field skill-attribute-field">Характеристика<select data-skill-field="attribute" aria-label="Ведущая характеристика"><option value="">Не указана</option>' +
-        window.CharacterStore.ATTRIBUTES.map(code => '<option value="' + code + '"' + (skill.attribute === code ? ' selected' : '') + '>' + escapeHtml(shortAttribute(code) + ' · ' + attributeLabels[code]) + '</option>').join("") +
+        window.WitcherApi.attributes.map(code => '<option value="' + code + '"' + (skill.attribute === code ? ' selected' : '') + '>' + escapeHtml(shortAttribute(code) + ' · ' + attributeLabels[code]) + '</option>').join("") +
         '</select></label>';
       const settingsControl = fixed ? '' : '<button class="skill-settings-icon" type="button" data-skill-setting-open="' + escapeHtml(skill.id) + '" aria-label="Настроить навык ' + escapeHtml(skill.name || "без названия") + '" title="Настроить навык">⚙</button>';
       const removeControl = removable
@@ -975,11 +800,11 @@
         '<output class="skill-total" data-skill-total="' + escapeHtml(skill.id) + '"><span>Итог</span><strong>—</strong><small data-skill-bonus></small></output>' +
         settingsControl + removeControl + '</div>';
     };
-    const attributes = window.CharacterStore.ATTRIBUTES;
+    const attributes = window.WitcherApi.attributes;
     const groups = attributes.map(attribute => {
       const skills = character.skills.filter(skill => skill.attribute === attribute);
       if (!skills.length) return "";
-      const value = window.CharacterRules.calculateAttributes(character)[attribute]?.total;
+      const value = window.WitcherApi.calculateAttributes(character)[attribute]?.total;
       return '<section class="skill-attribute-group">' +
         '<div class="skill-attribute-heading">' +
         '<button class="attribute-setting-trigger" type="button" data-attribute-setting-open="' + attribute + '" aria-label="Настроить ' + escapeHtml(attributeLabels[attribute]) + '">' +
@@ -1011,7 +836,7 @@
     if (profession.choice) {
       const selected = character.professionSkillChoices?.[profession.id] || [];
       const options = profession.choice.options.map(skillId => {
-        const skill = window.CharacterSkills.SKILLS.find(entry => entry.id === skillId);
+        const skill = window.WitcherApi.skillDefinitions.find(entry => entry.id === skillId);
         if (!skill) return "";
         const checked = selected.includes(skillId) ? " checked" : "";
         return `<label class="profession-choice-option"><input type="checkbox" data-profession-choice="${escapeHtml(skillId)}"${checked}><span>${escapeHtml(skill.name)}</span><small>${shortAttribute(skill.attribute)} · ${escapeHtml(attributeLabels[skill.attribute])}</small></label>`;
@@ -1020,7 +845,7 @@
     }
     if (profession.languageChoices) {
       const selected = character.professionLanguageChoices?.[profession.id] || [];
-      const options = window.CharacterSkills.LANGUAGES.map(language => `<label class="profession-choice-option"><input type="checkbox" data-profession-language-choice="${language.id}"${selected.includes(language.id) ? " checked" : ""}><span>${escapeHtml(language.name)}</span><small>Инт · стоимость ×2</small></label>`).join("");
+      const options = window.WitcherApi.languages.map(language => `<label class="profession-choice-option"><input type="checkbox" data-profession-language-choice="${language.id}"${selected.includes(language.id) ? " checked" : ""}><span>${escapeHtml(language.name)}</span><small>Инт · стоимость ×2</small></label>`).join("");
       sections.push(`<fieldset class="profession-choice-box"><legend>Языковые навыки профессии</legend><p>Выбрано ${selected.length} из ${profession.languageChoices}. У каждого языка свой ранг.</p><div class="profession-choice-grid">${options}</div></fieldset>`);
     }
     container.innerHTML = sections.join("");
@@ -1147,7 +972,7 @@
 
   function renderCharacterMagic() {
     const character = activeCharacter();
-    const profession = window.CharacterSkills.findCharacterProfession(character);
+    const profession = window.WitcherApi.findCharacterProfession(character);
     const professionSupportsMagic = ["witcher", "priest", "mage"].includes(profession?.id);
     const visible = professionSupportsMagic || character.magic.entries.length > 0;
     $("#character-magic-panel").hidden = !visible;
@@ -1181,29 +1006,15 @@
   }
 
   function isShieldEquipment(entry) {
-    const item = combatInventoryItem(entry);
-    return normalize(catalogAttribute(item, "armor_region") || "").includes("щит") || entry.customCategory === "shield";
+    return window.WitcherApi.isShieldEquipment(entry, (itemId, attribute) => catalogAttribute(itemById.get(itemId), attribute));
   }
 
   function combatItemAllowed(entry, kind) {
-    const item = combatInventoryItem(entry);
-    if (kind === "weapon") return item?.type === "weapon" || entry.customCategory === "weapon";
-    if (kind === "armor") return (item?.type === "armor" && !isShieldEquipment(entry)) || entry.customCategory === "armor";
-    return (item?.type === "armor" && isShieldEquipment(entry)) || entry.customCategory === "shield";
+    return window.WitcherApi.combatItemAllowed(entry, kind, itemId => itemById.get(itemId), (itemId, attribute) => catalogAttribute(itemById.get(itemId), attribute));
   }
 
   function armorCoversZone(entry, zone) {
-    if (entry.customCategory === "armor") return true;
-    const region = normalize(catalogAttribute(combatInventoryItem(entry), "armor_region") || "");
-    const matches = {
-      head: region.includes("голов"),
-      torso: region.includes("туловищ"),
-      rightArm: region.includes("рук"),
-      leftArm: region.includes("рук"),
-      rightLeg: region.includes("ног"),
-      leftLeg: region.includes("ног"),
-    };
-    return Boolean(matches[zone]);
+    return window.WitcherApi.armorCoversZone(entry, zone, itemId => itemById.get(itemId), (itemId, attribute) => catalogAttribute(itemById.get(itemId), attribute));
   }
 
   function combatItemOptions(kind, selectedId, zone = "") {
@@ -1305,7 +1116,7 @@
 
   function renderRaceTraits(character = activeCharacter()) {
     const container = $("#character-race-traits");
-    const traits = window.CharacterCreation.RACE_TRAITS[character.personal.race];
+    const traits = window.WitcherApi.raceTraits[character.personal.race];
     if (!traits) {
       container.innerHTML = `<p class="character-empty">Выберите расу, чтобы увидеть её особенности и автоматически учитываемые бонусы.</p>`;
       return;
@@ -1345,16 +1156,15 @@
 
   function renderProfessionTree(character = activeCharacter()) {
     const container = $("#character-profession-tree");
-    const profession = window.CharacterSkills.findCharacterProfession(character);
-    const tree = profession && window.CharacterProfessionTrees.TREES[profession.id];
+    const profession = window.WitcherApi.findCharacterProfession(character);
+    const tree = profession && window.WitcherApi.professionTrees[profession.id];
     if (!tree) {
       container.innerHTML = '<p class="character-empty">Выберите профессию, чтобы открыть её дерево способностей.</p>';
       return;
     }
-    window.CharacterProfessionTrees.ensureProgress(character, profession.id);
     const branches = tree.branches.map(branch => {
       const nodes = branch.nodes.map((node, index) => {
-        const state = window.CharacterProfessionTrees.getNodeState(character, profession.id, branch.id, index);
+        const state = window.WitcherApi.getProfessionNodeState(character, profession.id, branch.id, index);
         const status = state.unlocked ? '<span class="tree-node-state is-available">Открыто</span>' : '<span class="tree-node-state is-locked">🔒 Закрыто</span>';
         const unlockText = state.unlocked
           ? (index < 2 && state.rank < 5 ? 'Следующее умение откроется на ранге 5.' : 'Можно улучшать во вкладке «Развитие».')
@@ -1372,66 +1182,46 @@
 
   function renderCharacterAdvancement() {
     if (!$("#character-advancement-list")) return;
-    const character = activeCharacter();
-    const advancement = window.CharacterAdvancement;
-    const points = advancement.draftSummary(character, window.CharacterProfessionTrees);
+    const model = window.WitcherApi.getAdvancementView(activeCharacter());
     $("#character-improvement-summary").innerHTML =
-      '<div class="improvement-point-card"><span>Начислено</span><strong>' + points.earnedPoints + '</strong></div>' +
-      '<div class="improvement-point-card"><span>Применено</span><strong>' + points.spentPoints + '</strong></div>' +
-      '<div class="improvement-point-card is-reserved"><span>В черновике</span><strong>' + points.reservedPoints + '</strong></div>' +
-      '<div class="improvement-point-card is-available"><span>Свободно</span><strong>' + points.availablePoints + '</strong></div>';
-    $("#character-advancement-draft-note").textContent = points.hasDraft
-      ? 'Черновик: ' + points.reservedPoints + ' О.У. · нажмите «Применить прокачку», чтобы закрепить изменения.'
+      '<div class="improvement-point-card"><span>Начислено</span><strong>' + model.earnedPoints + '</strong></div>' +
+      '<div class="improvement-point-card"><span>Применено</span><strong>' + model.spentPoints + '</strong></div>' +
+      '<div class="improvement-point-card is-reserved"><span>В черновике</span><strong>' + model.reservedPoints + '</strong></div>' +
+      '<div class="improvement-point-card is-available"><span>Свободно</span><strong>' + model.availablePoints + '</strong></div>';
+    $("#character-advancement-draft-note").textContent = model.hasDraft
+      ? 'Черновик: ' + model.reservedPoints + ' О.У. · нажмите «Применить прокачку», чтобы закрепить изменения.'
       : 'Нет неподтверждённых улучшений.';
-    $("#apply-character-improvements").disabled = !points.hasDraft;
-    $("#cancel-character-improvements").disabled = !points.hasDraft;
+    $("#apply-character-improvements").disabled = !model.hasDraft;
+    $("#cancel-character-improvements").disabled = !model.hasDraft;
 
-    const attributeValues = window.CharacterRules.calculateAttributes(character);
-    const attributeRows = window.CharacterStore.ATTRIBUTES.map(code => {
-      const base = character.attributes[code];
-      const pending = advancement.draftCount(character, "attributes", code);
-      const projected = base === null || base === undefined ? null : Number(base) + pending;
-      const cost = advancement.attributeUpgradeCost(projected);
-      const canBuy = cost !== null && points.availablePoints >= cost;
-      const description = base === null || base === undefined ? 'Сначала задайте исходное значение' : cost === null ? 'Достигнут предел 10' : 'Следующий ранг стоит ' + cost + ' О.У.';
-      return '<div class="advancement-row advancement-attribute-row"><div class="advancement-row-title"><strong>' + escapeHtml(attributeLabels[code]) + '</strong><span>' + escapeHtml(shortAttribute(code)) + ' · итог ' + valueOrDash(attributeValues[code]?.total) + '</span></div>' +
-        '<span class="advancement-current">' + valueOrDash(base) + (pending ? ' → ' + projected + ' <small>(+' + pending + ')</small>' : '') + '</span>' +
-        '<div class="advancement-stepper"><button class="improvement-adjust-button" type="button" data-undo-attribute="' + code + '"' + (pending ? '' : ' disabled') + ' aria-label="Убрать одно черновое улучшение характеристики ' + escapeHtml(attributeLabels[code]) + '">−</button>' +
-        '<button class="improvement-adjust-button is-add" type="button" data-stage-attribute="' + code + '"' + (canBuy ? '' : ' disabled') + ' aria-label="Добавить черновое улучшение характеристики ' + escapeHtml(attributeLabels[code]) + ', стоимость ' + (cost ?? 'недоступно') + ' О.У.">' + (cost === null ? 'Максимум' : '+1 · ' + cost + ' О.У.') + '</button></div>' +
+    const attributeRows = model.attributes.map(entry => {
+      const description = entry.status === "set-base" ? "Сначала задайте исходное значение"
+        : entry.status === "max" ? "Достигнут предел 10" : "Следующий ранг стоит " + entry.cost + " О.У.";
+      return '<div class="advancement-row advancement-attribute-row"><div class="advancement-row-title"><strong>' + escapeHtml(attributeLabels[entry.code]) + '</strong><span>' + escapeHtml(shortAttribute(entry.code)) + ' · итог ' + valueOrDash(entry.total) + '</span></div>' +
+        '<span class="advancement-current">' + valueOrDash(entry.base) + (entry.pending ? ' → ' + entry.rank + ' <small>(+' + entry.pending + ')</small>' : '') + '</span>' +
+        '<div class="advancement-stepper"><button class="improvement-adjust-button" type="button" data-undo-attribute="' + entry.code + '"' + (entry.canUndo ? '' : ' disabled') + ' aria-label="Убрать одно черновое улучшение характеристики ' + escapeHtml(attributeLabels[entry.code]) + '">−</button>' +
+        '<button class="improvement-adjust-button is-add" type="button" data-stage-attribute="' + entry.code + '"' + (entry.canBuy ? '' : ' disabled') + ' aria-label="Добавить черновое улучшение характеристики ' + escapeHtml(attributeLabels[entry.code]) + ', стоимость ' + (entry.cost ?? 'недоступно') + ' О.У.">' + (entry.status === "max" ? 'Максимум' : entry.cost === null ? 'Недоступно' : '+1 · ' + entry.cost + ' О.У.') + '</button></div>' +
         '<small class="advancement-cost-note">' + description + '</small></div>';
     }).join("");
 
-    const attributeOrder = window.CharacterStore.ATTRIBUTES;
-    const skillRows = character.skills.map(skill => {
-      const definition = window.CharacterSkills.SKILLS.find(entry => entry.id === skill.catalogId);
-      const baseRank = (Number.isInteger(skill.rank) ? skill.rank : 0) + Number(skill.nativeBonus || 0);
-      const pending = advancement.draftCount(character, "skills", skill.id);
-      const rank = baseRank + pending;
-      const cost = advancement.skillUpgradeCost(rank, Boolean(definition?.doubleCost));
-      const canBuy = cost !== null && points.availablePoints >= cost;
-      const type = skill.professionSkillId ? 'Проф. умение' : skill.source === 'profession' ? 'Стартовый набор' : skill.source === 'general' ? 'Общий навык' : 'Свой навык';
-      return '<div class="advancement-row advancement-skill-row"><div class="advancement-row-title"><strong>' + escapeHtml(skill.name || 'Без названия') + '</strong><span>' + type + (definition?.doubleCost ? ' · сложный' : '') + '</span></div>' +
-        '<span class="advancement-current">Ранг ' + baseRank + (pending ? ' → <strong>' + rank + '</strong> <small>(+' + pending + ')</small>' : '') + '</span>' +
-        '<div class="advancement-stepper"><button class="improvement-adjust-button" type="button" data-undo-skill="' + escapeHtml(skill.id) + '"' + (pending ? '' : ' disabled') + ' aria-label="Убрать одно черновое улучшение навыка ' + escapeHtml(skill.name || 'без названия') + '">−</button>' +
-        '<button class="improvement-adjust-button is-add" type="button" data-stage-skill="' + escapeHtml(skill.id) + '"' + (canBuy ? '' : ' disabled') + ' aria-label="Добавить черновое улучшение навыка ' + escapeHtml(skill.name || 'без названия') + ', стоимость ' + (cost ?? 'недоступно') + ' О.У.">' + (cost === null ? 'Максимум' : '+1 · ' + cost + ' О.У.') + '</button></div></div>';
-    });
-    const skillGroups = attributeOrder.map(attribute => {
-      const rows = character.skills.filter(skill => skill.attribute === attribute).map(skill => skillRows[character.skills.indexOf(skill)]).join("");
+    const skillRows = model.skills.map(skill =>
+      '<div class="advancement-row advancement-skill-row"><div class="advancement-row-title"><strong>' + escapeHtml(skill.name) + '</strong><span>' + skill.type + (skill.doubleCost ? ' · сложный' : '') + '</span></div>' +
+      '<span class="advancement-current">Ранг ' + skill.baseRank + (skill.pending ? ' → <strong>' + skill.rank + '</strong> <small>(+' + skill.pending + ')</small>' : '') + '</span>' +
+      '<div class="advancement-stepper"><button class="improvement-adjust-button" type="button" data-undo-skill="' + escapeHtml(skill.id) + '"' + (skill.canUndo ? '' : ' disabled') + ' aria-label="Убрать одно черновое улучшение навыка ' + escapeHtml(skill.name) + '">−</button>' +
+      '<button class="improvement-adjust-button is-add" type="button" data-stage-skill="' + escapeHtml(skill.id) + '"' + (skill.canBuy ? '' : ' disabled') + ' aria-label="Добавить черновое улучшение навыка ' + escapeHtml(skill.name) + ', стоимость ' + (skill.cost ?? 'недоступно') + ' О.У.">' + (skill.cost === null ? 'Максимум' : '+1 · ' + skill.cost + ' О.У.') + '</button></div></div>'
+    );
+    const skillGroups = window.WitcherApi.attributeCodes.map(attribute => {
+      const rows = model.skills.filter(skill => skill.attribute === attribute).map(skill => skillRows[model.skills.indexOf(skill)]).join("");
       return rows ? '<section class="advancement-skill-group"><h3>' + escapeHtml(shortAttribute(attribute)) + ' · ' + escapeHtml(attributeLabels[attribute]) + '</h3>' + rows + '</section>' : '';
     }).join("");
-    const unassignedRows = character.skills.filter(skill => !attributeOrder.includes(skill.attribute)).map(skill => skillRows[character.skills.indexOf(skill)]).join("");
-    const profession = window.CharacterSkills.findCharacterProfession(character);
-    const tree = profession && window.CharacterProfessionTrees.TREES[profession.id];
-    const treeGroups = tree ? tree.branches.map(branch => {
-      const rows = branch.nodes.map((node, index) => {
-        const state = advancement.professionAbilityState(character, profession.id, branch.id, index, window.CharacterProfessionTrees);
-        const cost = advancement.skillUpgradeCost(state.rank, false);
-        const canBuy = state.unlocked && cost !== null && points.availablePoints >= cost;
-        const status = state.unlocked ? 'Открыто' : 'Закрыто до ранга 5 предыдущего узла';
-        return '<div class="advancement-row advancement-tree-row' + (state.unlocked ? '' : ' is-locked') + '"><div class="advancement-row-title"><strong>' + escapeHtml(node.name) + '</strong><span>Умение дерева · ' + status + '</span></div>' +
-          '<span class="advancement-current">Ранг ' + state.baseRank + (state.pending ? ' → <strong>' + state.rank + '</strong> <small>(+' + state.pending + ')</small>' : '') + '</span>' +
-          '<div class="advancement-stepper"><button class="improvement-adjust-button" type="button" data-undo-tree-profession="' + profession.id + '" data-undo-tree-branch="' + branch.id + '" data-undo-tree-index="' + index + '"' + (state.pending ? '' : ' disabled') + ' aria-label="Убрать одно черновое улучшение умения ' + escapeHtml(node.name) + '">−</button>' +
-          '<button class="improvement-adjust-button is-add" type="button" data-stage-tree-profession="' + profession.id + '" data-stage-tree-branch="' + branch.id + '" data-stage-tree-index="' + index + '"' + (canBuy ? '' : ' disabled') + ' aria-label="Добавить черновое улучшение умения ' + escapeHtml(node.name) + ', стоимость ' + (cost ?? 'недоступно') + ' О.У.">' + (!state.unlocked ? 'Закрыто' : cost === null ? 'Максимум' : '+1 · ' + cost + ' О.У.') + '</button></div></div>';
+    const unassignedRows = model.skills.filter(skill => !window.WitcherApi.attributeCodes.includes(skill.attribute)).map(skill => skillRows[model.skills.indexOf(skill)]).join("");
+    const treeGroups = model.treeBranches.length ? model.treeBranches.map(branch => {
+      const rows = branch.nodes.map(node => {
+        const status = node.status;
+        return '<div class="advancement-row advancement-tree-row' + (node.unlocked ? '' : ' is-locked') + '"><div class="advancement-row-title"><strong>' + escapeHtml(node.name) + '</strong><span>Умение дерева · ' + status + '</span></div>' +
+          '<span class="advancement-current">Ранг ' + node.baseRank + (node.pending ? ' → <strong>' + node.rank + '</strong> <small>(+' + node.pending + ')</small>' : '') + '</span>' +
+          '<div class="advancement-stepper"><button class="improvement-adjust-button" type="button" data-undo-tree-profession="' + node.professionId + '" data-undo-tree-branch="' + node.branchId + '" data-undo-tree-index="' + node.index + '"' + (node.canUndo ? '' : ' disabled') + ' aria-label="Убрать одно черновое улучшение умения ' + escapeHtml(node.name) + '">−</button>' +
+          '<button class="improvement-adjust-button is-add" type="button" data-stage-tree-profession="' + node.professionId + '" data-stage-tree-branch="' + node.branchId + '" data-stage-tree-index="' + node.index + '"' + (node.canBuy ? '' : ' disabled') + ' aria-label="Добавить черновое улучшение умения ' + escapeHtml(node.name) + ', стоимость ' + (node.cost ?? 'недоступно') + ' О.У.">' + (!node.unlocked ? 'Закрыто' : node.cost === null ? 'Максимум' : '+1 · ' + node.cost + ' О.У.') + '</button></div></div>';
       }).join("");
       return '<section class="advancement-skill-group advancement-tree-group"><h3>' + escapeHtml(branch.name) + '</h3>' + rows + '</section>';
     }).join("") : '<p class="character-empty">Выберите профессию, чтобы открыть её умения дерева.</p>';
@@ -1442,7 +1232,6 @@
 
   function renderCharacterEditor() {
     const character = activeCharacter();
-    const catalogChanged = window.CharacterSkills.initializeCharacterSkills(character);
     $("#character-editor-name").textContent = characterName(character);
     $("#inventory-character-name").textContent = character.personal.name.trim() || "Без имени";
     renderCharacterSelects(character);
@@ -1472,7 +1261,6 @@
     renderLifePathOutcomes();
     renderCharacterDerived();
     showCharacterTab(activeCharacterTab, false);
-    if (catalogChanged && persistenceReady) persistStore("Список навыков персонажа обновлён.");
   }
 
   function fillCharacterSelect(select, placeholder, options, value, { keepUnknown = false } = {}) {
@@ -1486,25 +1274,23 @@
 
   function renderCharacterSelects(character = activeCharacter()) {
     const personal = character.personal;
-    fillCharacterSelect($("[data-character-select='race']"), "Выберите расу", window.CharacterSkills.RACES.map(value => ({ value, label: value })), personal.race, { keepUnknown: true });
-    fillCharacterSelect($("[data-character-select='gender']"), "Не указано", window.CharacterSkills.GENDERS.map(value => ({ value, label: value })), personal.gender, { keepUnknown: true });
-    const profession = window.CharacterSkills.findCharacterProfession(character);
-    const professionOptions = window.CharacterSkills.PROFESSIONS.map(value => ({ value: value.id, label: value.name }));
+    fillCharacterSelect($("[data-character-select='race']"), "Выберите расу", window.WitcherApi.races.map(value => ({ value, label: value })), personal.race, { keepUnknown: true });
+    fillCharacterSelect($("[data-character-select='gender']"), "Не указано", window.WitcherApi.genders.map(value => ({ value, label: value })), personal.gender, { keepUnknown: true });
+    const profession = window.WitcherApi.findCharacterProfession(character);
+    const professionOptions = window.WitcherApi.professions.map(value => ({ value: value.id, label: value.name }));
     const currentProfessionValue = profession?.id || (personal.profession ? "legacy-profession" : "");
     if (currentProfessionValue === "legacy-profession") professionOptions.push({ value: currentProfessionValue, label: `Сохранённое значение: ${personal.profession}` });
     fillCharacterSelect($("[data-character-select='profession']"), "Выберите профессию", professionOptions, currentProfessionValue);
   }
 
   function updateCharacterPath(path, value) {
-    const parts = path.split(".");
-    if (parts.length === 1) activeCharacter()[parts[0]] = value;
-    else activeCharacter()[parts[0]][parts[1]] = value;
+    return window.WitcherApi.updateCharacterField(activeCharacter(), path, value);
   }
 
   function openAttributeSettings(code) {
-    if (!window.CharacterStore.ATTRIBUTES.includes(code)) return;
+    if (!window.WitcherApi.attributes.includes(code)) return;
     const character = activeCharacter();
-    const values = window.CharacterRules.calculateAttributes(character)[code];
+    const values = window.WitcherApi.calculateAttributes(character)[code];
     $("#character-attribute-dialog").dataset.attribute = code;
     $("#character-attribute-dialog-title").textContent = attributeLabels[code] + " · " + shortAttribute(code);
     $("#character-attribute-base").value = values.base === null ? "" : String(values.base);
@@ -1524,8 +1310,8 @@
     const character = activeCharacter();
     const skill = character.skills.find(entry => entry.id === skillId);
     if (!skill) return;
-    const definition = window.CharacterSkills.SKILLS.find(entry => entry.id === skill.catalogId);
-    const profession = window.CharacterSkills.findCharacterProfession(character);
+    const definition = window.WitcherApi.skillDefinitions.find(entry => entry.id === skill.catalogId);
+    const profession = window.WitcherApi.findCharacterProfession(character);
     const source = skill.professionSkillId ? "Профессиональное умение" :
       skill.source === "profession" ? "Навык стартового набора" :
       skill.source === "general" ? "Общий навык" : "Собственный навык";
@@ -1556,7 +1342,8 @@
       control.value = String(skill[control.dataset.skillSetting] ?? 0);
       return true;
     }
-    skill[control.dataset.skillSetting] = value;
+    const update = window.WitcherApi.updateCharacterRecord(activeCharacter(), "skills", skill.id, control.dataset.skillSetting, value);
+    if (!update.ok) { setSaveMessage(update.message, true); return true; }
     renderCharacterDerived();
     const derived = activeDerivedValues().skills.find(entry => entry.id === skill.id);
     $("#character-skill-dialog-total").textContent = valueOrDash(derived?.total);
@@ -1565,12 +1352,12 @@
   }
 
   function openProfessionSkillDetails(professionId, branchId, index) {
-    const tree = window.CharacterProfessionTrees.TREES[professionId];
+    const tree = window.WitcherApi.professionTrees[professionId];
     const branch = tree?.branches.find(item => item.id === branchId);
     const node = branch?.nodes[index];
     if (!node) return;
-    const state = window.CharacterProfessionTrees.getNodeState(activeCharacter(), professionId, branchId, index);
-    const profession = window.CharacterSkills.findProfession(professionId);
+    const state = window.WitcherApi.getProfessionNodeState(activeCharacter(), professionId, branchId, index);
+    const profession = window.WitcherApi.findProfession(professionId);
     const dialog = $("#profession-skill-dialog");
     dialog.dataset.profession = professionId;
     dialog.dataset.branch = branchId;
@@ -1590,20 +1377,14 @@
     if (!control) return false;
     const code = $("#character-attribute-dialog").dataset.attribute;
     const part = control.dataset.attributeSetting;
-    if (!window.CharacterStore.ATTRIBUTES.includes(code)) return true;
+    if (!window.WitcherApi.attributes.includes(code)) return true;
     const value = control.value === "" ? null : Number(control.value);
-    if (value !== null && (!Number.isInteger(value) || value < (part === "base" ? 0 : -1000) || value > (part === "base" ? 1000 : 1000))) {
+    const result = window.WitcherApi.setCharacterAttribute(activeCharacter(), code, part, value);
+    if (!result.ok) {
+      setSaveMessage(result.message, true);
       control.value = part === "base" ? activeCharacter().attributes[code] ?? "" : activeCharacter().attributeModifiers[code][part];
       return true;
     }
-    if (part === "base" && window.CharacterAdvancement.draftCount(activeCharacter(), "attributes", code) > 0) {
-      setSaveMessage("Сначала примените или отмените черновые улучшения этой характеристики.", true);
-      control.value = activeCharacter().attributes[code] ?? "";
-      return true;
-    }
-    if (part === "base") activeCharacter().attributes[code] = value;
-    else activeCharacter().attributeModifiers[code][part] = value ?? 0;
-    const result = window.CharacterRules.calculateAttributes(activeCharacter())[code];
     $("#character-attribute-dialog-total").textContent = valueOrDash(result.total);
     renderCharacterDerived();
     persistStore("Характеристика обновлена.", event.type === "change");
@@ -1624,139 +1405,29 @@
     setCreationError("");
   }
 
-  function changeCreationSkill(kind, key, nextRank) {
+  function changeCreationSkill(kind, key, delta) {
     const draft = characterCreationDraft;
     if (!draft) return;
-    const skills = kind === "profession" ? professionSkillDescriptors(draft) : startingGeneralSkills(draft);
-    const skill = skills.find(entry => entry.key === key);
-    if (!skill) return;
-    const rank = Number(nextRank);
-    const minimum = kind === "profession" ? 1 : 0;
-    if (!Number.isInteger(rank) || rank < minimum || rank > 6) {
-      setCreationError(`Рейтинг «${skill.name}» должен быть от ${minimum} до 6.`);
+    const allocation = window.WitcherApi.changeCreationSkill(draft, kind, key, delta);
+    if (!allocation.ok) {
+      setCreationError(allocation.message);
       renderCreationWizard();
       return;
     }
-    skill.rank = rank;
-    const used = startingSkillSpent(skills);
-    const budget = kind === "profession" ? 44 : creationGeneralBudget(draft);
-    if (used > budget) {
-      setCreationError(`Не хватает очков: распределено ${used}, доступно ${budget}.`);
-      renderCreationWizard();
-      return;
-    }
-    if (kind === "profession") draft.professionRanks[key] = rank;
-    else draft.generalRanks[key] = rank;
     setCreationError("");
     renderCreationWizard();
   }
 
   function validateCreationStep() {
-    const draft = characterCreationDraft;
-    if (draft.step === "identity") {
-      const age = Number(draft.age);
-      if (!draft.race || !draft.professionId) return "Выберите расу и профессию.";
-      if (!window.CharacterCreation.validRaceProfession(draft.race, draft.professionId)) return "Эта комбинация расы и профессии недопустима по правилам.";
-      if (!Number.isInteger(age) || age < (draft.race === "Ведьмак" ? 50 : 1) || age > 260) {
-        return draft.race === "Ведьмак" ? "Возраст ведьмака должен быть от 50 до 260 лет." : "Укажите возраст целым числом от 1 до 260.";
-      }
-      draft.age = String(age);
-      return "";
-    }
-    if (draft.step === "background") {
-      if (!draft.backgroundMode) return "Выберите ручную или случайную предысторию.";
-      if (draft.backgroundMode === "random" && !draft.generatedLifePath) return "Сначала сгенерируйте предысторию.";
-      return "";
-    }
-    if (draft.step === "attributes") {
-      if (draft.attributeMode === "points") {
-        const result = window.CharacterCreation.validatePointBuy(draft.attributes, draft.attributePool);
-        if (!result.ok) return result.message;
-        return "";
-      }
-      if (draft.attributeMode === "dice") {
-        const result = window.CharacterCreation.validateDiceAssignment(draft.diceAssignments, draft.rolls);
-        if (!result.ok) return result.message;
-        draft.attributes = result.attributes;
-        return "";
-      }
-      return "Выберите способ определения характеристик.";
-    }
-    const profession = window.CharacterSkills.findProfession(draft.professionId);
-    if (profession?.choice && draft.professionChoices.length !== profession.choice.requiredCount) {
-      return `Для профессии «${profession.name}» нужно выбрать ровно ${profession.choice.requiredCount} навыков.`;
-    }
-    if (profession?.languageChoices && draft.professionLanguageChoices.length !== profession.languageChoices) {
-      return `Для профессии «${profession.name}» нужно выбрать ровно ${profession.languageChoices} ${profession.languageChoices === 1 ? "язык" : "языка"}.`;
-    }
-    const professionalSkills = professionSkillDescriptors(draft);
-    const expectedProfessionalSkills = 1 + profession.skills.length + (profession.languageChoices || 0) + (profession.choice?.requiredCount || 0);
-    if (professionalSkills.length !== expectedProfessionalSkills) return `В профессиональном наборе должно быть ${expectedProfessionalSkills} навыков, сейчас: ${professionalSkills.length}.`;
-    const profSpent = startingSkillSpent(professionalSkills);
-    if (profSpent !== 44) return `Распределите 44 очка между профессиональными навыками. Сейчас распределено ${profSpent}.`;
-    const generalSkills = startingGeneralSkills(draft);
-    const generalSpent = startingSkillSpent(generalSkills);
-    const generalBudget = creationGeneralBudget(draft);
-    if (generalSpent > generalBudget) return `Общие навыки стоят ${generalSpent} очков при доступных ${generalBudget}.`;
-    return "";
+    return window.WitcherApi.validateCreationStep(characterCreationDraft);
   }
 
   function finishCharacterCreation() {
     const draft = characterCreationDraft;
-    const error = validateCreationStep();
-    if (error) { setCreationError(error); return; }
-    const character = window.CharacterStore.createCharacter(uniqueCharacterName(draft.name.trim() || `Персонаж ${characterStore.characters.length + 1}`));
-    character.personal.race = draft.race;
-    character.personal.age = draft.age;
-    character.personal.homeland = draft.backgroundMode === "manual" ? draft.homeland.trim() : "";
-    character.personal.professionId = draft.professionId;
-    character.personal.profession = window.CharacterSkills.findProfession(draft.professionId)?.name || "";
-    character.attributes = { ...draft.attributes };
-    character.creation = {
-      method: "guided",
-      backgroundMode: draft.backgroundMode,
-      attributeMethod: draft.attributeMode,
-      attributePool: draft.attributeMode === "points" ? Number(draft.attributePool) : null,
-      attributeRolls: draft.attributeMode === "dice" ? [...draft.rolls] : [],
-      professionSkillBudget: 44,
-      generalSkillBudget: creationGeneralBudget(draft),
-    };
-    if (draft.backgroundMode === "random") {
-      const generated = JSON.parse(JSON.stringify(draft.generatedLifePath));
-      character.lifePath.generated = generated;
-      if (generated.homeland?.region) {
-        character.personal.homeland = generated.homeland.region;
-        character.lifePath.familyHistory = generated.familyFate || "";
-        character.lifePath.familyStation = generated.familyStation || "";
-        character.lifePath.parents = generated.parents || "";
-        character.lifePath.siblings = (generated.siblings || []).map(sibling => `${sibling.role}${sibling.ageBand ? `, ${sibling.ageBand.toLowerCase()}` : ""}: ${sibling.relation}; ${sibling.personality}`).join("\n");
-      } else if (generated.kind === "witcher") {
-        character.lifePath.familyHistory = `${generated.school}. ${generated.importantEvent}`;
-        character.lifePath.familyStation = generated.presentStatus || "";
-        character.lifePath.parents = generated.training || "";
-      }
-      character.lifePath.decadeEvents = (generated.decadeEvents || []).map(event => `${event.decadeStart === undefined ? "" : `${event.decadeStart}–${event.decadeEnd} лет: `}${event.title || event.type}. ${event.description || ""}`.trim());
-      character.lifePath.allies = (generated.relatives || []).filter(relative => relative.role.startsWith("Союзник") || relative.role.startsWith("Друг")).map(relative => `${relative.role}: ${relative.details}`);
-      character.lifePath.enemies = (generated.relatives || []).filter(relative => relative.role.startsWith("Враг")).map(relative => `${relative.role}: ${relative.details}`);
-      character.lifePath.relationships = (generated.relatives || []).filter(relative => /возлюблен|роман|отношен/i.test(relative.role)).map(relative => `${relative.role}: ${relative.details}`);
-    }
-    window.CharacterSkills.setProfession(character, draft.professionId);
-    const profession = window.CharacterSkills.findProfession(draft.professionId);
-    if (profession?.choice) window.CharacterSkills.setProfessionChoices(character, profession.id, draft.professionChoices);
-    if (profession?.languageChoices) window.CharacterSkills.setProfessionLanguageChoices(character, profession.id, draft.professionLanguageChoices);
-    window.CharacterSkills.initializeCharacterSkills(character);
-    const professionalRanks = new Map(professionSkillDescriptors(draft).map(skill => [skill.key, skill.rank]));
-    for (const skill of character.skills) {
-      if (skill.source === "profession") {
-        const key = skill.professionSkillId || skill.catalogId;
-        if (professionalRanks.has(key)) skill.rank = professionalRanks.get(key);
-      } else if (skill.source === "general") {
-        skill.rank = draft.generalRanks[skill.languageId ? `language.${skill.languageId}` : skill.catalogId] ?? 0;
-      }
-    }
-    character.professionTrees[draft.professionId] = window.CharacterProfessionTrees.createProgress();
-    characterStore.characters.push(character);
-    characterStore.activeCharacterId = character.characterId;
+    const result = window.WitcherApi.createCharacterFromDraft(draft, uniqueCharacterName(draft.name.trim() || `Персонаж ${characterStore.characters.length + 1}`));
+    if (!result.ok) { setCreationError(result.error); return; }
+    const character = result.character;
+    window.WitcherApi.addCharacterToStore(characterStore, character);
     inventory = character.equipment;
     characterViewMode = "editor";
     $("#character-library").hidden = true;
@@ -1775,9 +1446,12 @@
     if (direction > 0) {
       const error = validateCreationStep();
       if (error) { setCreationError(error); return; }
+      if (draft.step === "attributes" && draft.attributeMode === "dice") {
+        window.WitcherApi.rollCreationAttributes(draft);
+      }
     }
     const index = creationSteps.findIndex(([id]) => id === draft.step);
-    draft.step = creationSteps[Math.max(0, Math.min(creationSteps.length - 1, index + direction))][0];
+    window.WitcherApi.updateCreationField(draft, "step", creationSteps[Math.max(0, Math.min(creationSteps.length - 1, index + direction))][0]);
     setCreationError("");
     renderCreationWizard();
   }
@@ -1785,11 +1459,12 @@
   function generateCreationLifePath() {
     const draft = characterCreationDraft;
     try {
-      draft.generatedLifePath = window.CharacterCreation.generateLifePath({
+      const generatedLifePath = window.WitcherApi.generateLifePath({
         race: draft.race,
         age: Number(draft.age),
         risk: draft.witcherRisk,
       });
+      window.WitcherApi.updateCreationField(draft, "generatedLifePath", generatedLifePath);
       setCreationError("");
     } catch (error) {
       setCreationError(error.message || "Не удалось создать предысторию.");
@@ -1804,53 +1479,45 @@
     if (field && ["input", "change"].includes(event.type)) {
       if (field.tagName === "SELECT" && event.type !== "change") return;
       const key = field.dataset.creationField;
+      const apiKey = key === "profession" ? "professionId" : key;
+      const update = window.WitcherApi.updateCreationField(draft, apiKey, field.value);
+      if (!update.ok && key !== "attributePool") { setCreationError(update.message); return; }
       if (key === "race") {
-        draft.race = field.value;
-        if (draft.professionId && draft.race && !window.CharacterCreation.validRaceProfession(draft.race, draft.professionId)) {
-          draft.professionId = "";
-          draft.professionChoices = [];
-          draft.professionLanguageChoices = [];
-        }
-        draft.generatedLifePath = null;
         renderCreationWizard();
       } else if (key === "profession") {
-        draft.professionId = field.value;
-        draft.professionChoices = [];
-        draft.professionLanguageChoices = [];
-        draft.professionRanks = {};
         renderCreationWizard();
       } else if (key === "age") {
-        draft.age = field.value;
-        if (draft.backgroundMode === "random") draft.generatedLifePath = null;
-      } else if (key === "name") {
-        draft.name = field.value;
-      } else if (key === "homeland") {
-        draft.homeland = field.value;
       } else if (key === "witcherRisk") {
-        draft.witcherRisk = field.value;
         if (draft.backgroundMode === "random" && draft.generatedLifePath) generateCreationLifePath();
       } else if (key === "attributePool") {
-        draft.attributePool = Number(field.value);
-        draft.attributes = window.CharacterCreation.balancedAttributes(draft.attributePool);
+        const result = window.WitcherApi.setCreationAttributePool(draft, Number(field.value));
+        if (!result.ok) { setCreationError(result.message); return; }
         renderCreationWizard();
       }
       return;
     }
     const attributeInput = event.target.closest("[data-attribute-point]");
     if (attributeInput && ["input", "change"].includes(event.type)) {
-      const value = attributeInput.value === "" ? null : Number(attributeInput.value);
-      if (value !== null && (!Number.isInteger(value) || value < 1 || value > 10)) return;
-      draft.attributes ||= window.CharacterCreation.balancedAttributes(draft.attributePool);
-      draft.attributes[attributeInput.dataset.attributePoint] = value;
-      const total = Object.values(draft.attributes).reduce((sum, current) => sum + Number(current || 0), 0);
-      $("#creation-attribute-spent").textContent = `${total} / ${draft.attributePool}`;
+      const value = Number(attributeInput.value);
+      if (!Number.isInteger(value)) return;
+      draft.attributes ||= window.WitcherApi.balancedAttributes(draft.attributePool);
+      const code = attributeInput.dataset.attributePoint;
+      const result = window.WitcherApi.changeCreationAttribute(draft, code, value - Number(draft.attributes[code]));
+      if (!result.ok) {
+        if (event.type === "change") { setCreationError(result.message); renderCreationWizard(); }
+        return;
+      }
+      $("#creation-attribute-spent").textContent = `${result.spent} / ${result.budget}`;
       if (event.type === "change") renderCreationWizard();
       return;
     }
     const diceInput = event.target.closest("[data-dice-attribute]");
     if (diceInput && event.type === "change") {
       if (diceInput.value === "") delete draft.diceAssignments[diceInput.dataset.diceAttribute];
-      else draft.diceAssignments[diceInput.dataset.diceAttribute] = Number(diceInput.value);
+      else {
+        const result = window.WitcherApi.assignCreationDie(draft, diceInput.dataset.diceAttribute, Number(diceInput.value));
+        if (!result.ok) { setCreationError(result.message); renderCreationWizard(); return; }
+      }
       renderCreationWizard();
       return;
     }
@@ -1859,13 +1526,12 @@
       const skillId = professionChoice.dataset.creationProfessionChoice;
       const selected = new Set(draft.professionChoices);
       if (professionChoice.checked) selected.add(skillId); else selected.delete(skillId);
-      const profession = window.CharacterSkills.findProfession(draft.professionId);
-      if (profession?.choice && selected.size > profession.choice.requiredCount) {
-        setCreationError(`Выберите ровно ${profession.choice.requiredCount} навыков.`);
+      const result = window.WitcherApi.setCreationChoices(draft, "profession", [...selected]);
+      if (!result.ok) {
+        setCreationError(result.message);
         renderCreationWizard();
         return;
       }
-      draft.professionChoices = [...selected];
       setCreationError("");
       renderCreationWizard();
       return;
@@ -1875,13 +1541,12 @@
       const languageId = professionLanguageChoice.dataset.creationProfessionLanguageChoice;
       const selected = new Set(draft.professionLanguageChoices);
       if (professionLanguageChoice.checked) selected.add(languageId); else selected.delete(languageId);
-      const profession = window.CharacterSkills.findProfession(draft.professionId);
-      if (profession?.languageChoices && selected.size > profession.languageChoices) {
-        setCreationError(`Для профессии «${profession.name}» выберите не больше ${profession.languageChoices} ${profession.languageChoices === 1 ? "языка" : "языков"}.`);
+      const result = window.WitcherApi.setCreationChoices(draft, "language", [...selected]);
+      if (!result.ok) {
+        setCreationError(result.message);
         renderCreationWizard();
         return;
       }
-      draft.professionLanguageChoices = [...selected];
       setCreationError("");
       renderCreationWizard();
       return;
@@ -1892,7 +1557,10 @@
       const separator = value.indexOf(".");
       const kind = value.slice(0, separator);
       const key = value.slice(separator + 1);
-      changeCreationSkill(kind, key, Number(skillInput.value));
+      const model = window.WitcherApi.creationView(draft);
+      const list = kind === "profession" ? model.professional : model.general;
+      const current = list.find(entry => entry.key === key)?.rank;
+      if (current !== undefined) changeCreationSkill(kind, key, Number(skillInput.value) - Number(current));
     }
   }
 
@@ -1907,23 +1575,15 @@
     if (action === "generate-life-path") { generateCreationLifePath(); return; }
     const background = event.target.closest("[data-creation-background]");
     if (background) {
-      draft.backgroundMode = background.dataset.creationBackground;
-      draft.generatedLifePath = null;
+      window.WitcherApi.updateCreationField(draft, "backgroundMode", background.dataset.creationBackground);
       setCreationError("");
       renderCreationWizard();
       return;
     }
     const attributeMode = event.target.closest("[data-attribute-mode]");
     if (attributeMode) {
-      draft.attributeMode = attributeMode.dataset.attributeMode;
-      if (draft.attributeMode === "dice") {
-        draft.rolls = window.CharacterCreation.rollAttributes();
-        draft.diceAssignments = {};
-        draft.attributes = null;
-      } else {
-        draft.attributePool ||= 70;
-        draft.attributes = window.CharacterCreation.balancedAttributes(draft.attributePool);
-      }
+      const modeResult = window.WitcherApi.setCreationAttributeMode(draft, attributeMode.dataset.attributeMode);
+      if (!modeResult.ok) { setCreationError(modeResult.message); return; }
       setCreationError("");
       renderCreationWizard();
       return;
@@ -1931,11 +1591,9 @@
     const attributeStep = event.target.closest("[data-attribute-step]");
     if (attributeStep) {
       const code = attributeStep.dataset.attributeCode;
-      draft.attributes ||= window.CharacterCreation.balancedAttributes(draft.attributePool);
-      const nextValue = Number(draft.attributes[code]) + Number(attributeStep.dataset.attributeStep);
-      const nextTotal = Object.values(draft.attributes).reduce((sum, value, index) => sum + (window.CharacterCreation.ATTRIBUTES[index] === code ? nextValue : Number(value)), 0);
-      if (nextValue < 1 || nextValue > 10 || nextTotal > Number(draft.attributePool)) return;
-      draft.attributes[code] = nextValue;
+      draft.attributes ||= window.WitcherApi.balancedAttributes(draft.attributePool);
+      const result = window.WitcherApi.changeCreationAttribute(draft, code, Number(attributeStep.dataset.attributeStep));
+      if (!result.ok) { setCreationError(result.message); return; }
       setCreationError("");
       renderCreationWizard();
       return;
@@ -1944,9 +1602,9 @@
     if (skillStep) {
       const kind = skillStep.dataset.skillKind;
       const key = skillStep.dataset.skillKey;
-      const skills = kind === "profession" ? professionSkillDescriptors(draft) : startingGeneralSkills(draft);
-      const skill = skills.find(entry => entry.key === key);
-      if (skill) changeCreationSkill(kind, key, skill.rank + Number(skillStep.dataset.skillStep));
+      const model = window.WitcherApi.creationView(draft);
+      const skills = kind === "profession" ? model.professional : model.general;
+      if (skills.some(entry => entry.key === key)) changeCreationSkill(kind, key, Number(skillStep.dataset.skillStep));
     }
   }
 
@@ -1964,16 +1622,16 @@
     if (persistenceReady) return;
     if (!window.confirm("Создать новый пустой лист? Текущее сохранение сначала будет сохранено отдельно, если браузер позволит.")) return;
     let raw = null;
-    try { raw = localStorage.getItem(window.CharacterStore.STORAGE_KEY); }
+    try { raw = window.WitcherApi.readRaw(localStorage, window.WitcherApi.storageKeys.characters); }
     catch (error) { setSaveMessage(`Браузер не разрешил прочитать сохранение: ${error.message || "ошибка хранилища"}`, true); return; }
     if (raw !== null) {
-      try { localStorage.setItem(`${window.CharacterStore.STORAGE_KEY}.recovery-backup-${Date.now()}`, raw); }
+      try { window.WitcherApi.writeRaw(localStorage, `${window.WitcherApi.storageKeys.characters}.recovery-backup-${Date.now()}`, raw); }
       catch { downloadRawRecoveryBackup(raw); }
     }
-    const candidate = window.CharacterStore.createStore("Персонаж 1");
-    window.CharacterSkills.initializeCharacterSkills(candidate.characters[0]);
+    const candidate = window.WitcherApi.createCharacterStore("Персонаж 1");
+    window.WitcherApi.initializeCharacterSkills(candidate.characters[0]);
     try {
-      characterStore = window.CharacterStore.save(localStorage, candidate);
+      characterStore = window.WitcherApi.saveCharacters(localStorage, candidate);
       persistenceReady = true;
       persistenceError = "";
       inventory = activeCharacter().equipment;
@@ -2007,7 +1665,7 @@
   function exportCharacterData(character = null) {
     try {
       if (!persistenceReady) {
-        const raw = localStorage.getItem(window.CharacterStore.STORAGE_KEY) ?? localStorage.getItem(window.CharacterStore.LEGACY_INVENTORY_KEY);
+        const raw = window.WitcherApi.readRaw(localStorage, window.WitcherApi.storageKeys.characters) ?? window.WitcherApi.readRaw(localStorage, window.WitcherApi.storageKeys.legacyInventory);
         if (raw !== null) {
           const blob = new Blob([raw], { type: "application/json" });
           const url = URL.createObjectURL(blob);
@@ -2023,7 +1681,7 @@
       const payload = character
         ? { ...characterStore, activeCharacterId: character.characterId, characters: [character] }
         : characterStore;
-      const backup = window.CharacterStore.createBackup(payload);
+      const backup = window.WitcherApi.createBackup(payload);
       if (character) delete backup.legacyInventoryBackup;
       const filename = character ? `witcher-${safeFilename(character.personal.name)}.json` : "witcher-characters.json";
       downloadJson(backup, filename);
@@ -2043,8 +1701,12 @@
     if (control.dataset.skillField === "permanentModifier" || control.dataset.skillField === "temporaryModifier") {
       const value = control.value === "" ? 0 : Number(control.value);
       if (!Number.isInteger(value) || value < -1000 || value > 1000) return true;
-      skill[control.dataset.skillField] = value;
-    } else skill[control.dataset.skillField] = control.value;
+      const result = window.WitcherApi.updateCharacterRecord(activeCharacter(), "skills", skill.id, control.dataset.skillField, value);
+      if (!result.ok) { setSaveMessage(result.message, true); return true; }
+    } else {
+      const result = window.WitcherApi.updateCharacterRecord(activeCharacter(), "skills", skill.id, control.dataset.skillField, control.value);
+      if (!result.ok) { setSaveMessage(result.message, true); return true; }
+    }
     if (control.dataset.skillField === "attribute" && event.type === "change") renderSkillRows();
     renderCharacterDerived();
     persistStore("Навыки обновлены.", event.type === "change");
@@ -2057,7 +1719,8 @@
     const row = control.closest("[data-ability-id]");
     const ability = activeCharacter().abilities.find(value => value.id === row?.dataset.abilityId);
     if (!ability) return true;
-    ability[control.dataset.abilityField] = control.value;
+    const result = window.WitcherApi.updateCharacterRecord(activeCharacter(), "abilities", ability.id, control.dataset.abilityField, control.value);
+    if (!result.ok) return true;
     persistStore("Способности обновлены.", event.type === "change");
     return true;
   }
@@ -2068,7 +1731,8 @@
     const row = control.closest("[data-life-path-outcome-id]");
     const outcome = activeCharacter().lifePath.outcomes.find(value => value.id === row?.dataset.lifePathOutcomeId);
     if (!outcome) return true;
-    outcome[control.dataset.lifePathOutcomeField] = control.value;
+    const result = window.WitcherApi.updateCharacterRecord(activeCharacter(), "outcomes", outcome.id, control.dataset.lifePathOutcomeField, control.value);
+    if (!result.ok) return true;
     persistStore("Жизненный путь обновлён.", event.type === "change");
     return true;
   }
@@ -2150,7 +1814,7 @@
     if (!button) return;
     selectedRecipeId = button.dataset.recipeId;
     syncCatalogRowSelection($("#recipe-list"), selectedRecipeId, "data-recipe-id");
-    $("#recipe-detail-content").innerHTML = recipeDetail(recipes.find(recipe => recipe.id === selectedRecipeId));
+    $("#recipe-detail-content").innerHTML = catalogView.recipeDetail(recipes.find(recipe => recipe.id === selectedRecipeId));
     openMobileCatalogDetail("recipes");
   });
   $("#item-list").addEventListener("click", event => {
@@ -2158,7 +1822,7 @@
     if (!button) return;
     selectedItemId = button.dataset.itemId;
     syncCatalogRowSelection($("#item-list"), selectedItemId, "data-item-id");
-    $("#item-detail-content").innerHTML = itemDetail(items.find(item => item.id === selectedItemId));
+    $("#item-detail-content").innerHTML = catalogView.itemDetail(items.find(item => item.id === selectedItemId));
     openMobileCatalogDetail("items");
   });
   document.addEventListener("click", event => {
@@ -2215,9 +1879,8 @@
     const relativeNameControl = event.target.closest("[data-generated-relative-name]");
     if (relativeNameControl) {
       if (!['input', 'change'].includes(event.type)) return true;
-      const relative = activeCharacter().lifePath.generated?.relatives?.find(entry => entry.id === relativeNameControl.dataset.generatedRelativeName);
-      if (relative) {
-        relative.name = relativeNameControl.value;
+      const result = window.WitcherApi.updateGeneratedRelativeName(activeCharacter(), relativeNameControl.dataset.generatedRelativeName, relativeNameControl.value);
+      if (result.ok) {
         persistStore("Имя персонажа из предыстории сохранено.", event.type === "change");
       }
       return true;
@@ -2227,14 +1890,14 @@
     if (professionChoice) {
       if (event.type !== "change") return true;
       const character = activeCharacter();
-      const profession = window.CharacterSkills.findCharacterProfession(character);
+      const profession = window.WitcherApi.findCharacterProfession(character);
       if (!profession?.choice) return true;
       const selected = [...(character.professionSkillChoices?.[profession.id] || [])];
       const skillId = professionChoice.dataset.professionChoice;
       const next = professionChoice.checked
         ? [...new Set([...selected, skillId])]
         : selected.filter(value => value !== skillId);
-      const result = window.CharacterSkills.setProfessionChoices(character, profession.id, next);
+      const result = window.WitcherApi.setProfessionChoices(character, profession.id, next);
       if (!result.ok) {
         setSaveMessage(result.message, true);
         renderProfessionChoiceFields(profession, character);
@@ -2249,14 +1912,14 @@
     if (professionLanguageChoice) {
       if (event.type !== "change") return true;
       const character = activeCharacter();
-      const profession = window.CharacterSkills.findCharacterProfession(character);
+      const profession = window.WitcherApi.findCharacterProfession(character);
       if (!profession?.languageChoices) return true;
       const selected = [...(character.professionLanguageChoices?.[profession.id] || [])];
       const languageId = professionLanguageChoice.dataset.professionLanguageChoice;
       const next = professionLanguageChoice.checked
         ? [...new Set([...selected, languageId])]
         : selected.filter(value => value !== languageId);
-      const result = window.CharacterSkills.setProfessionLanguageChoices(character, profession.id, next);
+      const result = window.WitcherApi.setProfessionLanguageChoices(character, profession.id, next);
       if (!result.ok) {
         setSaveMessage(result.message, true);
         renderProfessionChoiceFields(profession, character);
@@ -2272,24 +1935,27 @@
       const character = activeCharacter();
       const selection = selectControl.dataset.characterSelect;
       const nextRace = selection === "race" ? selectControl.value : character.personal.race;
-      const currentProfession = window.CharacterSkills.findCharacterProfession(character);
+      const currentProfession = window.WitcherApi.findCharacterProfession(character);
       const nextProfessionId = selection === "profession" ? selectControl.value : currentProfession?.id || "";
-      if (nextRace && nextProfessionId && !window.CharacterCreation.validRaceProfession(nextRace, nextProfessionId)) {
+      if (nextRace && nextProfessionId && !window.WitcherApi.validRaceProfession(nextRace, nextProfessionId)) {
         setSaveMessage("Эта раса несовместима с выбранной профессией по правилам.", true);
         renderCharacterSelects(character);
         return true;
       }
-      if (selection === "race") character.personal.race = selectControl.value;
-      else if (selection === "gender") character.personal.gender = selectControl.value;
-      else if (selection === "profession") {
+      if (selection === "race") {
+        const result = window.WitcherApi.setCharacterRace(character, selectControl.value);
+        if (!result.ok) { setSaveMessage(result.message, true); renderCharacterSelects(character); return true; }
+      } else if (selection === "gender") {
+        const result = window.WitcherApi.updateCharacterField(character, "personal.gender", selectControl.value);
+        if (!result.ok) { setSaveMessage(result.message, true); return true; }
+      } else if (selection === "profession") {
         if (selectControl.value === "legacy-profession") return true;
-        if (window.CharacterAdvancement.draftSummary(character, window.CharacterProfessionTrees).hasDraft) {
-          setSaveMessage("Перед сменой профессии примените прокачку или отмените черновик.", true);
+        const result = window.WitcherApi.setCharacterProfession(character, selectControl.value);
+        if (!result.ok) {
+          setSaveMessage(result.message, true);
           renderCharacterSelects(character);
           return true;
         }
-        window.CharacterSkills.setProfession(character, selectControl.value);
-        if (!selectControl.value) character.professionSkillChoices = {};
       }
       renderCharacterSelects(character);
       renderSkillRows();
@@ -2307,13 +1973,13 @@
     if (attributeControl) {
       const [code, part] = attributeControl.dataset.attributeInput.split(".");
       const value = attributeControl.value === "" ? null : Number(attributeControl.value);
-      if (value !== null && (!Number.isInteger(value) || value < (part === "base" ? 0 : -1000) || value > 1000)) return;
-      if (part === "base") activeCharacter().attributes[code] = value;
-      else activeCharacter().attributeModifiers[code][part] = value ?? 0;
+      if (!window.WitcherApi.validAttributeValue(part, value)) return;
+      const result = window.WitcherApi.setCharacterAttribute(activeCharacter(), code, part, value);
+      if (!result.ok) { setSaveMessage(result.message, true); return; }
     } else if (textControl) {
       updateCharacterPath(textControl.dataset.characterPath, textControl.value);
       if (textControl.dataset.characterPath === "personal.homeland" && event.type === "change") {
-        window.CharacterSkills.applyNativeLanguage(activeCharacter());
+        window.WitcherApi.applyNativeLanguage(activeCharacter());
         renderSkillRows();
       }
       if (textControl.dataset.characterPath === "personal.name") {
@@ -2323,14 +1989,15 @@
     } else if (numberControl) {
       const value = numberControl.value === "" ? null : Number(numberControl.value);
       const [section, key] = numberControl.dataset.characterNumber.split(".");
-      const minimum = section === "magic" && key === "vigorModifier" ? -100000 : 0;
-      if (value !== null && (!Number.isFinite(value) || value < minimum || value > 100000)) return;
-      activeCharacter()[section][key] = value;
+      const result = window.WitcherApi.updateCharacterField(activeCharacter(), `${section}.${key}`, value);
+      if (!result.ok) { setSaveMessage(result.message, true); return; }
     } else if (linesControl) {
       const [section, key] = linesControl.dataset.characterLines.split(".");
-      activeCharacter()[section][key] = linesControl.value.split(/\r?\n/).map(value => value.trim()).filter(Boolean);
+      const result = window.WitcherApi.updateCharacterField(activeCharacter(), `${section}.${key}`, linesControl.value.split(/\r?\n/).map(value => value.trim()).filter(Boolean));
+      if (!result.ok) { setSaveMessage(result.message, true); return; }
     } else if (event.target.id === "character-conditions") {
-      activeCharacter().state.conditions = event.target.value.split(/\r?\n/).map(value => value.trim()).filter(Boolean);
+      const result = window.WitcherApi.updateCharacterField(activeCharacter(), "state.conditions", event.target.value.split(/\r?\n/).map(value => value.trim()).filter(Boolean));
+      if (!result.ok) { setSaveMessage(result.message, true); return; }
     } else return;
     renderCharacterDerived();
     persistStore("Лист персонажа обновлён.", event.type === "change");
@@ -2339,17 +2006,17 @@
   $("#character-form").addEventListener("input", updateCharacterFromForm);
   $("#character-form").addEventListener("change", updateCharacterFromForm);
   $("#start-character-session").addEventListener("click", () => {
-    const luck = window.CharacterRules.calculateAttributes(activeCharacter()).LUCK.total;
+    const luck = window.WitcherApi.calculateAttributes(activeCharacter()).LUCK.total;
     if (luck === null || luck < 0) {
       setSaveMessage("Сначала укажите характеристику Удачи.", true);
       return;
     }
-    activeCharacter().state.currentLuck = luck;
+    window.WitcherApi.updateCharacterField(activeCharacter(), "state.currentLuck", luck);
     renderCharacterEditor();
     persistStore(`Новая сессия начата. Удача восстановлена до ${numberText(luck)}.`);
   });
   $("#add-character-wound").addEventListener("click", () => {
-    activeCharacter().state.wounds.push({ id: createEntryId(), location: "other", title: "", description: "", status: "active" });
+    window.WitcherApi.addCharacterRecord(activeCharacter(), "wounds", { id: createEntryId(), location: "other", title: "", description: "", status: "active" });
     renderCharacterWounds();
     persistStore("Добавлено ранение.");
     [...$("#character-wounds").querySelectorAll('[data-wound-field="title"]')].at(-1)?.focus();
@@ -2358,28 +2025,28 @@
     const control = event.target.closest("[data-wound-field]");
     const wound = activeCharacter().state.wounds.find(entry => entry.id === control?.closest("[data-wound-id]")?.dataset.woundId);
     if (!control || !wound) return;
-    wound[control.dataset.woundField] = control.value;
+    const result = window.WitcherApi.updateCharacterRecord(activeCharacter(), "wounds", wound.id, control.dataset.woundField, control.value);
+    if (!result.ok) return;
     persistStore("Ранение обновлено.", false);
   });
   $("#character-wounds").addEventListener("change", event => {
     const control = event.target.closest("[data-wound-field]");
     const wound = activeCharacter().state.wounds.find(entry => entry.id === control?.closest("[data-wound-id]")?.dataset.woundId);
     if (!control || !wound) return;
-    wound[control.dataset.woundField] = control.value;
+    const result = window.WitcherApi.updateCharacterRecord(activeCharacter(), "wounds", wound.id, control.dataset.woundField, control.value);
+    if (!result.ok) return;
     persistStore("Ранение обновлено.");
   });
   $("#character-wounds").addEventListener("click", event => {
     const button = event.target.closest("[data-remove-wound]");
     if (!button) return;
-    activeCharacter().state.wounds = activeCharacter().state.wounds.filter(wound => wound.id !== button.dataset.removeWound);
+    window.WitcherApi.removeCharacterRecord(activeCharacter(), "wounds", button.dataset.removeWound);
     renderCharacterWounds();
     persistStore("Ранение удалено.");
   });
   $("#add-character-combat-weapon").addEventListener("click", () => {
-    const weapons = activeCharacter().equipment.combat.weapons;
-    if (weapons.length >= 2) return;
-    const slot = weapons.some(weapon => weapon.slot === "primary") ? "backup" : "primary";
-    weapons.push({ id: createEntryId(), slot, inventoryEntryId: null, name: "", reliability: "" });
+    const result = window.WitcherApi.addCombatWeapon(activeCharacter(), createEntryId());
+    if (!result.ok) return;
     renderCharacterCombatEquipment();
     persistStore("Добавлен слот оружия.");
   });
@@ -2388,8 +2055,7 @@
   $("#character-combat-weapons").addEventListener("click", event => {
     const button = event.target.closest("[data-remove-combat-weapon]");
     if (!button) return;
-    const combat = activeCharacter().equipment.combat;
-    combat.weapons = combat.weapons.filter(weapon => weapon.id !== button.dataset.removeCombatWeapon);
+    window.WitcherApi.removeCombatWeapon(activeCharacter(), button.dataset.removeCombatWeapon);
     renderCharacterCombatEquipment();
     renderCharacterDerived();
     persistStore("Слот оружия удалён.");
@@ -2397,9 +2063,8 @@
   $("#character-armor-zones").addEventListener("input", updateCombatEquipmentFromControl);
   $("#character-armor-zones").addEventListener("change", updateCombatEquipmentFromControl);
   $("#add-character-shield").addEventListener("click", () => {
-    const combat = activeCharacter().equipment.combat;
-    if (combat.shield !== null) return;
-    combat.shield = { inventoryEntryId: null, currentSP: null, damage: "" };
+    const result = window.WitcherApi.setCombatShield(activeCharacter(), { inventoryEntryId: null, currentSP: null, damage: "" });
+    if (!result.ok) return;
     renderCharacterCombatEquipment();
     persistStore("Добавлен слот щита.");
   });
@@ -2407,7 +2072,7 @@
   $("#character-combat-shield").addEventListener("change", updateCombatEquipmentFromControl);
   $("#character-combat-shield").addEventListener("click", event => {
     if (!event.target.closest("[data-remove-character-shield]")) return;
-    activeCharacter().equipment.combat.shield = null;
+    window.WitcherApi.setCombatShield(activeCharacter(), null);
     renderCharacterCombatEquipment();
     renderCharacterDerived();
     persistStore("Щит убран из боевого снаряжения.");
@@ -2420,20 +2085,15 @@
       const slot = character.equipment.combat.armorByZone[armorRow.dataset.armorZone];
       if (!slot) return;
       if (target.matches("[data-armor-zone-item]")) {
-        slot.inventoryEntryId = target.value || null;
-        const entry = character.equipment.items.find(item => item.id === slot.inventoryEntryId);
+        const entry = character.equipment.items.find(item => item.id === target.value);
         const catalog = combatInventoryItem(entry || {});
         const baseSP = catalogAttribute(catalog, "armor_rating");
-        slot.currentSP = baseSP === null || baseSP === "" ? null : Number(baseSP);
-        slot.damage = "";
+        window.WitcherApi.setCombatSlotField(character, "armor", armorRow.dataset.armorZone, "inventoryEntryId", target.value, { armorRating: baseSP });
       } else {
         const field = target.dataset.armorZoneField;
         if (!field) return;
-        if (field === "currentSP") {
-          const value = target.value === "" ? null : Number(target.value);
-          if (value !== null && (!Number.isFinite(value) || value < 0)) return;
-          slot.currentSP = value;
-        } else slot[field] = target.value;
+        const result = window.WitcherApi.setCombatSlotField(character, "armor", armorRow.dataset.armorZone, field, target.value);
+        if (!result.ok) { setSaveMessage(result.message, true); return; }
       }
       if (event.type === "change") {
         renderCharacterCombatEquipment();
@@ -2447,23 +2107,13 @@
       const weapon = character.equipment.combat.weapons.find(entry => entry.id === weaponRow.dataset.combatWeaponId);
       const field = target.dataset.combatWeaponField;
       if (!weapon || !field) return;
-      if (field === "slot" && character.equipment.combat.weapons.some(entry => entry.id !== weapon.id && entry.slot === target.value)) {
-        setSaveMessage(target.value === "primary" ? "Основное оружие уже назначено." : "Запасное оружие уже назначено.", true);
-        renderCharacterCombatEquipment();
-        return;
-      }
+      let result;
       if (field === "inventoryEntryId") {
-        if (target.value && character.equipment.combat.weapons.some(entry => entry.id !== weapon.id && entry.inventoryEntryId === target.value)) {
-          setSaveMessage("Этот предмет уже назначен другому слоту оружия.", true);
-          renderCharacterCombatEquipment();
-          return;
-        }
-        weapon.inventoryEntryId = target.value || null;
-        const entry = character.equipment.items.find(item => item.id === weapon.inventoryEntryId);
+        const entry = character.equipment.items.find(item => item.id === target.value);
         const item = combatInventoryItem(entry || {});
-        weapon.name = entry?.name || "";
-        weapon.reliability = String(catalogAttribute(item, "reliability") ?? "");
-      } else weapon[field] = target.value;
+        result = window.WitcherApi.setCombatSlotField(character, "weapon", weapon.id, field, target.value, { name: entry?.name, reliability: catalogAttribute(item, "reliability") });
+      } else result = window.WitcherApi.setCombatSlotField(character, "weapon", weapon.id, field, target.value);
+      if (!result.ok) { setSaveMessage(result.message, true); renderCharacterCombatEquipment(); return; }
       if (event.type === "change") {
         renderCharacterCombatEquipment();
         renderCharacterDerived();
@@ -2473,20 +2123,15 @@
     }
     const shieldControl = target.closest("[data-shield-field]");
     if (shieldControl && character.equipment.combat.shield) {
-      const shield = character.equipment.combat.shield;
       const field = shieldControl.dataset.shieldField;
-      if (field === "inventoryEntryId") shield.inventoryEntryId = shieldControl.value || null;
-      else if (field === "currentSP") {
-        const value = shieldControl.value === "" ? null : Number(shieldControl.value);
-        if (value !== null && (!Number.isFinite(value) || value < 0)) return;
-        shield.currentSP = value;
-      } else shield[field] = shieldControl.value;
+      const result = window.WitcherApi.setCombatSlotField(character, "shield", "shield", field, shieldControl.value);
+      if (!result.ok) { setSaveMessage(result.message, true); return; }
       if (event.type === "change") renderCharacterCombatEquipment();
       persistStore("Щит обновлён.", event.type === "change");
     }
   }
   $("#add-character-magic-entry").addEventListener("click", () => {
-    activeCharacter().magic.entries.push({ id: createEntryId(), kind: "spell", name: "", catalogRef: null, cost: "", effect: "", range: "", duration: "", time: "", difficulty: "", components: "", notes: "" });
+    window.WitcherApi.addCharacterRecord(activeCharacter(), "magicEntries", { id: createEntryId(), kind: "spell", name: "", catalogRef: null, cost: "", effect: "", range: "", duration: "", time: "", difficulty: "", components: "", notes: "" });
     renderMagicEntries();
     persistStore("Добавлена магическая запись.");
     [...$("#character-magic-entries").querySelectorAll('[data-magic-field="name"]')].at(-1)?.focus();
@@ -2496,7 +2141,7 @@
   $("#character-magic-entries").addEventListener("click", event => {
     const button = event.target.closest("[data-remove-magic-entry]");
     if (!button) return;
-    activeCharacter().magic.entries = activeCharacter().magic.entries.filter(entry => entry.id !== button.dataset.removeMagicEntry);
+    window.WitcherApi.removeCharacterRecord(activeCharacter(), "magicEntries", button.dataset.removeMagicEntry);
     renderMagicEntries();
     persistStore("Магическая запись удалена.");
   });
@@ -2506,15 +2151,16 @@
     if (!entry) return;
     if (target.matches("[data-magic-catalog-search]")) {
       const reference = findMagicCatalogRef(target.value);
-      entry.catalogRef = reference;
-      if (reference && !entry.name.trim()) entry.name = reference.name;
+      window.WitcherApi.updateCharacterRecord(activeCharacter(), "magicEntries", entry.id, "catalogRef", reference);
+      if (reference && !entry.name.trim()) window.WitcherApi.updateCharacterRecord(activeCharacter(), "magicEntries", entry.id, "name", reference.name);
       if (event.type === "change") renderMagicEntries();
       persistStore("Связь с каталогом обновлена.", event.type === "change");
       return;
     }
     const field = target.dataset.magicField;
     if (!field) return;
-    entry[field] = target.value;
+    const result = window.WitcherApi.updateCharacterRecord(activeCharacter(), "magicEntries", entry.id, field, target.value);
+    if (!result.ok) { setSaveMessage(result.message, true); return; }
     persistStore("Магическая запись обновлена.", event.type === "change");
   }
   $("#character-development-panel").addEventListener("click", event => {
@@ -2522,8 +2168,8 @@
     const cancelButton = event.target.closest("#cancel-character-improvements");
     if (applyButton || cancelButton) {
       const result = applyButton
-        ? window.CharacterAdvancement.applyDraft(activeCharacter(), window.CharacterProfessionTrees)
-        : window.CharacterAdvancement.cancelDraft(activeCharacter(), window.CharacterProfessionTrees);
+        ? window.WitcherApi.applyAdvancement(activeCharacter())
+        : window.WitcherApi.cancelAdvancement(activeCharacter());
       if (!result.ok) {
         setSaveMessage(result.message, true);
         renderCharacterAdvancement();
@@ -2545,31 +2191,22 @@
     if (!stageAttribute && !undoAttribute && !stageSkill && !undoSkill && !stageTree && !undoTree) return;
     let result;
     if (stageAttribute) {
-      result = window.CharacterAdvancement.stageAttributeUpgrade(activeCharacter(), stageAttribute.dataset.stageAttribute);
+      result = window.WitcherApi.stageImprovement(activeCharacter(), "attribute", stageAttribute.dataset.stageAttribute);
     } else if (undoAttribute) {
-      result = window.CharacterAdvancement.undoAttributeUpgrade(activeCharacter(), undoAttribute.dataset.undoAttribute);
+      result = window.WitcherApi.undoImprovement(activeCharacter(), "attribute", undoAttribute.dataset.undoAttribute);
     } else if (stageSkill || undoSkill) {
       const skillId = stageSkill?.dataset.stageSkill || undoSkill.dataset.undoSkill;
-      const skill = activeCharacter().skills.find(entry => entry.id === skillId);
-      const definition = window.CharacterSkills.SKILLS.find(entry => entry.id === skill?.catalogId);
       result = stageSkill
-        ? window.CharacterAdvancement.stageSkillUpgrade(activeCharacter(), skillId, definition || {})
-        : window.CharacterAdvancement.undoSkillUpgrade(activeCharacter(), skillId, definition || {});
+        ? window.WitcherApi.stageImprovement(activeCharacter(), "skill", skillId)
+        : window.WitcherApi.undoImprovement(activeCharacter(), "skill", skillId);
     } else {
       const button = stageTree || undoTree;
-      result = stageTree ? window.CharacterAdvancement.stageProfessionAbilityUpgrade(
-        activeCharacter(),
-        button.dataset.stageTreeProfession,
-        button.dataset.stageTreeBranch,
-        Number(button.dataset.stageTreeIndex),
-        window.CharacterProfessionTrees,
-      ) : window.CharacterAdvancement.undoProfessionAbilityUpgrade(
-        activeCharacter(),
-        button.dataset.undoTreeProfession,
-        button.dataset.undoTreeBranch,
-        Number(button.dataset.undoTreeIndex),
-        window.CharacterProfessionTrees,
-      );
+      const detail = stageTree
+        ? { professionId: button.dataset.stageTreeProfession, branchId: button.dataset.stageTreeBranch, index: Number(button.dataset.stageTreeIndex) }
+        : { professionId: button.dataset.undoTreeProfession, branchId: button.dataset.undoTreeBranch, index: Number(button.dataset.undoTreeIndex) };
+      result = stageTree
+        ? window.WitcherApi.stageImprovement(activeCharacter(), "professionAbility", null, detail)
+        : window.WitcherApi.undoImprovement(activeCharacter(), "professionAbility", null, detail);
     }
     if (!result.ok) {
       setSaveMessage(result.message, true);
@@ -2583,7 +2220,7 @@
   });
   $("#award-improvement-points").addEventListener("click", () => {
     const input = $("#improvement-points-input");
-    const result = window.CharacterAdvancement.awardPoints(activeCharacter(), input.value);
+    const result = window.WitcherApi.awardImprovementPoints(activeCharacter(), input.value);
     if (!result.ok) {
       setSaveMessage(result.message, true);
       return;
@@ -2653,8 +2290,8 @@
       $("#rename-character-input").reportValidity();
       return;
     }
-    character.personal.name = name;
-    character.updatedAt = new Date().toISOString();
+    window.WitcherApi.updateCharacterField(character, "personal.name", name);
+    window.WitcherApi.updateCharacterField(character, "updatedAt", new Date().toISOString());
     $("#character-editor-name").textContent = name;
     $("#inventory-character-name").textContent = name;
     renderCharacterLibrary();
@@ -2662,7 +2299,7 @@
     $("#rename-character-dialog").close();
   });
   $("#add-life-path-outcome").addEventListener("click", () => {
-    activeCharacter().lifePath.outcomes.push({ id: createEntryId(), type: "Событие", description: "", source: "" });
+    window.WitcherApi.addCharacterRecord(activeCharacter(), "outcomes", { id: createEntryId(), type: "Событие", description: "", source: "" });
     renderLifePathOutcomes();
     persistStore("Добавлено последствие жизненного пути.");
     [...$("#character-life-path-outcomes").querySelectorAll('[data-life-path-outcome-field="description"]')].at(-1)?.focus();
@@ -2672,12 +2309,12 @@
   $("#character-life-path-outcomes").addEventListener("click", event => {
     const button = event.target.closest("[data-remove-life-path-outcome]");
     if (!button) return;
-    activeCharacter().lifePath.outcomes = activeCharacter().lifePath.outcomes.filter(outcome => outcome.id !== button.dataset.removeLifePathOutcome);
+    window.WitcherApi.removeCharacterRecord(activeCharacter(), "outcomes", button.dataset.removeLifePathOutcome);
     renderLifePathOutcomes();
     persistStore("Последствие жизненного пути удалено.");
   });
   $("#add-character-skill").addEventListener("click", () => {
-    activeCharacter().skills.push({ id: createEntryId(), name: "", attribute: null, rank: 0, permanentModifier: 0, temporaryModifier: 0, source: "custom" });
+    window.WitcherApi.addCharacterRecord(activeCharacter(), "skills", { id: createEntryId(), name: "", attribute: null, rank: 0, permanentModifier: 0, temporaryModifier: 0, source: "custom" });
     renderSkillRows();
     persistStore("Добавлен навык.");
     [...$("#character-skills").querySelectorAll('[data-skill-field="name"]')].at(-1)?.focus();
@@ -2693,19 +2330,17 @@
     }
     if (!button) return;
     const character = activeCharacter();
-    const skill = character.skills.find(value => value.id === button.dataset.removeSkill);
-    const definition = window.CharacterSkills.SKILLS.find(entry => entry.id === skill?.catalogId);
-    while (window.CharacterAdvancement.draftCount(character, "skills", button.dataset.removeSkill) > 0) {
-      const undone = window.CharacterAdvancement.undoSkillUpgrade(character, button.dataset.removeSkill, definition || {});
+    while (window.WitcherApi.getAdvancementView(character).skills.find(entry => entry.id === button.dataset.removeSkill)?.pending > 0) {
+      const undone = window.WitcherApi.undoImprovement(character, "skill", button.dataset.removeSkill);
       if (!undone.ok) break;
     }
-    character.skills = character.skills.filter(value => value.id !== button.dataset.removeSkill);
+    window.WitcherApi.removeSkill(character, button.dataset.removeSkill);
     renderSkillRows();
     renderCharacterAdvancement();
     persistStore("Навык удалён.");
   });
   $("#add-character-ability").addEventListener("click", () => {
-    activeCharacter().abilities.push({ id: createEntryId(), name: "", description: "" });
+    window.WitcherApi.addCharacterRecord(activeCharacter(), "abilities", { id: createEntryId(), name: "", description: "" });
     renderAbilityRows();
     persistStore("Добавлена способность.");
     [...$("#character-abilities").querySelectorAll('[data-ability-field="name"]')].at(-1)?.focus();
@@ -2715,7 +2350,7 @@
   $("#character-abilities").addEventListener("click", event => {
     const button = event.target.closest("[data-remove-ability]");
     if (!button) return;
-    activeCharacter().abilities = activeCharacter().abilities.filter(ability => ability.id !== button.dataset.removeAbility);
+    window.WitcherApi.removeCharacterRecord(activeCharacter(), "abilities", button.dataset.removeAbility);
     renderAbilityRows();
     persistStore("Способность удалена.");
   });
@@ -2725,7 +2360,7 @@
     try {
       if (file.size > 20 * 1024 * 1024) throw new Error("Файл больше 20 МБ.");
       const payload = JSON.parse(await file.text());
-      const imported = window.CharacterStore.parseImport(payload, { cleanLegacyEntry: cleanEntry });
+      const imported = window.WitcherApi.parseImport(payload, { cleanLegacyEntry: cleanEntry });
       let candidate;
       let resultMessage = "Резервная копия персонажей загружена.";
       if (imported.kind === "characters" && persistenceReady) {
@@ -2734,32 +2369,28 @@
           if (!window.confirm(`Добавить персонажа «${characterName(incoming)}» в список?`)) return;
           candidate = JSON.parse(JSON.stringify(characterStore));
           const added = candidate.characters.some(character => character.characterId === incoming.characterId)
-            ? window.CharacterStore.copyCharacter(incoming, uniqueCharacterName(`${incoming.personal.name.trim() || "Персонаж"} (копия)`))
+            ? window.WitcherApi.copyCharacter(incoming, uniqueCharacterName(`${incoming.personal.name.trim() || "Персонаж"} (копия)`))
             : incoming;
-          candidate.characters.push(added);
-          candidate.activeCharacterId = added.characterId;
+          window.WitcherApi.addCharacterToStore(candidate, added);
           resultMessage = `Персонаж «${characterName(added)}» добавлен из JSON.`;
         } else {
           if (!window.confirm("Заменить текущий список персонажей этим файлом? Перед заменой текущие данные сохранятся в браузере.")) return;
-          const currentRaw = localStorage.getItem(window.CharacterStore.STORAGE_KEY);
-          if (currentRaw !== null) localStorage.setItem(`${window.CharacterStore.STORAGE_KEY}.pre-import-backup`, currentRaw);
+          window.WitcherApi.backupRaw(localStorage, window.WitcherApi.storageKeys.characters, `${window.WitcherApi.storageKeys.characters}.pre-import-backup`);
           candidate = imported.store;
           resultMessage = "Список персонажей восстановлен из JSON.";
         }
       } else if (imported.kind === "legacy-inventory" && persistenceReady) {
         candidate = JSON.parse(JSON.stringify(characterStore));
         const newCharacter = imported.store.characters[0];
-        newCharacter.personal.name = uniqueCharacterName(`Персонаж ${candidate.characters.length + 1}`);
-        candidate.characters.push(newCharacter);
-        candidate.activeCharacterId = newCharacter.characterId;
+        window.WitcherApi.updateCharacterField(newCharacter, "personal.name", uniqueCharacterName(`Персонаж ${candidate.characters.length + 1}`));
+        window.WitcherApi.addCharacterToStore(candidate, newCharacter);
         resultMessage = "Старый инвентарь добавлен отдельным персонажем.";
       } else {
-        const currentRaw = localStorage.getItem(window.CharacterStore.STORAGE_KEY);
-        if (currentRaw !== null) localStorage.setItem(`${window.CharacterStore.STORAGE_KEY}.recovery-backup`, currentRaw);
+        window.WitcherApi.backupRaw(localStorage, window.WitcherApi.storageKeys.characters, `${window.WitcherApi.storageKeys.characters}.recovery-backup`);
         candidate = imported.store;
         resultMessage = imported.kind === "legacy-inventory" ? "Старый инвентарь восстановлен как первый персонаж." : "Список персонажей восстановлен из JSON.";
       }
-      characterStore = window.CharacterStore.save(localStorage, candidate);
+      characterStore = window.WitcherApi.saveCharacters(localStorage, candidate);
       persistenceReady = true;
       persistenceError = "";
       inventory = activeCharacter().equipment;
@@ -2911,34 +2542,20 @@
     const row = input.closest("[data-entry-id]");
     const entry = inventory.items.find(item => item.id === row.dataset.entryId);
     if (!entry) return;
-    if (input.dataset.field === "quantity") {
-      const value = Number(input.value);
-      if (!Number.isFinite(value) || value <= 0) { input.value = entry.quantity; return; }
-      entry.quantity = value;
-    } else if (input.dataset.field === "unitWeightKg") {
-      const value = input.value === "" ? null : Number(input.value);
-      if (value !== null && (!Number.isFinite(value) || value < 0)) { input.value = entry.unitWeightKg ?? ""; return; }
-      entry.unitWeightKg = value;
-    } else if (input.dataset.field === "conditionNotes") {
-      entry.conditionNotes = input.value.slice(0, 2000);
-    } else if (input.dataset.field === "armorEv") {
-      const value = input.value === "" ? null : Number(input.value);
-      if (value !== null && (!Number.isFinite(value) || value < 0 || value > 100)) { input.value = entry.armorEv ?? ""; return; }
-      entry.armorEv = value;
-    }
+    const field = input.dataset.field;
+    const result = window.WitcherApi.updateCharacterRecord(activeCharacter(), "inventoryItems", entry.id, field, field === "conditionNotes" ? input.value.slice(0, 2000) : input.value);
+    if (!result.ok) { input.value = entry[field] ?? ""; return; }
     saveInventory("Изменения сохранены.");
   });
   $("#inventory-list").addEventListener("click", event => {
     const button = event.target.closest("[data-remove]");
     if (!button) return;
-    unlinkInventoryEntry(button.dataset.remove);
-    inventory.items = inventory.items.filter(item => item.id !== button.dataset.remove);
+    window.WitcherApi.removeInventoryItem(activeCharacter(), button.dataset.remove);
     saveInventory("Предмет удалён.");
   });
   $("#clear-inventory").addEventListener("click", () => {
     if (!inventory.items.length || !window.confirm("Удалить все предметы из инвентаря?")) return;
-    inventory.items.forEach(item => unlinkInventoryEntry(item.id));
-    inventory.items = [];
+    window.WitcherApi.clearInventory(activeCharacter());
     saveInventory("Инвентарь очищен.");
   });
   updateRecipeFilters();

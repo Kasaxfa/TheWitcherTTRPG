@@ -45,7 +45,7 @@
   }
 
   function draftCount(character, group, key) {
-    const draft = progression(character).draft;
+    const draft = character?.development?.draft || {};
     return Math.max(0, Number(draft[group]?.[key] || 0));
   }
 
@@ -305,15 +305,24 @@
   }
 
   function draftSummary(character, trees) {
-    const cost = draftCosts(character, trees || (typeof globalThis !== "undefined" ? globalThis.CharacterProfessionTrees : null));
+    const draft = character?.development?.draft || emptyDraft();
+    const snapshot = {
+      ...character,
+      development: {
+        earnedPoints: Number(character?.development?.earnedPoints ?? 0),
+        availablePoints: Number(character?.development?.availablePoints ?? 0),
+        draft: Object.fromEntries(DRAFT_GROUPS.map(group => [group, { ...(draft[group] || {}) }])),
+      },
+    };
+    const cost = draftCosts(snapshot, trees || (typeof globalThis !== "undefined" ? globalThis.CharacterProfessionTrees : null));
     if (cost === null) throw new Error("Черновик прокачки повреждён.");
-    const points = progression(character);
+    const points = snapshot.development;
     return {
       earnedPoints: points.earnedPoints,
       availablePoints: points.availablePoints,
       reservedPoints: cost,
       spentPoints: points.earnedPoints - points.availablePoints - cost,
-      hasDraft: hasPendingRanks(character),
+      hasDraft: hasPendingRanks(snapshot),
     };
   }
 

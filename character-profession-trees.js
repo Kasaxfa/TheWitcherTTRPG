@@ -201,7 +201,6 @@
   }
 
   function getNodeState(character, professionId, branchId, index) {
-    ensureProgress(character, professionId);
     const ranks = character?.professionTrees?.[professionId]?.branches?.[branchId] || [0, 0, 0];
     const unlocked = index === 0 || ranks[index - 1] >= 5;
     return { rank: ranks[index] ?? 0, unlocked, nextUnlockAt: index > 0 ? 5 : null };
