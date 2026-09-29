@@ -70,7 +70,7 @@ test("version 2 characters gain separate modifiers without losing ratings or sou
   const result = CharacterStore.load(storage);
   const migrated = result.store.characters[0];
   assert.equal(result.migratedSchemaVersion, true);
-  assert.equal(result.store.schemaVersion, 8);
+  assert.equal(result.store.schemaVersion, 9);
   assert.equal(migrated.attributes.BODY, 6);
   assert.deepEqual(migrated.attributeModifiers.BODY, { permanent: 0, temporary: 0 });
   assert.equal(migrated.skills[0].rank, 5);
@@ -93,8 +93,8 @@ test("version 3 characters migrate profession identity and choice storage withou
 
   const result = CharacterStore.load(storage);
   const migrated = result.store.characters[0];
-  assert.equal(result.store.schemaVersion, 8);
-  assert.equal(migrated.schemaVersion, 8);
+  assert.equal(result.store.schemaVersion, 9);
+  assert.equal(migrated.schemaVersion, 9);
   assert.equal(migrated.personal.profession, "Бард");
   assert.equal(migrated.personal.professionId, "");
   assert.deepEqual(migrated.professionSkillChoices, {});
@@ -117,7 +117,7 @@ test("version 4 migration adds creation, generated life path, profession-tree st
   delete character.development;
   delete character.lifePath.generated;
   const migrated = CharacterStore.migrateStore(original).characters[0];
-  assert.equal(migrated.schemaVersion, 8);
+  assert.equal(migrated.schemaVersion, 9);
   assert.equal(migrated.personal.race, "Человек");
   assert.equal(migrated.attributes.INT, 8);
   assert.equal(migrated.skills[0].id, "stable-skill");
@@ -137,8 +137,8 @@ test("version 5 migration adds an empty improvement-point ledger and preserves t
   character.skills.push({ id: "stable-skill", name: "Дедукция", attribute: "INT", rank: 4 });
   delete character.development;
   const migrated = CharacterStore.migrateStore(original);
-  assert.equal(migrated.schemaVersion, 8);
-  assert.equal(migrated.characters[0].schemaVersion, 8);
+  assert.equal(migrated.schemaVersion, 9);
+  assert.equal(migrated.characters[0].schemaVersion, 9);
   assert.equal(migrated.characters[0].personal.name, "Цири");
   assert.equal(migrated.characters[0].attributes.INT, 8);
   assert.equal(migrated.characters[0].skills[0].id, "stable-skill");
@@ -152,8 +152,8 @@ test("version 6 migration adds a draft ledger and preserves available improvemen
   character.schemaVersion = 6;
   character.development = { earnedPoints: 25, availablePoints: 9 };
   const migrated = CharacterStore.migrateStore(original);
-  assert.equal(migrated.schemaVersion, 8);
-  assert.equal(migrated.characters[0].schemaVersion, 8);
+  assert.equal(migrated.schemaVersion, 9);
+  assert.equal(migrated.characters[0].schemaVersion, 9);
   assert.deepEqual(migrated.characters[0].development, { earnedPoints: 25, availablePoints: 9, draft: { attributes: {}, skills: {}, professionAbilities: {} } });
 });
 
@@ -175,7 +175,7 @@ test("version 7 migration adds combat, wound, and magic sections without replaci
 
   const migrated = CharacterStore.migrateStore(original);
   const restored = migrated.characters[0];
-  assert.equal(migrated.schemaVersion, 8);
+  assert.equal(migrated.schemaVersion, 9);
   assert.equal(restored.characterId, character.characterId);
   assert.equal(restored.personal.name, "Трисс");
   assert.equal(restored.state.currentHp, 22);
@@ -189,6 +189,27 @@ test("version 7 migration adds combat, wound, and magic sections without replaci
   assert.equal(restored.equipment.items[0].armorEv, null);
   assert.deepEqual(restored.equipment.combat.weapons, []);
   assert.equal(restored.equipment.combat.shield.inventoryEntryId, null);
+});
+
+test("version 8 migration preserves ambiguous language ratings and discards manual carrying capacity", () => {
+  const store = CharacterStore.createStore("Версия 8");
+  store.schemaVersion = 8;
+  const character = store.characters[0];
+  character.schemaVersion = 8;
+  character.equipment.capacityKg = 75;
+  character.skills.push({ id: "old-language", catalogId: "language", name: "Язык", attribute: "INT", rank: 4, permanentModifier: 1, temporaryModifier: 0, source: "profession" });
+
+  const migrated = CharacterStore.migrateStore(store);
+  const restored = migrated.characters[0];
+  assert.equal(migrated.schemaVersion, 9);
+  assert.deepEqual(restored.professionLanguageChoices, {});
+  assert.equal(Object.hasOwn(restored.equipment, "capacityKg"), false);
+  const language = restored.skills.find(skill => skill.id === "old-language");
+  assert.equal(language.catalogId, null);
+  assert.equal(language.legacyLanguage, true);
+  assert.equal(language.rank, 4);
+  assert.equal(language.permanentModifier, 1);
+  assert.equal(language.source, "other");
 });
 
 test("pending advancement survives normalization and rejects missing skill links", () => {
@@ -236,7 +257,6 @@ test("legacy inventory migrates to the first character and remains available as 
   const storage = new MemoryStorage();
   const legacy = {
     version: 1,
-    capacityKg: 75,
     items: [inventoryItem("entry-1", "Стальной меч", 1, 1.4, "item-sword")],
   };
   const legacyRaw = JSON.stringify(legacy);
@@ -246,7 +266,7 @@ test("legacy inventory migrates to the first character and remains available as 
   const first = result.store.characters[0];
   assert.equal(result.migratedLegacyInventory, true);
   assert.equal(first.personal.name, "Персонаж 1");
-  assert.equal(first.equipment.capacityKg, 75);
+  assert.equal(Object.hasOwn(first.equipment, "capacityKg"), false);
   assert.deepEqual(first.equipment.items[0], {
     ...legacy.items[0], conditionNotes: "", armorEv: null, customCategory: "",
   });
@@ -300,7 +320,7 @@ test("characters keep independent sheets and inventories after save and reload",
   assert.equal(restoredFirst.abilities[0].name, "Знак Квен");
   assert.equal(restoredFirst.equipment.items[0].name, "Медальон");
   assert.equal(restoredSecond.equipment.items.length, 0);
-  assert.equal(restoredSecond.equipment.capacityKg, 10);
+  assert.equal(Object.hasOwn(restoredSecond.equipment, "capacityKg"), false);
 });
 
 test("copying a character preserves its data and assigns independent persistent IDs", () => {
@@ -421,13 +441,12 @@ test("legacy inventory backup imports as an additional character", () => {
   const payload = {
     format: "witcher-workshop-inventory",
     version: 1,
-    capacityKg: null,
     items: [inventoryItem("entry-1", "Амулет", 2, 0.1)],
   };
   const result = CharacterStore.parseImport(payload);
   assert.equal(result.kind, "legacy-inventory");
   assert.equal(result.store.characters[0].equipment.items[0].quantity, 2);
-  assert.equal(result.store.characters[0].equipment.capacityKg, null);
+  assert.equal(Object.hasOwn(result.store.characters[0].equipment, "capacityKg"), false);
 });
 
 test("invalid stored JSON is not overwritten", () => {

@@ -65,6 +65,10 @@
     return total;
   }
 
+  function effectiveSkillRank(skill) {
+    return Number(skill?.rank ?? 0) + Number(skill?.nativeBonus ?? 0);
+  }
+
   function attributeDraftCost(character, code) {
     const count = draftCount(character, "attributes", code);
     const base = character.attributes?.[code];
@@ -127,7 +131,7 @@
       const skill = character.skills?.find(entry => entry.id === skillId);
       if (!skill || !Number.isInteger(count)) return null;
       const definition = skill.catalogId && skillCatalog?.SKILLS?.find(entry => entry.id === skill.catalogId);
-      const cost = rankCostFrom(Number(skill.rank ?? 0), count, Boolean(definition?.doubleCost));
+      const cost = rankCostFrom(effectiveSkillRank(skill), count, Boolean(definition?.doubleCost));
       if (cost === null) return null;
       total += cost;
     }
@@ -185,7 +189,7 @@
   function stageSkillUpgrade(character, skillId, definition = {}) {
     const skill = character?.skills?.find(entry => entry.id === skillId);
     if (!skill) return { ok: false, message: "Навык не найден." };
-    const baseRank = Number(skill.rank ?? 0);
+    const baseRank = effectiveSkillRank(skill);
     const currentRank = baseRank + draftCount(character, "skills", skillId);
     return reserve(character, "skills", skillId, currentRank, skillUpgradeCost(currentRank, Boolean(definition.doubleCost)));
   }
@@ -193,7 +197,7 @@
   function undoSkillUpgrade(character, skillId, definition = {}) {
     const skill = character?.skills?.find(entry => entry.id === skillId);
     if (!skill) return { ok: false, message: "Навык не найден." };
-    return releaseLast(character, "skills", skillId, Number(skill.rank ?? 0), Boolean(definition.doubleCost));
+    return releaseLast(character, "skills", skillId, effectiveSkillRank(skill), Boolean(definition.doubleCost));
   }
 
   function stageAttributeUpgrade(character, code) {
@@ -274,7 +278,7 @@
     }
     for (const [skillId, count] of Object.entries(draft.skills)) {
       const skill = character.skills?.find(entry => entry.id === skillId);
-      if (!skill || Number(skill.rank ?? 0) + count > MAX_RANK) return { ok: false, message: "Ранг навыка изменился. Пересоберите черновик." };
+      if (!skill || effectiveSkillRank(skill) + count > MAX_RANK) return { ok: false, message: "Ранг навыка изменился. Пересоберите черновик." };
     }
     for (const [key, count] of Object.entries(draft.professionAbilities)) {
       const parsed = parseTreeKey(key);

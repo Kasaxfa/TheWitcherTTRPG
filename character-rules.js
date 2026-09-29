@@ -98,7 +98,8 @@
     if (attribute === null || attribute === undefined) return null;
     return attribute + (finiteNumber(skill.rank) ?? 0)
       + modifierValue(skill, "permanentModifier")
-      + modifierValue(skill, "temporaryModifier");
+      + modifierValue(skill, "temporaryModifier")
+      + (finiteNumber(skill.nativeBonus) ?? 0);
   }
 
   function deriveCharacter(character, { carriedWeightKg = null, unknownWeightCount = 0, armorEv = 0, unknownArmorEvCount = 0 } = {}) {
@@ -157,7 +158,9 @@
       const baseTotal = attributeTotal === null ? null : attributeTotal
         + (finiteNumber(skill.rank) ?? 0)
         + modifierValue(skill, "permanentModifier")
-        + modifierValue(skill, "temporaryModifier");
+        + modifierValue(skill, "temporaryModifier")
+        + (finiteNumber(skill.nativeBonus) ?? 0);
+      const nativeBonus = finiteNumber(skill.nativeBonus) ?? 0;
       const magicSkill = ["spellcasting", "rituals", "hexing"].includes(skillCatalogId(skill));
       const armorPenaltyUnknown = magicSkill && knownArmorEv === null;
       const armorPenalty = magicSkill ? knownArmorEv : 0;
@@ -165,6 +168,7 @@
         id: skill.id,
         racialBonus: bonuses.racial,
         originBonus: bonuses.origin,
+        nativeBonus,
         armorPenalty,
         equipmentPenalty: skill.attribute && ["REF", "DEX", "SPD"].includes(skill.attribute)
           ? (loadPenalty ?? 0) + (["REF", "DEX"].includes(skill.attribute) ? (knownArmorEv ?? 0) : 0)

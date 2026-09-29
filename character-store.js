@@ -9,7 +9,7 @@
   "use strict";
 
   const FORMAT = "witcher-workshop-characters";
-  const SCHEMA_VERSION = 8;
+  const SCHEMA_VERSION = 9;
   const STORAGE_KEY = "witcher-workshop-characters-v1";
   const LEGACY_INVENTORY_KEY = "witcher-workshop-inventory-v1";
   const RULES_VERSION = "witcher-core-russian-errata-v5";
@@ -101,6 +101,7 @@
       attributeModifiers: createAttributeModifiers(),
       skills: [],
       professionSkillChoices: {},
+      professionLanguageChoices: {},
       professionTrees: {},
       creation: {},
       development: { earnedPoints: 0, availablePoints: 0, draft: { attributes: {}, skills: {}, professionAbilities: {} } },
@@ -116,7 +117,6 @@
       abilities: [],
       magic: createMagic(),
       equipment: {
-        capacityKg: null,
         items: [],
         combat: createCombatEquipment(),
       },
@@ -325,6 +325,7 @@
     }
 
     if (!Array.isArray(raw.skills ?? [])) throw new Error(`Персонаж ${index + 1}: навыки должны быть массивом.`);
+    const knownLanguages = new Set((initialSkillCatalog || globalThis.CharacterSkills)?.LANGUAGES?.map(language => language.id) || ["common", "elder-speech", "dwarven"]);
     const skills = (raw.skills ?? []).map((skill, skillIndex) => {
       if (!isObject(skill)) throw new Error(`Навык ${skillIndex + 1}: ожидался объект.`);
       const name = boundedString(String(skill.name || ""), `Навык ${skillIndex + 1}, название`, 200).trim();
@@ -335,9 +336,15 @@
       const rank = optionalNumber(skill.rank, `Навык «${name}», значение`, { min: 0, max: 1000 });
       const permanentModifier = optionalNumber(skill.permanentModifier ?? 0, `Навык «${name}», постоянное изменение`, { min: -1000, max: 1000 }) ?? 0;
       const temporaryModifier = optionalNumber(skill.temporaryModifier ?? 0, `Навык «${name}», временное изменение`, { min: -1000, max: 1000 }) ?? 0;
-      return { ...skill, id: boundedString(String(skill.id || makeId()), `Навык «${name}», ID`, 160, false), name, attribute, rank, permanentModifier, temporaryModifier };
+      if (skill.languageId !== undefined && skill.languageId !== null && !knownLanguages.has(skill.languageId)) {
+        throw new Error(`Навык «${name}»: неизвестный ID языка.`);
+      }
+      const nativeBonus = optionalNumber(skill.nativeBonus ?? 0, `Навык «${name}», бонус родного языка`, { min: 0, max: 8 }) ?? 0;
+      if (![0, 8].includes(nativeBonus) || (nativeBonus > 0 && !skill.languageId)) throw new Error(`Навык «${name}»: неверный бонус родного языка.`);
+      return { ...skill, id: boundedString(String(skill.id || makeId()), `Навык «${name}», ID`, 160, false), name, attribute, rank, permanentModifier, temporaryModifier, nativeBonus };
     });
     ensureUnique(skills, item => item.id, "ID навыка");
+    ensureUnique(skills.filter(skill => skill.languageId), item => item.languageId, "ID языка");
 
     const professionSkillChoicesRaw = raw.professionSkillChoices ?? {};
     if (!isObject(professionSkillChoicesRaw)) throw new Error(`Профессиональные навыки персонажа ${index + 1} должны быть объектом.`);
@@ -348,6 +355,20 @@
       professionSkillChoices[professionId] = choices.map((choice, choiceIndex) =>
         boundedString(choice, `Выбор навыка профессии «${professionId}», запись ${choiceIndex + 1}`, 120, false));
       ensureUnique(professionSkillChoices[professionId], value => value, `ID выбранного навыка профессии «${professionId}»`);
+    }
+
+    const professionLanguageChoicesRaw = raw.professionLanguageChoices ?? {};
+    if (!isObject(professionLanguageChoicesRaw)) throw new Error(`Языки профессиональных навыков персонажа ${index + 1} должны быть объектом.`);
+    const professionLanguageChoices = {};
+    for (const [professionId, choices] of Object.entries(professionLanguageChoicesRaw)) {
+      boundedString(professionId, `Профессия в выборе языков персонажа ${index + 1}`, 120, false);
+      if (!Array.isArray(choices)) throw new Error(`Выбор языков профессии «${professionId}» должен быть списком.`);
+      professionLanguageChoices[professionId] = choices.map((choice, choiceIndex) => {
+        const languageId = boundedString(choice, `Выбор языка профессии «${professionId}», запись ${choiceIndex + 1}`, 120, false);
+        if (!knownLanguages.has(languageId)) throw new Error(`Выбран неизвестный язык «${languageId}» для профессии «${professionId}».`);
+        return languageId;
+      });
+      ensureUnique(professionLanguageChoices[professionId], value => value, `ID выбранного языка профессии «${professionId}»`);
     }
 
     const professionTreesRaw = raw.professionTrees ?? {};
@@ -394,7 +415,7 @@
           if (!ATTRIBUTE_SET.has(key) || attributes[key] === null || Number(attributes[key]) + count > 10) throw new Error(`Черновик содержит недопустимое улучшение характеристики «${key}».`);
         } else if (group === "skills") {
           const skill = skills.find(entry => entry.id === key);
-          if (!skill || Number(skill.rank ?? 0) + count > 10) throw new Error(`Черновик содержит недопустимое улучшение навыка «${key}».`);
+          if (!skill || Number(skill.rank ?? 0) + Number(skill.nativeBonus ?? 0) + count > 10) throw new Error(`Черновик содержит недопустимое улучшение навыка «${key}».`);
         } else {
           const match = /^([a-z0-9-]+):([ABC]):([012])$/i.exec(key);
           const ranks = match && professionTrees[match[1]]?.branches?.[match[2]];
@@ -430,7 +451,7 @@
     for (const [skillId, count] of Object.entries(draft.skills)) {
       const skill = skills.find(entry => entry.id === skillId);
       const definition = skill?.catalogId && skillCatalog?.SKILLS?.find(entry => entry.id === skill.catalogId);
-      const cost = rankCost(Number(skill?.rank ?? 0), count, definition?.doubleCost ? 2 : 1);
+      const cost = rankCost(Number(skill?.rank ?? 0) + Number(skill?.nativeBonus ?? 0), count, definition?.doubleCost ? 2 : 1);
       if (cost === null) throw new Error(`Черновик навыка «${skillId}» содержит неверные ранги.`);
       reservedPoints += cost;
     }
@@ -476,11 +497,11 @@
     });
     ensureUnique(abilities, item => item.id, "ID способности");
 
-    const capacityKg = optionalNumber(equipmentRaw.capacityKg, "Грузоподъёмность", { min: 0 });
     if (!Array.isArray(equipmentRaw.items ?? [])) throw new Error(`Персонаж ${index + 1}: снаряжение должно быть массивом.`);
     const equipmentItems = (equipmentRaw.items ?? []).map(normalizeEquipmentEntry);
     const combatRaw = equipmentRaw.combat ?? createCombatEquipment();
-    const equipment = { ...equipmentRaw, capacityKg, items: equipmentItems, combat: normalizeCombatEquipment(combatRaw, equipmentItems) };
+    const { capacityKg: _discardedCapacity, ...equipmentFields } = equipmentRaw;
+    const equipment = { ...equipmentFields, items: equipmentItems, combat: normalizeCombatEquipment(combatRaw, equipmentItems) };
     ensureUnique(equipment.items, item => item.id, "ID предмета инвентаря");
     const magic = normalizeMagic(magicRaw);
 
@@ -503,6 +524,7 @@
       attributeModifiers,
       skills,
       professionSkillChoices,
+      professionLanguageChoices,
       professionTrees,
       creation,
       development,
@@ -644,6 +666,19 @@
         },
       })),
     }),
+    8: raw => ({
+      ...raw,
+      schemaVersion: 9,
+      characters: raw.characters.map(character => ({
+        ...character,
+        schemaVersion: 9,
+        professionLanguageChoices: character.professionLanguageChoices ?? {},
+        skills: (character.skills ?? []).map(skill => skill.catalogId === "language" && !skill.languageId
+          ? { ...skill, catalogId: null, legacyLanguage: true, name: skill.name || "Язык (старый общий навык)", source: "other", professionId: null, professionSkillId: null }
+          : skill),
+        equipment: Object.fromEntries(Object.entries(character.equipment ?? {}).filter(([key]) => key !== "capacityKg")),
+      })),
+    }),
   });
 
   function migrateStore(raw) {
@@ -676,7 +711,6 @@
     if (!isObject(raw) || Number(raw.version) !== 1 || !Array.isArray(raw.items)) {
       throw new Error("Старый инвентарь не соответствует формату версии 1.");
     }
-    const capacityKg = optionalNumber(raw.capacityKg, "Грузоподъёмность", { min: 0 });
     const items = raw.items.map((item, index) => {
       let result;
       try { result = cleanEntry(item, index); }
@@ -685,7 +719,7 @@
       return normalizeEquipmentEntry(result, index);
     });
     ensureUnique(items, item => item.id, "ID предмета инвентаря");
-    return { capacityKg, items };
+    return { items };
   }
 
   function load(storage, { cleanLegacyEntry = normalizeEquipmentEntry } = {}) {

@@ -48,6 +48,18 @@ test("skill totals combine leading attribute, rank, and separate modifiers", () 
   assert.equal(Rules.calculateSkill({ attribute: "CRA", rank: 2 }, derived.attributes), null);
 });
 
+test("native-language bonus is added without altering the stored language rank", () => {
+  const character = characterWith(6, 5, 8);
+  character.attributes.INT = 5;
+  const skill = { id: "language-common", catalogId: "language", languageId: "common", name: "Язык: Всеобщий", attribute: "INT", rank: 0, nativeBonus: 8 };
+  character.skills.push(skill);
+  const derived = Rules.deriveCharacter(character).skills.find(entry => entry.id === skill.id);
+  assert.equal(skill.rank, 0);
+  assert.equal(derived.nativeBonus, 8);
+  assert.equal(derived.total, 13);
+  assert.equal(Rules.calculateSkill(skill, Rules.calculateAttributes(character)), 13);
+});
+
 test("load penalties apply per full 5 kg and stop at the lift limit", () => {
   const character = characterWith(6, 5, 8);
   character.attributes.REF = 7;
