@@ -12,7 +12,7 @@
     toggle.title = action;
     toggle.querySelector(".theme-icon").textContent = dark ? "☀" : "☾";
     toggle.querySelector(".theme-label").textContent = dark ? "Светлая тема" : "Тёмная тема";
-    if (themeColor) themeColor.content = dark ? "#141c1e" : "#f5f7f6";
+    if (themeColor) themeColor.content = dark ? "#1b1e2b" : "#f5f7f6";
   }
 
   toggle.addEventListener("click", () => {
